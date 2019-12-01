@@ -1,0 +1,24 @@
+CHIP DMux3 {
+    IN in[3], sel;
+    OUT a[3], b[3];
+
+    PARTS:
+    //dmux1
+    Nand(a=sel, b=sel, out=aNand1);
+    Nand(a=in[0], b=aNand1, out=bNand1);
+    Nand(a=sel, b=in[0], out=cNand1);
+    Nand(a=bNand1, b=bNand1, out=a[0]);
+    Nand(a=cNand1, b=cNand1, out=b[0]);
+    //dmux2
+    Nand(a=sel, b=sel, out=aNand2);
+    Nand(a=in[1], b=aNand2, out=bNand2);
+    Nand(a=sel, b=in[1], out=cNand2);
+    Nand(a=bNand2, b=bNand2, out=a[1]);
+    Nand(a=cNand2, b=cNand2, out=b[1]);
+    //dmux3
+    Nand(a=sel, b=sel, out=aNand3);
+    Nand(a=in[2], b=aNand3, out=bNand3);
+    Nand(a=sel, b=in[2], out=cNand3);
+    Nand(a=bNand3, b=bNand3, out=a[2]);
+    Nand(a=cNand3, b=cNand3, out=b[2]);
+}
