@@ -1,15 +1,16 @@
 """"
 Python bindings & test framework for Nand2Tetris HACK Assembly language
 """
+
 import assembler
+import tester
 
 
-def run(input_file, debug=False):
-    global hw
-    # TODO: (week 6) all files parsed
-    # TODO: (week 7-8) asm/tst parsed
-    # TODO: (week 7-8) integrate tester (cmp/tst) >> generate out & compare cmp
+def run(input_file, test=None, debug=False):
+    # TODO: (week 6) asm/cmp parsed (all done)
+    # TODO: (week 7-8) asm/tst/cmp parsed >> execute test & write out
     # TODO: (week 7-8) integrate VM translator
+    # TODO: VM debug features (mapping for segments, stack etc)
     # TODO: (future) write a HDL module for interpreter?
 
     # initialize hardware
@@ -237,8 +238,14 @@ if __name__ == '__main__':
         "../08/ProgramFlow/BasicLoop/BasicLoop.asm",
         "../08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
     ]
+
     for _input_file in file_list:
-        assembler.assemble(_input_file, debug=True)
-        run(_input_file, debug=True)
-        assembler.assemble(_input_file, debug=False)
-        run(_input_file, debug=False)
+        if _input_file.endswith(".asm"):
+            assembler.assemble(_input_file, debug=False)
+
+            if "../06/" not in _input_file:  # test scripts only used from week 7+
+                _tst_filepath = _input_file.replace(".asm", ".tst")
+                _cmp_filepath = _input_file.replace(".asm", ".cmp")
+                _tst_params = tester.load_tst(_tst_filepath, debug=False)
+                _tst_params["compare"] = tester.load_cmp(_cmp_filepath, debug=False)
+                run(_input_file, test=_tst_params, debug=True)

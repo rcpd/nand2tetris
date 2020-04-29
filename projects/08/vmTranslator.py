@@ -253,6 +253,7 @@ def generate_guid():
     global test_file
     global guids
 
+    # TODO: make this deterministic to avoid guids showing up as diffs on each run
     # generate a guid
     guid = str(random.random())[2:6]
     guids.append(guid)
