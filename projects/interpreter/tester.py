@@ -9,9 +9,15 @@ import re
 
 def load_tst(tst_filepath, debug=False):
     test_params = {
-        "inspections": [],
+        "input_files": [],
+        "out_file": "",
+        "cmp_file": "",
+        "results": [],
+        "compare": {},
         "RAM": [0] * 32768,
+        "MAX": 1000,
     }
+
     with open(tst_filepath, "r") as test_file:
         test_content = test_file.readlines()
     if debug:
@@ -51,9 +57,9 @@ def load_tst(tst_filepath, debug=False):
             addresses = re.sub(r"\%\D.\..\..", "", raw_cmd).split(" ")  # regex = "%D1.6.1", numbers vary
 
             for address in addresses:
-                test_params["inspections"].append(int(address.replace("RAM[", "")[:-1]))
+                test_params["results"].append(int(address.replace("RAM[", "")[:-1]))
             if debug:
-                print(test_params["inspections"])
+                print(test_params["results"])
         elif test_cmd.startswith("set "):
             if "RAM[" in test_cmd:
                 set_vals = test_cmd.replace("set RAM[", "").replace("]", "").replace(",", "").split(" ")
@@ -72,7 +78,7 @@ def load_tst(tst_filepath, debug=False):
                 set_var = set_var.replace("sp", "0").replace("local", "1").replace("argument", "2") \
                     .replace("this", "3").replace("that", "4")
             else:
-                raise RuntimeError("Unexpected set command: %s" % test_cmd)
+                raise RuntimeError("Tester: Unexpected set command: %s" % test_cmd)
 
             test_params["RAM"][int(set_var)] = int(set_element)
 
@@ -83,7 +89,7 @@ def load_tst(tst_filepath, debug=False):
             if debug:
                 print(test_params["MAX"])
         else:
-            raise NotImplementedError(test_cmd)
+            raise NotImplementedError("Tester: %s" % test_cmd)
 
     print("Tester: loaded test params %s" % tst_filepath)
     return test_params
@@ -122,9 +128,9 @@ def load_cmp(cmp_filepath, debug=False):
         print(cmp_dict)
 
     if not len(address_list) or not len(value_list):
-        raise RuntimeError("Address or Value parsing error (no values)")
+        raise RuntimeError("Tester: Address or Value parsing error (no values)")
     if len(address_list) != len(value_list):
-        raise RuntimeError("Address/Value mismatch in cmp file parsing")
+        raise RuntimeError("Tester: Address/Value mismatch in cmp file parsing")
 
     print("Tester: loaded test targets %s" % cmp_filepath)
     return cmp_dict
@@ -158,6 +164,7 @@ if __name__ == '__main__':
         "../08/ProgramFlow/FibonacciSeries/FibonacciSeriesVME.tst",
         "../08/ProgramFlow/BasicLoop/BasicLoopVME.tst",
     ]
+
     debug_runs = [True, False]
     for debug in debug_runs:
         for _tst_filepath in tst_filepaths:

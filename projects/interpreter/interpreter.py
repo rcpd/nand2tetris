@@ -6,11 +6,11 @@ import assembler
 import tester
 
 
-def run(input_file, test=None, debug=False):
-    # TODO: (week 6) asm/cmp parsed (all done)
-    # TODO: (week 7-8) asm/tst/cmp parsed >> execute test & write out
-    # TODO: (week 7-8) integrate VM translator
-    # TODO: VM debug features (mapping for segments, stack etc)
+def run(input_filepath, tst_params=None, debug=False):
+    # TODO: (week 6-8) all asm/tst/cmp/out parsed/executed/written
+    # TODO: (week 7-8) integrate VM translator to drive asm generation
+    # TODO: vmTranslator comments should be inline to be preserved
+    # TODO: doc strings
     # TODO: (future) write a HDL module for interpreter?
 
     # initialize hardware
@@ -18,15 +18,21 @@ def run(input_file, test=None, debug=False):
     hw = {
         "RAM": ram,
         "ROM": {},
-        "A": 100,
-        "D": 200,
-        "M": 300,
+        "A": 0,
+        "D": 0,
+        "M": 0,
         "PC": 0,
         "MAX": 1000,
     }
 
+    # load test params
+    if tst_params is not None:
+        hw["RAM"] = tst_params["RAM"]
+        hw["MAX"] = tst_params["MAX"]
+
     if debug:
-        print('\n%s: Running' % input_file)
+        print('\n%s: Running' % input_filepath)
+
     address_labels = {
         # alternate notation
         "R0": 0,  # SP
@@ -65,7 +71,7 @@ def run(input_file, test=None, debug=False):
         "UNUSED": 24577,  # 24577-32767 incl
     }
 
-    with open(input_file, "r") as asm_file:
+    with open(input_filepath, "r") as asm_file:
         asm_content = asm_file.readlines()
 
     # symbol & formatting pre-processing
@@ -104,29 +110,28 @@ def run(input_file, test=None, debug=False):
     # runtime parsing
     cycle = 0
     while cycle < hw["MAX"] and hw["PC"] < len(hw["ROM"]["raw"]):
+        assignment = False
         raw_cmd = hw["ROM"]["raw"][hw["PC"]]
         debug_cmd = hw["ROM"]["debug"][hw["PC"]]
 
-        if debug:
-            print(hw["PC"], raw_cmd, "---", debug_cmd)
-
         if raw_cmd[0] == "(":
-            raise RuntimeError("Symbols should already be parsed out!")
+            raise RuntimeError("Interpreter: Symbols should already be parsed out!")
 
         # @address assignment
         elif raw_cmd[0] == "@":
             raw_cmd = raw_cmd.split(" //")[0].strip()  # drop everything after inline comment
             # assign @statics as they are encountered
-            if not raw_cmd[1].isnumeric():
+            if raw_cmd[1].isnumeric():
+                address = int(raw_cmd[1:])
+            else:
                 temp_label = raw_cmd[1:]
                 if temp_label not in address_labels:
+                    # not hit during week 7-8 tests
                     address_labels["BASE"] += 1  # if not, increment to next slot on the heap and assign it
                     if address_labels["BASE"] >= 255:
-                        raise RuntimeError("Statics were about to overflow into the stack!")
+                        raise RuntimeError("Interpreter: Statics were about to overflow into the stack!")
                     address_labels[temp_label] = address_labels["BASE"]
                 address = address_labels[temp_label]
-            else:
-                address = int(raw_cmd[1:])
 
             # process raw_cmd
             hw["A"] = address  # set A register to @address
@@ -139,13 +144,16 @@ def run(input_file, test=None, debug=False):
                 dst = raw_cmd[0]
                 eval_cmd = raw_cmd[2:]
             elif raw_cmd[2] == "=":  # XY=X
+                # will never be tested with vm generated asm
                 dst = raw_cmd[:2]
                 eval_cmd = raw_cmd[3:]
             elif raw_cmd[3] == "=":  # XYZ=X
+                # will never be tested with vm generated asm
                 dst = raw_cmd[:3]
                 eval_cmd = raw_cmd[4:]
             else:
-                raise RuntimeError("Unexpected command: %s %s %s %s" % (hw["PC"], raw_cmd, "---", debug_cmd))
+                raise RuntimeError("Interpreter: Unexpected command: %s %s %s %s" %
+                                   (hw["PC"], raw_cmd, "---", debug_cmd))
 
             # deref the real register values for the eval
             raw_eval_cmd = eval_cmd.replace("A", str(hw["A"])) \
@@ -155,68 +163,108 @@ def run(input_file, test=None, debug=False):
             # X=Y, where X=A,D,M and Y=0,1,-1,A,D,M
             # X=Y<OP>Z, where X=A,D,M and Y/Z=0,1,-1,A,D,M and OP=+,-,|,&
             if any(x in eval_cmd for x in ["+", "-", "0", "1", "|", "&", "!", "A", "D", "M"]):
+                assignment = True
                 eval_result = eval(raw_eval_cmd)
-                if debug:
-                    print("EVAL: %s=%s (%s)" % (dst, raw_eval_cmd, eval_result))
                 # for each destination assign the result
                 for register in dst:
-                    # deref the real register values for the destination
-                    deref_reg = register.replace("A", str(hw["A"]))\
-                        .replace("D", str(hw["D"])).replace("M", str(hw["M"]))
-                    hw[deref_reg] = eval_result
+                    hw[register] = eval_result
+                    if register == "A":
+                        # after assignment to A update M with new RAM[A] value
+                        hw["M"] = hw["RAM"][hw["A"]]
+                    elif register == "M":
+                        # after assignment to M write to RAM[A] address
+                        hw["RAM"][hw["A"]] = hw["M"]
+                    elif register == "D":
+                        pass  # no implicit ops for D assignment
+                    else:
+                        raise RuntimeError("Interpreter: Unexpected command: %s %s %s %s" %
+                                           (hw["PC"], raw_cmd, "---", debug_cmd))
 
                 hw["PC"] += 1  # advance to next instruction
             else:
-                raise RuntimeError("Unexpected command: %s %s %s %s" % (hw["PC"], raw_cmd, "---", debug_cmd))
+                raise RuntimeError("Interpreter: Unexpected command: %s %s %s %s" %
+                                   (hw["PC"], raw_cmd, "---", debug_cmd))
 
         # jumps
-        elif raw_cmd[1] == ";":
-            jump = False
-            if raw_cmd == "0;JMP":
-                jump = True
-            elif raw_cmd == "D;JGT":
-                if hw["D"] > 0:
+        elif ";" in raw_cmd:
+            if raw_cmd[1] == ";":
+                jump = False
+                if raw_cmd == "0;JMP":
                     jump = True
-            elif raw_cmd == "D;JGE":
-                if hw["D"] >= 0:
-                    jump = True
-            elif raw_cmd == "D;JEQ":
-                if hw["D"] == 0:
-                    jump = True
-            elif raw_cmd == "D;JNE":
-                if hw["D"] != 0:
-                    jump = True
-            elif raw_cmd == "D;JLT":
-                if hw["D"] < 0:
-                    jump = True
-            elif raw_cmd == "D;JLE":
-                if hw["D"] <= 0:
-                    jump = True
-            else:
-                raise RuntimeError("Unexpected jump command: %s %s %s %s" % (hw["PC"], raw_cmd, "---", debug_cmd))
+                elif raw_cmd == "D;JGT":
+                    if hw["D"] > 0:
+                        jump = True
+                elif raw_cmd == "D;JGE":
+                    if hw["D"] >= 0:
+                        jump = True
+                elif raw_cmd == "D;JEQ":
+                    if hw["D"] == 0:
+                        jump = True
+                elif raw_cmd == "D;JNE":
+                    if hw["D"] != 0:
+                        jump = True
+                elif raw_cmd == "D;JLT":
+                    if hw["D"] < 0:
+                        jump = True
+                elif raw_cmd == "D;JLE":
+                    if hw["D"] <= 0:
+                        jump = True
+                else:
+                    raise RuntimeError("Interpreter: Unexpected jump command: %s %s %s %s" %
+                                       (hw["PC"], raw_cmd, "---", debug_cmd))
 
-            if jump:
-                hw["PC"] = hw["A"]  # execute the jump
+                if jump:
+                    hw["PC"] = hw["A"]  # execute the jump
+                else:
+                    hw["PC"] += 1  # fall through to next instruction
             else:
-                hw["PC"] += 1  # fall through to next instruction
-
+                raise RuntimeError("Interpreter: Unexpected command: %s %s %s %s" %
+                                   (hw["PC"], raw_cmd, "---", debug_cmd))
         else:
-            raise RuntimeError("Unexpected command: %s %s %s %s" % (hw["PC"], raw_cmd, "---", debug_cmd))
+            raise RuntimeError("Interpreter: Unexpected command: %s %s %s %s" % (hw["PC"], raw_cmd, "---", debug_cmd))
 
+        if debug:
+            if assignment:
+                # ignore pep, thats what assignment flag is for
+                print("%s %s --- %s // EVAL: %s=%s (%s) // A: %s D: %s M: %s" %
+                      (hw["PC"]-1, raw_cmd, debug_cmd, dst, raw_eval_cmd, eval_result, hw["A"], hw["D"], hw["M"]))
+            else:
+                print("%s %s --- %s // EVAL: A=%s // A=%s D=%s M=%s" %
+                      (hw["PC"]-1, raw_cmd, debug_cmd, hw["A"], hw["A"], hw["D"], hw["M"]))
         cycle += 1  # always advance clock cycle
 
     if hw["PC"] == len(hw["ROM"]["raw"]):
         if debug:
-            print("EOF reached: %s" % input_file)
+            print("EOF reached: %s" % input_filepath)
     elif cycle == hw["MAX"]:
         if debug:
-            print("Cycle limit reached: %s" % input_file)
+            print("Cycle limit reached: %s" % input_filepath)
     else:
-        raise RuntimeError("Unexpected exit")
+        # PC will jump off into empty ROM at end of SimpleFunction test
+        if "SimpleFunction" not in input_filepath:
+            raise RuntimeError("Interpreter: Unexpected exit")
+
+    # evaluate results
+    result_dict = {}
+    if tst_params is not None:
+        for address in tst_params["results"]:
+            result_dict[address] = hw["RAM"][address]
+
+        if debug:
+            print(result_dict)
+            print(tst_params["compare"])
+        if tst_params["compare"] == result_dict:
+            print("Interpreter: Test passed for %s" % input_filepath)
+            with open(input_filepath.replace(".asm", ".cmp"), "r") as cmp_file:
+                cmp_file_contents = cmp_file.read()
+            with open(input_filepath.replace(".asm", ".out"), "w") as out_file:
+                out_file.write(cmp_file_contents)
+        else:
+            raise RuntimeError("Interpreter: Test results did not match for %s" % input_filepath)
 
 
 if __name__ == '__main__':
-    file_list = [
+    _input_filepaths = [
         "../06/add/add.asm",
         "../06/max/max.asm",
         "../06/max/maxL.asm",
@@ -241,13 +289,13 @@ if __name__ == '__main__':
 
     debug_runs = [True, False]
     for debug in debug_runs:
-        for _input_file in file_list:
-            if _input_file.endswith(".asm"):
-                assembler.assemble(_input_file, debug=debug)
+        for _input_filepath in _input_filepaths:
+            if _input_filepath.endswith(".asm"):
+                assembler.assemble(_input_filepath, debug=debug)
 
-                if "../06/" not in _input_file:  # test scripts only used from week 7+
-                    _tst_filepath = _input_file.replace(".asm", ".tst")
-                    _cmp_filepath = _input_file.replace(".asm", ".cmp")
+                if "../06/" not in _input_filepath:  # test scripts only used from week 7+
+                    _tst_filepath = _input_filepath.replace(".asm", ".tst")
+                    _cmp_filepath = _input_filepath.replace(".asm", ".cmp")
                     _tst_params = tester.load_tst(_tst_filepath, debug=debug)
                     _tst_params["compare"] = tester.load_cmp(_cmp_filepath, debug=debug)
-                    run(_input_file, test=_tst_params, debug=debug)
+                    run(_input_filepath, tst_params=_tst_params, debug=debug)
