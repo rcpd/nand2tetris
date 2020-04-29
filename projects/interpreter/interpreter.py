@@ -239,13 +239,15 @@ if __name__ == '__main__':
         "../08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
     ]
 
-    for _input_file in file_list:
-        if _input_file.endswith(".asm"):
-            assembler.assemble(_input_file, debug=False)
+    debug_runs = [True, False]
+    for debug in debug_runs:
+        for _input_file in file_list:
+            if _input_file.endswith(".asm"):
+                assembler.assemble(_input_file, debug=debug)
 
-            if "../06/" not in _input_file:  # test scripts only used from week 7+
-                _tst_filepath = _input_file.replace(".asm", ".tst")
-                _cmp_filepath = _input_file.replace(".asm", ".cmp")
-                _tst_params = tester.load_tst(_tst_filepath, debug=False)
-                _tst_params["compare"] = tester.load_cmp(_cmp_filepath, debug=False)
-                run(_input_file, test=_tst_params, debug=True)
+                if "../06/" not in _input_file:  # test scripts only used from week 7+
+                    _tst_filepath = _input_file.replace(".asm", ".tst")
+                    _cmp_filepath = _input_file.replace(".asm", ".cmp")
+                    _tst_params = tester.load_tst(_tst_filepath, debug=debug)
+                    _tst_params["compare"] = tester.load_cmp(_cmp_filepath, debug=debug)
+                    run(_input_file, test=_tst_params, debug=debug)
