@@ -16,8 +16,8 @@ M=D
 M=M+1
 
 // (-9) call Main.fibonacci 1   // computes the 4th fibonacci element
-(sys.Main.fibonacci.2242)
-@sys.Main.fibonacci.2242 // create the RIP pointer and push it to the stack
+(sys.Main.fibonacci.1)
+@sys.Main.fibonacci.1 // create the RIP pointer and push it to the stack
 D=A
 @SP
 A=M
@@ -122,18 +122,18 @@ D=M // d = [val2]
 M=M-1 // *esp-- (*val1)
 A=M // [esp] ([val1])
 D=M-D // d = [val1] - [val2]
-@JLT_TRUE_0509
+@JLT_TRUE_2
 D;JLT
-(JLT_FALSE_0509)
+(JLT_FALSE_2)
 @0
 D=A // d = false
-@JLT_END_0509
+@JLT_END_2
 0;JMP
-(JLT_TRUE_0509)
+(JLT_TRUE_2)
 @0
 D=A
 D=D-1 // d = -1 (true)
-(JLT_END_0509)
+(JLT_END_2)
 @SP // *esp (*val1)
 A=M // [esp] ([val1])
 M=D // [esp] = eq result
@@ -277,8 +277,8 @@ M=M-D
 M=M+1
 
 // (-51) call Main.fibonacci 1  // computes fib(n-2)
-(main.Main.fibonacci.3364)
-@main.Main.fibonacci.3364 // create the RIP pointer and push it to the stack
+(main.Main.fibonacci.3)
+@main.Main.fibonacci.3 // create the RIP pointer and push it to the stack
 D=A
 @SP
 A=M
@@ -377,8 +377,8 @@ M=M-D
 M=M+1
 
 // (-60) call Main.fibonacci 1  // computes fib(n-1)
-(main.Main.fibonacci.0253)
-@main.Main.fibonacci.0253 // create the RIP pointer and push it to the stack
+(main.Main.fibonacci.4)
+@main.Main.fibonacci.4 // create the RIP pointer and push it to the stack
 D=A
 @SP
 A=M
