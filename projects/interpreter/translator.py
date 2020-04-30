@@ -773,22 +773,10 @@ def parse_static(vm_filepath, local_dict, static_dict, debug=False):
     return local_dict, static_dict
 
 
-def translate(debug=False):
+def translate(vm_filelist=(), vm_dirlist=(), debug=False):
     """
-    parse all the vm files/dirs
+    translate vm files/dirs into asm
     """
-    vm_filelist = [
-        r'..\08\ProgramFlow\BasicLoop\BasicLoop.vm',
-        r'..\08\ProgramFlow\FibonacciSeries\FibonacciSeries.vm',
-        r'..\08\FunctionCalls\SimpleFunction\SimpleFunction.vm',
-    ]
-
-    vm_dirlist = [
-        r'..\08\FunctionCalls\FibonacciElement',
-        r'..\08\FunctionCalls\NestedCall',
-        r'..\08\FunctionCalls\StaticsTest'
-    ]
-
     # parse the single file VM programs
     for vm_filepath in vm_filelist:
         guids = []
@@ -867,6 +855,25 @@ def translate(debug=False):
 
 
 if __name__ == "__main__":
+    # TODO: test week 8 VM programs
+    _vm_filepaths = [
+        # r'..\07\MemoryAccess\BasicTest\BasicTest.vm',
+        # r'..\07\MemoryAccess\PointerTest\PointerTest.vm',
+        # r'..\07\MemoryAccess\StaticTest\StaticTest.vm',
+        # r'..\07\StackArithmetic\SimpleAdd\SimpleAdd.vm',
+        # r'..\07\StackArithmetic\StackTest\StackTest.vm',
+
+        r'..\08\ProgramFlow\BasicLoop\BasicLoop.vm',
+        r'..\08\ProgramFlow\FibonacciSeries\FibonacciSeries.vm',
+        r'..\08\FunctionCalls\SimpleFunction\SimpleFunction.vm',
+    ]
+
+    _vm_dirpaths = [
+        r'..\08\FunctionCalls\FibonacciElement',
+        r'..\08\FunctionCalls\NestedCall',
+        r'..\08\FunctionCalls\StaticsTest'
+    ]
+
     debug_runs = [True, False]
     for _debug in debug_runs:
-        translate(debug=_debug)
+        translate(_vm_filepaths, _vm_dirpaths, debug=_debug)

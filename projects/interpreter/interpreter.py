@@ -4,9 +4,10 @@ Python bindings & test framework for Nand2Tetris HACK Assembly language
 
 import assembler
 import tester
+import translator
 
 
-def run(input_filepath, tst_params=None, debug=False):
+def run(asm_filepath, tst_params=None, debug=False):
     # TODO: (week 6-8) all asm/tst/cmp/out parsed/executed/written
     # TODO: (week 7-8) integrate VM translator to drive asm generation
     # TODO: vmTranslator comments should be inline to be preserved
@@ -31,7 +32,7 @@ def run(input_filepath, tst_params=None, debug=False):
         hw["MAX"] = tst_params["MAX"]
 
     if debug:
-        print('\n%s: Running' % input_filepath)
+        print('\n%s: Running' % asm_filepath)
 
     address_labels = {
         # alternate notation
@@ -71,7 +72,7 @@ def run(input_filepath, tst_params=None, debug=False):
         "UNUSED": 24577,  # 24577-32767 incl
     }
 
-    with open(input_filepath, "r") as asm_file:
+    with open(asm_filepath, "r") as asm_file:
         asm_content = asm_file.readlines()
 
     # symbol & formatting pre-processing
@@ -235,13 +236,13 @@ def run(input_filepath, tst_params=None, debug=False):
 
     if hw["PC"] == len(hw["ROM"]["raw"]):
         if debug:
-            print("EOF reached: %s" % input_filepath)
+            print("EOF reached: %s" % asm_filepath)
     elif cycle == hw["MAX"]:
         if debug:
-            print("Cycle limit reached: %s" % input_filepath)
+            print("Cycle limit reached: %s" % asm_filepath)
     else:
         # PC will jump off into empty ROM at end of SimpleFunction test
-        if "SimpleFunction" not in input_filepath:
+        if "SimpleFunction" not in asm_filepath:
             raise RuntimeError("Interpreter: Unexpected exit")
 
     # evaluate results
@@ -254,25 +255,36 @@ def run(input_filepath, tst_params=None, debug=False):
             print(result_dict)
             print(tst_params["compare"])
         if tst_params["compare"] == result_dict:
-            print("Interpreter: Test passed for %s" % input_filepath)
-            with open(input_filepath.replace(".asm", ".cmp"), "r") as cmp_file:
+            print("Interpreter: Test passed for %s" % asm_filepath)
+            with open(asm_filepath.replace(".asm", ".cmp"), "r") as cmp_file:
                 cmp_file_contents = cmp_file.read()
-            with open(input_filepath.replace(".asm", ".out"), "w") as out_file:
+            with open(asm_filepath.replace(".asm", ".out"), "w") as out_file:
                 out_file.write(cmp_file_contents)
         else:
-            raise RuntimeError("Interpreter: Test results did not match for %s" % input_filepath)
+            raise RuntimeError("Interpreter: Test results did not match for %s" % asm_filepath)
 
 
 if __name__ == '__main__':
-    _input_filepaths = [
-        "../06/add/add.asm",
-        "../06/max/max.asm",
-        "../06/max/maxL.asm",
-        "../06/pong/pong.asm",
-        "../06/pong/pongL.asm",
-        "../06/rect/rect.asm",
-        "../06/rect/rectL.asm",
+    # TODO: test week 8 VM programs
+    _vm_filepaths = [
+        # r'..\07\MemoryAccess\BasicTest\BasicTest.vm',
+        # r'..\07\MemoryAccess\PointerTest\PointerTest.vm',
+        # r'..\07\MemoryAccess\StaticTest\StaticTest.vm',
+        # r'..\07\StackArithmetic\SimpleAdd\SimpleAdd.vm',
+        # r'..\07\StackArithmetic\StackTest\StackTest.vm',
 
+        r'..\08\ProgramFlow\BasicLoop\BasicLoop.vm',
+        r'..\08\ProgramFlow\FibonacciSeries\FibonacciSeries.vm',
+        r'..\08\FunctionCalls\SimpleFunction\SimpleFunction.vm',
+    ]
+
+    _vm_dirpaths = [
+        r'..\08\FunctionCalls\FibonacciElement',
+        r'..\08\FunctionCalls\NestedCall',
+        r'..\08\FunctionCalls\StaticsTest'
+    ]
+
+    vm_asm_filepaths = [
         "../07/MemoryAccess/BasicTest/BasicTest.asm",
         "../07/MemoryAccess/PointerTest/PointerTest.asm",
         "../07/MemoryAccess/StaticTest/StaticTest.asm",
@@ -287,15 +299,35 @@ if __name__ == '__main__':
         "../08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
     ]
 
-    debug_runs = [True, False]
-    for debug in debug_runs:
-        for _input_filepath in _input_filepaths:
-            if _input_filepath.endswith(".asm"):
-                assembler.assemble(_input_filepath, debug=debug)
+    binary_asm_filepaths = [
+        "../06/add/add.asm",
+        "../06/max/max.asm",
+        "../06/max/maxL.asm",
+        "../06/pong/pong.asm",
+        "../06/pong/pongL.asm",
+        "../06/rect/rect.asm",
+        "../06/rect/rectL.asm",
+    ]
 
-                if "../06/" not in _input_filepath:  # test scripts only used from week 7+
-                    _tst_filepath = _input_filepath.replace(".asm", ".tst")
-                    _cmp_filepath = _input_filepath.replace(".asm", ".cmp")
-                    _tst_params = tester.load_tst(_tst_filepath, debug=debug)
-                    _tst_params["compare"] = tester.load_cmp(_cmp_filepath, debug=debug)
-                    run(_input_filepath, tst_params=_tst_params, debug=debug)
+    # debug_runs = [True, False]
+    debug_runs = [False]
+    for debug in debug_runs:
+        # transpile VM to ASM
+        translator.translate(_vm_filepaths, _vm_dirpaths, debug=debug)
+
+        # compile all ASM to HACK and binary match if available
+        _asm_filepaths = vm_asm_filepaths + binary_asm_filepaths
+        for _asm_filepath in _asm_filepaths:
+            assembler.assemble(_asm_filepath, debug=debug)
+
+        # load & execute modules without test scripts
+        for _asm_filepath in binary_asm_filepaths:
+            run(_asm_filepath, debug=debug)
+
+        # load & execute modules with test scripts
+        for _asm_filepath in vm_asm_filepaths:
+            _tst_filepath = _asm_filepath.replace(".asm", ".tst")
+            _cmp_filepath = _asm_filepath.replace(".asm", ".cmp")
+            _tst_params = tester.load_tst(_tst_filepath, debug=debug)
+            _tst_params["compare"] = tester.load_cmp(_cmp_filepath, debug=debug)
+            run(_asm_filepath, tst_params=_tst_params, debug=debug)
