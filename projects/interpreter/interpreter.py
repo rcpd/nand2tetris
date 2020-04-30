@@ -7,8 +7,9 @@ import translator
 
 
 def run(asm_filepath, tst_params=None, debug=False):
-    # TODO: (week 6-8) all asm/tst/cmp/out parsed/executed/written --> week 8 VM to go
-    # TODO: vmTranslator comments should be inline to be preserved
+    # TODO: (week 6-8) all asm/tst/cmp/out/vms parsed/compiled/executed/passed
+    # TODO: translator refactor comments -- inline would be easiest
+    # TODO: translator segment/stack/call tree mapping
     # TODO: doc strings
     # TODO: (future) write a HDL module for interpreter?
 
