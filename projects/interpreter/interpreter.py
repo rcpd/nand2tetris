@@ -1,15 +1,13 @@
 """"
 Python bindings & test framework for Nand2Tetris HACK Assembly language
 """
-
 import assembler
 import tester
 import translator
 
 
 def run(asm_filepath, tst_params=None, debug=False):
-    # TODO: (week 6-8) all asm/tst/cmp/out parsed/executed/written
-    # TODO: (week 7-8) integrate VM translator to drive asm generation
+    # TODO: (week 6-8) all asm/tst/cmp/out parsed/executed/written --> week 8 VM to go
     # TODO: vmTranslator comments should be inline to be preserved
     # TODO: doc strings
     # TODO: (future) write a HDL module for interpreter?

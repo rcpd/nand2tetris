@@ -34,9 +34,7 @@ def load_tst(tst_filepath, debug=False):
             print(test_cmd)
 
         if test_cmd.startswith("load,"):
-            # TODO: load all files in test file dir
-            if debug:
-                print("***NOT YET IMPLEMENTED: %s***" % test_cmd)
+            raise NotImplementedError
         elif test_cmd.startswith("load "):
             test_params["input_files"] = [test_cmd.split(" ")[-1][:-1]]
             if debug:

@@ -253,7 +253,6 @@ def generate_guid():
     global test_file
     global guids
 
-    # TODO: make this deterministic to avoid guids showing up as diffs on each run
     # generate a guid
     guid = str(random.random())[2:6]
     guids.append(guid)
@@ -622,7 +621,6 @@ def call(cmd, src):
     asm += "@SP\n"  # *esp
     asm += "M=M+1\n"  # *esp = *esp++
 
-    # TODO: this could have been parsed from the function definiton
     current_function = cmd.split(" ")[1]
     if current_function in local_dict:
         num_locals = local_dict[current_function]
@@ -860,7 +858,6 @@ def parse_static(test_file):
                 except ValueError:
                     print("Warning: Value not parsed: %s" % cmd)
 
-            # TODO: this could have been parsed from the function definiton
             # update local dictionary
             if cmd.startswith("function"):
                 current_function = cmd.split(" ")[1]
