@@ -26,18 +26,18 @@ D=M // d = [val2]
 M=M-1 // *esp-- (*val1)
 A=M // [esp] ([val1])
 D=M-D // d = [val1] - [val2]
-@EQ_TRUE_1435
+@EQ_TRUE_1
 D;JEQ
-(EQ_FALSE_1435)
+(EQ_FALSE_1)
 @0
 D=A // d = false
-@EQ_END_1435
+@EQ_END_1
 0;JMP
-(EQ_TRUE_1435)
+(EQ_TRUE_1)
 @0
 D=A
 D=D-1 // d = -1 (true)
-(EQ_END_1435)
+(EQ_END_1)
 @SP // *esp (*val1)
 A=M // [esp] ([val1])
 M=D // [esp] = eq result
@@ -71,18 +71,18 @@ D=M // d = [val2]
 M=M-1 // *esp-- (*val1)
 A=M // [esp] ([val1])
 D=M-D // d = [val1] - [val2]
-@EQ_TRUE_1648
+@EQ_TRUE_2
 D;JEQ
-(EQ_FALSE_1648)
+(EQ_FALSE_2)
 @0
 D=A // d = false
-@EQ_END_1648
+@EQ_END_2
 0;JMP
-(EQ_TRUE_1648)
+(EQ_TRUE_2)
 @0
 D=A
 D=D-1 // d = -1 (true)
-(EQ_END_1648)
+(EQ_END_2)
 @SP // *esp (*val1)
 A=M // [esp] ([val1])
 M=D // [esp] = eq result
@@ -116,18 +116,18 @@ D=M // d = [val2]
 M=M-1 // *esp-- (*val1)
 A=M // [esp] ([val1])
 D=M-D // d = [val1] - [val2]
-@EQ_TRUE_3721
+@EQ_TRUE_3
 D;JEQ
-(EQ_FALSE_3721)
+(EQ_FALSE_3)
 @0
 D=A // d = false
-@EQ_END_3721
+@EQ_END_3
 0;JMP
-(EQ_TRUE_3721)
+(EQ_TRUE_3)
 @0
 D=A
 D=D-1 // d = -1 (true)
-(EQ_END_3721)
+(EQ_END_3)
 @SP // *esp (*val1)
 A=M // [esp] ([val1])
 M=D // [esp] = eq result
@@ -161,18 +161,18 @@ D=M // d = [val2]
 M=M-1 // *esp-- (*val1)
 A=M // [esp] ([val1])
 D=M-D // d = [val1] - [val2]
-@JLT_TRUE_6789
+@JLT_TRUE_4
 D;JLT
-(JLT_FALSE_6789)
+(JLT_FALSE_4)
 @0
 D=A // d = false
-@JLT_END_6789
+@JLT_END_4
 0;JMP
-(JLT_TRUE_6789)
+(JLT_TRUE_4)
 @0
 D=A
 D=D-1 // d = -1 (true)
-(JLT_END_6789)
+(JLT_END_4)
 @SP // *esp (*val1)
 A=M // [esp] ([val1])
 M=D // [esp] = eq result
@@ -206,18 +206,18 @@ D=M // d = [val2]
 M=M-1 // *esp-- (*val1)
 A=M // [esp] ([val1])
 D=M-D // d = [val1] - [val2]
-@JLT_TRUE_6194
+@JLT_TRUE_5
 D;JLT
-(JLT_FALSE_6194)
+(JLT_FALSE_5)
 @0
 D=A // d = false
-@JLT_END_6194
+@JLT_END_5
 0;JMP
-(JLT_TRUE_6194)
+(JLT_TRUE_5)
 @0
 D=A
 D=D-1 // d = -1 (true)
-(JLT_END_6194)
+(JLT_END_5)
 @SP // *esp (*val1)
 A=M // [esp] ([val1])
 M=D // [esp] = eq result
@@ -251,18 +251,18 @@ D=M // d = [val2]
 M=M-1 // *esp-- (*val1)
 A=M // [esp] ([val1])
 D=M-D // d = [val1] - [val2]
-@JLT_TRUE_7027
+@JLT_TRUE_6
 D;JLT
-(JLT_FALSE_7027)
+(JLT_FALSE_6)
 @0
 D=A // d = false
-@JLT_END_7027
+@JLT_END_6
 0;JMP
-(JLT_TRUE_7027)
+(JLT_TRUE_6)
 @0
 D=A
 D=D-1 // d = -1 (true)
-(JLT_END_7027)
+(JLT_END_6)
 @SP // *esp (*val1)
 A=M // [esp] ([val1])
 M=D // [esp] = eq result
@@ -296,18 +296,18 @@ D=M // d = [val2]
 M=M-1 // *esp-- (*val1)
 A=M // [esp] ([val1])
 D=M-D // d = [val1] - [val2]
-@JGT_TRUE_7704
+@JGT_TRUE_7
 D;JGT
-(JGT_FALSE_7704)
+(JGT_FALSE_7)
 @0
 D=A // d = false
-@JGT_END_7704
+@JGT_END_7
 0;JMP
-(JGT_TRUE_7704)
+(JGT_TRUE_7)
 @0
 D=A
 D=D-1 // d = -1 (true)
-(JGT_END_7704)
+(JGT_END_7)
 @SP // *esp (*val1)
 A=M // [esp] ([val1])
 M=D // [esp] = eq result
@@ -341,18 +341,18 @@ D=M // d = [val2]
 M=M-1 // *esp-- (*val1)
 A=M // [esp] ([val1])
 D=M-D // d = [val1] - [val2]
-@JGT_TRUE_5318
+@JGT_TRUE_8
 D;JGT
-(JGT_FALSE_5318)
+(JGT_FALSE_8)
 @0
 D=A // d = false
-@JGT_END_5318
+@JGT_END_8
 0;JMP
-(JGT_TRUE_5318)
+(JGT_TRUE_8)
 @0
 D=A
 D=D-1 // d = -1 (true)
-(JGT_END_5318)
+(JGT_END_8)
 @SP // *esp (*val1)
 A=M // [esp] ([val1])
 M=D // [esp] = eq result
@@ -386,18 +386,18 @@ D=M // d = [val2]
 M=M-1 // *esp-- (*val1)
 A=M // [esp] ([val1])
 D=M-D // d = [val1] - [val2]
-@JGT_TRUE_5821
+@JGT_TRUE_9
 D;JGT
-(JGT_FALSE_5821)
+(JGT_FALSE_9)
 @0
 D=A // d = false
-@JGT_END_5821
+@JGT_END_9
 0;JMP
-(JGT_TRUE_5821)
+(JGT_TRUE_9)
 @0
 D=A
 D=D-1 // d = -1 (true)
-(JGT_END_5821)
+(JGT_END_9)
 @SP // *esp (*val1)
 A=M // [esp] ([val1])
 M=D // [esp] = eq result
@@ -480,7 +480,7 @@ D=M
 @SP
 M=M-1
 A=M
-M=M&D
+M=D&M
 @SP
 M=M+1
 

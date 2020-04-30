@@ -283,6 +283,6 @@ if __name__ == '__main__':
     ]
 
     debug_runs = [True, False]
-    for debug in debug_runs:
+    for _debug in debug_runs:
         for _asm_filepath in _asm_filepaths:
-            assemble(_asm_filepath, debug=debug)
+            assemble(_asm_filepath, debug=_debug)

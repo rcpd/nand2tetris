@@ -697,7 +697,7 @@ def parse_asm(vm_filepath, asm, guids, local_dict, static_dict, offset_list, com
         elif cmd.startswith("sub"):
             asm, comment_count = sub(asm, cmd, comment_count, debug=debug)
         elif cmd.startswith("eq"):
-            asm, guids, comment_count = eq(asm, cmd, comment_count, guids, debug=debug)
+            asm, guids, comment_count = eq(asm, cmd, guids, comment_count, debug=debug)
         elif cmd.startswith("lt"):
             asm, guids, comment_count = lt(asm, cmd, guids, comment_count, debug=debug)
         elif cmd.startswith("gt"):
@@ -773,30 +773,12 @@ def parse_static(vm_filepath, local_dict, static_dict, debug=False):
     return local_dict, static_dict
 
 
-def translate(vm_filelist=(), vm_dirlist=(), debug=False):
+def translate(vm_dirpaths, vm_bootstrap_paths=(), debug=False):
     """
     translate vm files/dirs into asm
     """
-    # parse the single file VM programs
-    for vm_filepath in vm_filelist:
-        guids = []
-        local_dict = {}
-        static_dict = {}
-        offset_list = []
-        comment_count = -1
-        asm = ""
-        if debug:
-            print(vm_filepath)
-
-        asm, guids, comment_count = parse_asm(vm_filepath, asm, guids, local_dict, static_dict, offset_list,
-                                              comment_count, debug=debug)
-        with open(vm_filepath.replace('.vm', '.asm'), 'w') as asm_file:
-            asm_file.write(asm)
-
-        print("Translated VM file to ASM: %s" % vm_filepath)
-
-    # parse the multi-file VM programs
-    for vm_dir in vm_dirlist:
+    # walk the VM program directories
+    for vm_dir in vm_dirpaths:
         vm_dir_filelist = []
         comment_count = -1
         asm = ""
@@ -841,13 +823,17 @@ def translate(vm_filelist=(), vm_dirlist=(), debug=False):
                 vm_dir_filelist.append(vm_filepath)
 
         # write asm_file
+        bootstrap = "@261 // bootstrap: initialize SP as 261\n"
+        bootstrap += "D=A\n"
+        bootstrap += "@0\n"
+        bootstrap += "M=D\n"
         asm_path = os.path.join(vm_dir, vm_dir.split('\\')[-1]+'.asm')
         with open(asm_path, 'w') as asm_file:
-            bootstrap = "@261 // bootstrap: initialize SP as 261\n"  # test scripts do not conform to spec (256) >:|
-            bootstrap += "D=A\n"
-            bootstrap += "@0\n"
-            bootstrap += "M=D\n"
-            asm_file.write(bootstrap+asm)
+            if any(bootstrap_path in asm_path for bootstrap_path in vm_bootstrap_paths):
+                # test scripts do not conform to spec (256) >:|
+                asm_file.write(bootstrap+asm)
+            else:
+                asm_file.write(asm)
 
         print("Translated VM file(s) in directory: %s" % vm_dir)
         for vm_filepath in vm_dir_filelist:
@@ -855,25 +841,28 @@ def translate(vm_filelist=(), vm_dirlist=(), debug=False):
 
 
 if __name__ == "__main__":
-    # TODO: test week 8 VM programs
-    _vm_filepaths = [
-        # r'..\07\MemoryAccess\BasicTest\BasicTest.vm',
-        # r'..\07\MemoryAccess\PointerTest\PointerTest.vm',
-        # r'..\07\MemoryAccess\StaticTest\StaticTest.vm',
-        # r'..\07\StackArithmetic\SimpleAdd\SimpleAdd.vm',
-        # r'..\07\StackArithmetic\StackTest\StackTest.vm',
+    # regular VM programs
+    _vm_dirpaths = [
+        r'..\07\MemoryAccess\BasicTest',
+        r'..\07\MemoryAccess\PointerTest',
+        r'..\07\MemoryAccess\StaticTest',
+        r'..\07\StackArithmetic\SimpleAdd',
+        r'..\07\StackArithmetic\StackTest',
 
-        r'..\08\ProgramFlow\BasicLoop\BasicLoop.vm',
-        r'..\08\ProgramFlow\FibonacciSeries\FibonacciSeries.vm',
-        r'..\08\FunctionCalls\SimpleFunction\SimpleFunction.vm',
+        r'..\08\ProgramFlow\BasicLoop',
+        r'..\08\ProgramFlow\FibonacciSeries',
+        r'..\08\FunctionCalls\SimpleFunction',
     ]
 
-    _vm_dirpaths = [
+    # VM programs that require non-spec bootstrap to pass tests
+    _vm_bootstrap_paths = [
         r'..\08\FunctionCalls\FibonacciElement',
         r'..\08\FunctionCalls\NestedCall',
         r'..\08\FunctionCalls\StaticsTest'
     ]
 
+    _vm_dirpaths = _vm_dirpaths + _vm_bootstrap_paths
+
     debug_runs = [True, False]
     for _debug in debug_runs:
-        translate(_vm_filepaths, _vm_dirpaths, debug=_debug)
+        translate(_vm_dirpaths, _vm_bootstrap_paths, debug=_debug)

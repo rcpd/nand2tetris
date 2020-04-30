@@ -263,24 +263,27 @@ def run(asm_filepath, tst_params=None, debug=False):
 
 
 if __name__ == '__main__':
-    # TODO: test week 8 VM programs
-    _vm_filepaths = [
-        # r'..\07\MemoryAccess\BasicTest\BasicTest.vm',
-        # r'..\07\MemoryAccess\PointerTest\PointerTest.vm',
-        # r'..\07\MemoryAccess\StaticTest\StaticTest.vm',
-        # r'..\07\StackArithmetic\SimpleAdd\SimpleAdd.vm',
-        # r'..\07\StackArithmetic\StackTest\StackTest.vm',
+    # regular VM programs
+    _vm_dirpaths = [
+        r'..\07\MemoryAccess\BasicTest',
+        r'..\07\MemoryAccess\PointerTest',
+        r'..\07\MemoryAccess\StaticTest',
+        r'..\07\StackArithmetic\SimpleAdd',
+        r'..\07\StackArithmetic\StackTest',
 
-        r'..\08\ProgramFlow\BasicLoop\BasicLoop.vm',
-        r'..\08\ProgramFlow\FibonacciSeries\FibonacciSeries.vm',
-        r'..\08\FunctionCalls\SimpleFunction\SimpleFunction.vm',
+        r'..\08\ProgramFlow\BasicLoop',
+        r'..\08\ProgramFlow\FibonacciSeries',
+        r'..\08\FunctionCalls\SimpleFunction',
     ]
 
-    _vm_dirpaths = [
+    # VM programs that require non-spec bootstrap to pass tests
+    _vm_bootstrap_paths = [
         r'..\08\FunctionCalls\FibonacciElement',
         r'..\08\FunctionCalls\NestedCall',
         r'..\08\FunctionCalls\StaticsTest'
     ]
+
+    _vm_dirpaths = _vm_dirpaths + _vm_bootstrap_paths
 
     vm_asm_filepaths = [
         "../07/MemoryAccess/BasicTest/BasicTest.asm",
@@ -309,23 +312,23 @@ if __name__ == '__main__':
 
     # debug_runs = [True, False]
     debug_runs = [False]
-    for debug in debug_runs:
+    for _debug in debug_runs:
         # transpile VM to ASM
-        translator.translate(_vm_filepaths, _vm_dirpaths, debug=debug)
+        translator.translate(_vm_dirpaths, _vm_bootstrap_paths, debug=_debug)
 
         # compile all ASM to HACK and binary match if available
         _asm_filepaths = vm_asm_filepaths + binary_asm_filepaths
         for _asm_filepath in _asm_filepaths:
-            assembler.assemble(_asm_filepath, debug=debug)
+            assembler.assemble(_asm_filepath, debug=_debug)
 
         # load & execute modules without test scripts
         for _asm_filepath in binary_asm_filepaths:
-            run(_asm_filepath, debug=debug)
+            run(_asm_filepath, debug=_debug)
 
         # load & execute modules with test scripts
         for _asm_filepath in vm_asm_filepaths:
             _tst_filepath = _asm_filepath.replace(".asm", ".tst")
             _cmp_filepath = _asm_filepath.replace(".asm", ".cmp")
-            _tst_params = tester.load_tst(_tst_filepath, debug=debug)
-            _tst_params["compare"] = tester.load_cmp(_cmp_filepath, debug=debug)
-            run(_asm_filepath, tst_params=_tst_params, debug=debug)
+            _tst_params = tester.load_tst(_tst_filepath, debug=_debug)
+            _tst_params["compare"] = tester.load_cmp(_cmp_filepath, debug=_debug)
+            run(_asm_filepath, tst_params=_tst_params, debug=_debug)
