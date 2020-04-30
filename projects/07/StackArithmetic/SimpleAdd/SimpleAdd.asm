@@ -1,6 +1,6 @@
 
 // (-3) push constant 7
-@7
+@7 // push constant 7
 D=A
 @SP
 A=M
@@ -9,7 +9,7 @@ M=D
 M=M+1
 
 // (-5) push constant 8
-@8
+@8 // push constant 8
 D=A
 @SP
 A=M
@@ -18,7 +18,7 @@ M=D
 M=M+1
 
 // (-7) add
-@SP
+@SP // add
 M=M-1
 A=M
 D=M

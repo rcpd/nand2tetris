@@ -1,6 +1,6 @@
 
 // (-3) push constant 0
-@0
+@0 // push constant 0
 D=A
 @SP
 A=M
@@ -8,8 +8,8 @@ M=D
 @SP
 M=M+1
 
-// (-5) pop local 0         // initializes sum = 0
-@LCL
+// (-5) pop local 0 // initializes sum = 0
+@LCL // pop local 0 // initializes sum = 0
 D=M
 @0
 D=D+A
@@ -29,10 +29,10 @@ M=D
 M=M-1
 
 // (-7) label LOOP_START
-(BasicLoop.LOOP_START)
+(BasicLoop.LOOP_START) // label LOOP_START
 
 // (-10) push argument 0
-@ARG
+@ARG // push argument 0
 D=M
 @0
 A=D+A
@@ -44,7 +44,7 @@ M=D
 M=M+1
 
 // (-12) push local 0
-@LCL
+@LCL // push local 0
 D=M
 @0
 A=D+A
@@ -56,7 +56,7 @@ M=D
 M=M+1
 
 // (-14) add
-@SP
+@SP // add
 M=M-1
 A=M
 D=M
@@ -67,10 +67,10 @@ M=D+M
 @SP
 M=M+1
 
-// (-16) pop local 0	        // sum = sum + counter
-@LCL
+// (-16) pop local 0 // sum = sum + counter
+@LCL // pop local 0 // sum = sum + counter
 D=M
-@0	
+@0
 D=D+A
 @SP
 A=M
@@ -88,7 +88,7 @@ M=D
 M=M-1
 
 // (-18) push argument 0
-@ARG
+@ARG // push argument 0
 D=M
 @0
 A=D+A
@@ -100,7 +100,7 @@ M=D
 M=M+1
 
 // (-20) push constant 1
-@1
+@1 // push constant 1
 D=A
 @SP
 A=M
@@ -109,7 +109,7 @@ M=D
 M=M+1
 
 // (-22) sub
-@SP
+@SP // sub
 M=M-1
 A=M
 D=M
@@ -120,8 +120,8 @@ M=M-D
 @SP
 M=M+1
 
-// (-24) pop argument 0      // counter--
-@ARG
+// (-24) pop argument 0 // counter--
+@ARG // pop argument 0 // counter--
 D=M
 @0
 D=D+A
@@ -141,7 +141,7 @@ M=D
 M=M-1
 
 // (-26) push argument 0
-@ARG
+@ARG // push argument 0
 D=M
 @0
 A=D+A
@@ -152,9 +152,9 @@ M=D
 @SP
 M=M+1
 
-// (-28) if-goto LOOP_START  // If counter > 0, goto LOOP_START
-@0 // push a zero onto the stack
-D=A
+// (-28) if-goto LOOP_START // If counter > 0, goto LOOP_START
+@0 // if-goto LOOP_START // If counter > 0, goto LOOP_START
+D=A // push a zero onto the stack
 @SP
 A=M
 M=D
@@ -172,7 +172,7 @@ D=M-D // d = [val1] - [val2] // leave esp here (pop equivalent)
 D;JNE // jump if not zero
 
 // (-30) push local 0
-@LCL
+@LCL // push local 0
 D=M
 @0
 A=D+A

@@ -13,7 +13,7 @@ def push(asm, cmd, vm_segment, asm_segment, value, static_dict, offset_list, vm_
 
     # push an arbitrary value onto the stack
     if vm_segment == "constant":
-        asm += "@%s\n" % value  # literal
+        asm += "@%s // %s\n" % (value, cmd)  # literal
         asm += "D=A\n"  # d = literal
         asm += "@SP\n"  # *esp
         asm += "A=M\n"  # [esp]
@@ -24,19 +24,19 @@ def push(asm, cmd, vm_segment, asm_segment, value, static_dict, offset_list, vm_
         # retrieve a value from segment+offset and push it onto the stack
         if vm_segment == "temp":
             # but also account for the temp mapping
-            asm += "@5\n"  # *asm_segment
+            asm += "@5 // %s\n" % cmd  # *asm_segment
             asm += "D=A\n"  # d = *asm_segment
         elif vm_segment == "pointer":
-            asm += "@3\n"  # *asm_segment
+            asm += "@3 // %s\n" % cmd  # *asm_segment
             asm += "D=A\n"  # d = *asm_segment
         elif vm_segment == "static":
             pos = static_dict[vm_filepath][0]
             offset = 16 + (offset_list[pos])
-            asm += "@%s // static + src segment offset (%s)\n" % (offset, vm_filepath)  # *asm_segment
+            asm += "@%s // %s // static + src segment offset (%s)\n" % (offset, cmd, vm_filepath)  # *asm_segment
             asm += "D=A\n"  # d = *asm_segment
         else:
             # normal segment resolution
-            asm += "@%s\n" % asm_segment  # *asm_segment
+            asm += "@%s // %s\n" % (asm_segment, cmd)  # *asm_segment
             asm += "D=M\n"  # d = [asm_segment]
 
         asm += "@%s\n" % value  # offset
@@ -63,18 +63,18 @@ def pop(asm, cmd, vm_segment, asm_segment, value, static_dict, offset_list, vm_f
 
     # account for temp mapping vs normal segment resolution
     if vm_segment == "temp":
-        asm += "@5\n"  # *asm_segment
+        asm += "@5 // %s\n" % cmd  # *asm_segment
         asm += "D=A\n"  # d = *asm_segment
     elif vm_segment == "pointer":
-        asm += "@3\n"  # *asm_segment
+        asm += "@3 // %s\n" % cmd  # *asm_segment
         asm += "D=A\n"  # d = *asm_segment
     elif vm_segment == "static":
         pos = static_dict[vm_filepath][0]
         offset = 16 + (offset_list[pos])
-        asm += "@%s // static + src segment offset (%s)\n" % (offset, vm_filepath)  # *asm_segment
+        asm += "@%s // %s // static + src segment offset (%s)\n" % (offset, cmd, vm_filepath)  # *asm_segment
         asm += "D=A\n"  # d = *asm_segment
     else:
-        asm += "@%s\n" % asm_segment  # *asm_segment
+        asm += "@%s // %s\n" % (asm_segment, cmd)  # *asm_segment
         asm += "D=M\n"  # d = [asm_segment]
 
     # retrieve the *dst (segment+offset) and temporarily store it at *esp
@@ -114,7 +114,7 @@ def add(asm, cmd, comment_count, debug=False):
     asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     # add two values, push result, dec esp
-    asm += "@SP\n"  # *esp
+    asm += "@SP // %s\n" % cmd  # *esp
     asm += "M=M-1\n"  # *esp-- // *val2
     asm += "A=M\n"  # [val2]
     asm += "D=M\n"  # d = [val2]
@@ -136,7 +136,7 @@ def sub(asm, cmd, comment_count, debug=False):
     asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     # eval two values, push result, dec esp
-    asm += "@SP\n"  # *esp
+    asm += "@SP // %s\n" % cmd  # *esp
     asm += "M=M-1\n"  # *esp-- // *val2
     asm += "A=M\n"  # [val2]
     asm += "D=M\n"  # d = [val2]
@@ -158,7 +158,7 @@ def eq(asm, cmd, guids, comment_count, debug=False):
     comment_count -= 2
     asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
-    asm += "@SP // *esp\n"
+    asm += "@SP // %s // *esp \n" % cmd
     asm += "M=M-1 // *esp-- (*val2)\n"
     asm += "A=M // [val2]\n"
     asm += "D=M // d = [val2]\n"
@@ -212,7 +212,7 @@ def lt(asm, cmd, guids, comment_count, debug=False):
     comment_count -= 2
     asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
-    asm += "@SP // *esp\n"
+    asm += "@SP // *esp // %s\n" % cmd
     asm += "M=M-1 // *esp-- (*val2)\n"
     asm += "A=M // [val2]\n"
     asm += "D=M // d = [val2]\n"
@@ -257,7 +257,7 @@ def gt(asm, cmd, guids, comment_count, debug=False):
     comment_count -= 2
     asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
-    asm += "@SP // *esp\n"
+    asm += "@SP // *esp // %s\n" % cmd
     asm += "M=M-1 // *esp-- (*val2)\n"
     asm += "A=M // [val2]\n"
     asm += "D=M // d = [val2]\n"
@@ -301,7 +301,7 @@ def _and(asm, cmd, comment_count, debug=False):
     asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     # eval two values, push result, dec esp
-    asm += "@SP\n"  # *esp
+    asm += "@SP // %s\n" % cmd  # *esp
     asm += "M=M-1\n"  # *esp-- // *val2
     asm += "A=M\n"  # [val2]
     asm += "D=M\n"  # d = [val2]
@@ -323,7 +323,7 @@ def _or(asm, cmd, comment_count, debug=False):
     asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     # eval two values, push result, dec esp
-    asm += "@SP\n"  # *esp
+    asm += "@SP // %s\n" % cmd  # *esp
     asm += "M=M-1\n"  # *esp-- // *val2
     asm += "A=M\n"  # [val2]
     asm += "D=M\n"  # d = [val2]
@@ -345,7 +345,7 @@ def _not(asm, cmd, comment_count, debug=False):
     asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     # eval one value, push result
-    asm += "@SP\n"  # *esp
+    asm += "@SP // %s\n" % cmd  # *esp
     asm += "M=M-1\n"  # *esp-- // *val1
     asm += "A=M\n"  # [esp] // [val1]
     asm += "M=!M\n"  # [esp] = ![val1]
@@ -363,7 +363,7 @@ def neg(asm, cmd, comment_count, debug=False):
     asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     # eval one value, push result
-    asm += "@SP\n"  # *esp
+    asm += "@SP // %s\n" % cmd  # *esp
     asm += "M=M-1\n"  # *esp-- // *val1
     asm += "A=M\n"  # [esp] // [val1]
     asm += "M=-M\n"  # [esp] = -[val1]
@@ -391,15 +391,20 @@ def label(asm, cmd, src, guids, comment_count, debug=False):
     asm_label = cmd.split(" ")[1]
 
     if cmd.startswith('function'):
-        asm += "(%s)\n" % asm_label
+        asm += "(%s) // %s\n" % (asm_label, cmd)
+        label_str = asm_label
     elif cmd.startswith('call'):
         guid, guids = generate_guid(guids, debug=debug)
-        asm += "(%s.%s.%s)\n" % (src, asm_label, guid)
+        asm += "(%s.%s.%s) // %s\n" % (src, asm_label, guid, cmd)
+        label_str = "%s.%s.%s" % (src, asm_label, guid)
     elif cmd.startswith('label'):
-        asm += "(%s.%s)\n" % (src, asm_label)
+        asm += "(%s.%s) // %s\n" % (src, asm_label, cmd)
+        label_str = "%s.%s" % (src, asm_label)
         comment_count -= 1  # post-adjust for label
+    else:
+        raise RuntimeError("Translator: Unexpected command %s")
 
-    return asm, guids, comment_count
+    return asm, guids, comment_count, label_str
 
 
 def goto(asm, cmd, src, comment_count, debug=False):
@@ -412,7 +417,7 @@ def goto(asm, cmd, src, comment_count, debug=False):
     asm_label = "%s.%s" % (src, asm_label)
 
     asm += '\n// (%s) %s\n' % (comment_count, cmd)
-    asm += "@%s\n" % asm_label
+    asm += "@%s // %s\n" % (asm_label, cmd)
     asm += "0;JMP // unconditional jump\n"
 
     return asm, comment_count
@@ -428,8 +433,8 @@ def if_goto(asm, cmd, src, comment_count, debug=False):
 
     asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
-    asm += "@0 // push a zero onto the stack\n"  # literal
-    asm += "D=A\n"  # d = literal
+    asm += "@0 // %s\n" % cmd  # literal
+    asm += "D=A // push a zero onto the stack\n"  # d = literal
     asm += "@SP\n"  # *esp
     asm += "A=M\n"  # [esp]
     asm += "M=D\n"  # [esp] = literal
@@ -460,20 +465,19 @@ def call(asm, cmd, src, guids, local_dict, static_dict, offset_list, vm_filepath
 
     num_args = int(cmd.split(" ")[2])
     func_label = cmd.split(" ")[1]  # function EIP
-    asm, guids, comment_count = label(asm, cmd, src, guids, comment_count, debug=debug)  # generate function RIP label
-    rip_label = asm.strip().split("\n")[-1].split("(")[-1].split(")")[0]
+    asm, guids, comment_count, label_str = label(asm, cmd, src, guids, comment_count, debug=debug)  # RIP label
 
     # stack frame before call = <args>...<SP>
     # stack frame after call = <args>...<RIP><LCL><ARG><THIS><THAT><locals>...<SP>
 
     if num_args == 0:
-        asm, comment_count = push(asm, "push constant 9999 // if no args, create a space on the stack for the return",
-                                  "constant", "constant", 9999, static_dict, offset_list, vm_filepath, comment_count,
-                                  debug=debug)
+        asm, comment_count = push(asm, "push constant 9999 // call: if no args, create a space on the stack for the "
+                                       "return", "constant", "constant", 9999, static_dict, offset_list, vm_filepath,
+                                       comment_count, debug=debug)
         prologue_size += 7  # 7 instructions added by conditional push for return placeholder
         num_args = 1
 
-    asm += "@%s // create the RIP pointer and push it to the stack\n" % rip_label  # *rip
+    asm += "@%s // create the RIP pointer and push it to the stack\n" % label_str  # *rip
     asm += "D=A\n"  # d = [rip]
     asm += "@SP\n"  # *esp
     asm += "A=M\n"  # [esp]
@@ -566,7 +570,7 @@ def function(asm, cmd, src, guids, comment_count, debug=False):
     """
     comment_count -= 2
 
-    asm, guids, comment_count = label(asm, cmd, src, guids, comment_count, debug=debug)
+    asm, guids, comment_count, label_str = label(asm, cmd, src, guids, comment_count, debug=debug)
     comment_count -= 1  # post-adjust for label
 
     return asm, guids, comment_count
@@ -583,11 +587,11 @@ def _return(asm, cmd, static_dict, offset_list, vm_filepath, comment_count, debu
     # jump to RIP
 
     asm += '\n// (%s) %s\n' % (comment_count, cmd)
-    asm, comment_count = pop(asm, "pop argument 0 // function return: move result to ARG[0] (soon to be last stack "
+    asm, comment_count = pop(asm, "pop argument 0 // return: move result to ARG[0] (soon to be last stack "
                              "item)", "argument", "ARG", 0, static_dict, offset_list, vm_filepath, comment_count,
                              debug=debug)
 
-    asm += "@ARG // *ARG[0] // function return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1\n"
+    asm += "@ARG // *ARG[0] // return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1\n"
     asm += "D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter\n"
     asm += "@SP // *esp // as the intent is to discard everything after result at this point\n"
     asm += "M=D // [esp] = *ARG[0]+1\n"
@@ -711,7 +715,7 @@ def parse_asm(vm_filepath, asm, guids, local_dict, static_dict, offset_list, com
         elif cmd.startswith("neg"):
             asm, comment_count = neg(asm, cmd, comment_count, debug=debug)
         elif cmd.startswith("label"):
-            asm, guids, comment_count = label(asm, cmd, src, guids, comment_count, debug=debug)
+            asm, guids, comment_count, label_str = label(asm, cmd, src, guids, comment_count, debug=debug)
         elif cmd.startswith("goto"):
             asm, comment_count = goto(asm, cmd, src, comment_count, debug=debug)
         elif cmd.startswith("if-goto"):
