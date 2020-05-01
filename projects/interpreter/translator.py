@@ -725,7 +725,7 @@ def parse_asm(vm_filepath, asm, guids, local_dict, static_dict, offset_list, com
         elif cmd.startswith("if-goto"):
             asm, comment_count = if_goto(asm, cmd, src, comment_count, debug=debug)
         elif cmd.startswith("function"):
-            stored_comment = " // %s\n" % cmd  # function only creates a label which gets parsed out
+            stored_comment = " // %s" % cmd  # function only creates a label which gets parsed out
             asm, guids, comment_count = function(asm, cmd, src, guids, comment_count, debug=debug)
         elif cmd.startswith("return"):
             asm, comment_count = _return(asm, cmd, static_dict, offset_list, vm_filepath, comment_count, debug=debug)
