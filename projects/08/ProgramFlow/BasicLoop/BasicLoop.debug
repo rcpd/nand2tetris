@@ -1,0 +1,1267 @@
+0 @0 
+  // push constant 0 
+  EVAL: A=0 
+  A=0 D=0 M=256
+1 D=A 
+  EVAL: D=0 (0) 
+  A=0 D=0 M=256
+2 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=256
+3 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=0 M=0
+4 M=D 
+  EVAL: M=0 (0) 
+  A=256 D=0 M=0
+5 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=256
+6 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=0 M=257
+7 @LCL 
+  // pop local 0 
+  // initializes sum = 0 
+  EVAL: A=1 
+  A=1 D=0 M=300
+8 D=M 
+  EVAL: D=300 (300) 
+  A=1 D=300 M=300
+9 @0 
+  EVAL: A=0 
+  A=0 D=300 M=257
+10 D=D+A 
+  EVAL: D=300 (300+0) 
+  A=0 D=300 M=257
+11 @SP 
+  EVAL: A=0 
+  A=0 D=300 M=257
+12 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=300 M=0
+13 M=D 
+  EVAL: M=300 (300) 
+  A=257 D=300 M=300
+14 @SP 
+  EVAL: A=0 
+  A=0 D=300 M=257
+15 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=300 M=256
+16 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=300 M=0
+17 D=M 
+  EVAL: D=0 (0) 
+  A=256 D=0 M=0
+18 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=256
+19 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=0 M=257
+20 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=0 M=300
+21 A=M 
+  EVAL: A=300 (300) 
+  A=300 D=0 M=0
+22 M=D 
+  EVAL: M=0 (0) 
+  A=300 D=0 M=0
+23 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=257
+24 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=0 M=256
+25 @ARG 
+  // push argument 0 
+  // (BasicLoop.LOOP_START) 
+  EVAL: A=2 
+  A=2 D=0 M=400
+26 D=M 
+  EVAL: D=400 (400) 
+  A=2 D=400 M=400
+27 @0 
+  EVAL: A=0 
+  A=0 D=400 M=256
+28 A=D+A 
+  EVAL: A=400 (400+0) 
+  A=400 D=400 M=3
+29 D=M 
+  EVAL: D=3 (3) 
+  A=400 D=3 M=3
+30 @SP 
+  EVAL: A=0 
+  A=0 D=3 M=256
+31 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=3 M=0
+32 M=D 
+  EVAL: M=3 (3) 
+  A=256 D=3 M=3
+33 @SP 
+  EVAL: A=0 
+  A=0 D=3 M=256
+34 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=3 M=257
+35 @LCL 
+  // push local 0 
+  EVAL: A=1 
+  A=1 D=3 M=300
+36 D=M 
+  EVAL: D=300 (300) 
+  A=1 D=300 M=300
+37 @0 
+  EVAL: A=0 
+  A=0 D=300 M=257
+38 A=D+A 
+  EVAL: A=300 (300+0) 
+  A=300 D=300 M=0
+39 D=M 
+  EVAL: D=0 (0) 
+  A=300 D=0 M=0
+40 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=257
+41 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=0 M=300
+42 M=D 
+  EVAL: M=0 (0) 
+  A=257 D=0 M=0
+43 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=257
+44 M=M+1 
+  EVAL: M=258 (257+1) 
+  A=0 D=0 M=258
+45 @SP 
+  // add 
+  EVAL: A=0 
+  A=0 D=0 M=258
+46 M=M-1 
+  EVAL: M=257 (258-1) 
+  A=0 D=0 M=257
+47 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=0 M=0
+48 D=M 
+  EVAL: D=0 (0) 
+  A=257 D=0 M=0
+49 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=257
+50 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=0 M=256
+51 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=0 M=3
+52 M=D+M 
+  EVAL: M=3 (0+3) 
+  A=256 D=0 M=3
+53 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=256
+54 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=0 M=257
+55 @LCL 
+  // pop local 0 
+  // sum = sum + counter 
+  EVAL: A=1 
+  A=1 D=0 M=300
+56 D=M 
+  EVAL: D=300 (300) 
+  A=1 D=300 M=300
+57 @0 
+  EVAL: A=0 
+  A=0 D=300 M=257
+58 D=D+A 
+  EVAL: D=300 (300+0) 
+  A=0 D=300 M=257
+59 @SP 
+  EVAL: A=0 
+  A=0 D=300 M=257
+60 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=300 M=0
+61 M=D 
+  EVAL: M=300 (300) 
+  A=257 D=300 M=300
+62 @SP 
+  EVAL: A=0 
+  A=0 D=300 M=257
+63 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=300 M=256
+64 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=300 M=3
+65 D=M 
+  EVAL: D=3 (3) 
+  A=256 D=3 M=3
+66 @SP 
+  EVAL: A=0 
+  A=0 D=3 M=256
+67 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=3 M=257
+68 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=3 M=300
+69 A=M 
+  EVAL: A=300 (300) 
+  A=300 D=3 M=0
+70 M=D 
+  EVAL: M=3 (3) 
+  A=300 D=3 M=3
+71 @SP 
+  EVAL: A=0 
+  A=0 D=3 M=257
+72 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=3 M=256
+73 @ARG 
+  // push argument 0 
+  EVAL: A=2 
+  A=2 D=3 M=400
+74 D=M 
+  EVAL: D=400 (400) 
+  A=2 D=400 M=400
+75 @0 
+  EVAL: A=0 
+  A=0 D=400 M=256
+76 A=D+A 
+  EVAL: A=400 (400+0) 
+  A=400 D=400 M=3
+77 D=M 
+  EVAL: D=3 (3) 
+  A=400 D=3 M=3
+78 @SP 
+  EVAL: A=0 
+  A=0 D=3 M=256
+79 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=3 M=3
+80 M=D 
+  EVAL: M=3 (3) 
+  A=256 D=3 M=3
+81 @SP 
+  EVAL: A=0 
+  A=0 D=3 M=256
+82 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=3 M=257
+83 @1 
+  // push constant 1 
+  EVAL: A=1 
+  A=1 D=3 M=300
+84 D=A 
+  EVAL: D=1 (1) 
+  A=1 D=1 M=300
+85 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=257
+86 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=1 M=300
+87 M=D 
+  EVAL: M=1 (1) 
+  A=257 D=1 M=1
+88 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=257
+89 M=M+1 
+  EVAL: M=258 (257+1) 
+  A=0 D=1 M=258
+90 @SP 
+  // sub 
+  EVAL: A=0 
+  A=0 D=1 M=258
+91 M=M-1 
+  EVAL: M=257 (258-1) 
+  A=0 D=1 M=257
+92 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=1 M=1
+93 D=M 
+  EVAL: D=1 (1) 
+  A=257 D=1 M=1
+94 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=257
+95 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=1 M=256
+96 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=1 M=3
+97 M=M-D 
+  EVAL: M=2 (3-1) 
+  A=256 D=1 M=2
+98 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=256
+99 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=1 M=257
+100 @ARG 
+  // pop argument 0 
+  // counter-- 
+  EVAL: A=2 
+  A=2 D=1 M=400
+101 D=M 
+  EVAL: D=400 (400) 
+  A=2 D=400 M=400
+102 @0 
+  EVAL: A=0 
+  A=0 D=400 M=257
+103 D=D+A 
+  EVAL: D=400 (400+0) 
+  A=0 D=400 M=257
+104 @SP 
+  EVAL: A=0 
+  A=0 D=400 M=257
+105 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=400 M=1
+106 M=D 
+  EVAL: M=400 (400) 
+  A=257 D=400 M=400
+107 @SP 
+  EVAL: A=0 
+  A=0 D=400 M=257
+108 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=400 M=256
+109 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=400 M=2
+110 D=M 
+  EVAL: D=2 (2) 
+  A=256 D=2 M=2
+111 @SP 
+  EVAL: A=0 
+  A=0 D=2 M=256
+112 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=2 M=257
+113 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=2 M=400
+114 A=M 
+  EVAL: A=400 (400) 
+  A=400 D=2 M=3
+115 M=D 
+  EVAL: M=2 (2) 
+  A=400 D=2 M=2
+116 @SP 
+  EVAL: A=0 
+  A=0 D=2 M=257
+117 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=2 M=256
+118 @ARG 
+  // push argument 0 
+  EVAL: A=2 
+  A=2 D=2 M=400
+119 D=M 
+  EVAL: D=400 (400) 
+  A=2 D=400 M=400
+120 @0 
+  EVAL: A=0 
+  A=0 D=400 M=256
+121 A=D+A 
+  EVAL: A=400 (400+0) 
+  A=400 D=400 M=2
+122 D=M 
+  EVAL: D=2 (2) 
+  A=400 D=2 M=2
+123 @SP 
+  EVAL: A=0 
+  A=0 D=2 M=256
+124 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=2 M=2
+125 M=D 
+  EVAL: M=2 (2) 
+  A=256 D=2 M=2
+126 @SP 
+  EVAL: A=0 
+  A=0 D=2 M=256
+127 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=2 M=257
+128 @0 
+  // if-goto LOOP_START 
+  // If counter > 0, goto LOOP_START 
+  EVAL: A=0 
+  A=0 D=2 M=257
+129 D=A 
+  // push a zero onto the stack 
+  EVAL: D=0 (0) 
+  A=0 D=0 M=257
+130 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=257
+131 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=0 M=400
+132 M=D 
+  EVAL: M=0 (0) 
+  A=257 D=0 M=0
+133 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=257
+134 M=M+1 
+  EVAL: M=258 (257+1) 
+  A=0 D=0 M=258
+135 @SP 
+  // *esp 
+  // compare val1 (if-goto conditional) with val2 (zero) 
+  EVAL: A=0 
+  A=0 D=0 M=258
+136 M=M-1 
+  // *esp-- (*val2) 
+  EVAL: M=257 (258-1) 
+  A=0 D=0 M=257
+137 A=M 
+  // [val2] 
+  EVAL: A=257 (257) 
+  A=257 D=0 M=0
+138 D=M 
+  // d = [val2] 
+  EVAL: D=0 (0) 
+  A=257 D=0 M=0
+139 @SP 
+  // *esp (*val2) 
+  EVAL: A=0 
+  A=0 D=0 M=257
+140 M=M-1 
+  // *esp-- (*val1) 
+  EVAL: M=256 (257-1) 
+  A=0 D=0 M=256
+141 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=256 (256) 
+  A=256 D=0 M=2
+142 D=M-D 
+  // d = [val1] - [val2] 
+  // leave esp here (pop equivalent) 
+  EVAL: D=2 (2-0) 
+  A=256 D=2 M=2
+143 @BasicLoop.LOOP_START 
+  EVAL: A=25 
+  A=25 D=2 M=0
+24 D;JNE 
+  // jump if not zero 
+  EVAL: A=25 
+  A=25 D=2 M=0
+25 @ARG 
+  // push argument 0 
+  // (BasicLoop.LOOP_START) 
+  EVAL: A=2 
+  A=2 D=2 M=400
+26 D=M 
+  EVAL: D=400 (400) 
+  A=2 D=400 M=400
+27 @0 
+  EVAL: A=0 
+  A=0 D=400 M=256
+28 A=D+A 
+  EVAL: A=400 (400+0) 
+  A=400 D=400 M=2
+29 D=M 
+  EVAL: D=2 (2) 
+  A=400 D=2 M=2
+30 @SP 
+  EVAL: A=0 
+  A=0 D=2 M=256
+31 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=2 M=2
+32 M=D 
+  EVAL: M=2 (2) 
+  A=256 D=2 M=2
+33 @SP 
+  EVAL: A=0 
+  A=0 D=2 M=256
+34 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=2 M=257
+35 @LCL 
+  // push local 0 
+  EVAL: A=1 
+  A=1 D=2 M=300
+36 D=M 
+  EVAL: D=300 (300) 
+  A=1 D=300 M=300
+37 @0 
+  EVAL: A=0 
+  A=0 D=300 M=257
+38 A=D+A 
+  EVAL: A=300 (300+0) 
+  A=300 D=300 M=3
+39 D=M 
+  EVAL: D=3 (3) 
+  A=300 D=3 M=3
+40 @SP 
+  EVAL: A=0 
+  A=0 D=3 M=257
+41 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=3 M=0
+42 M=D 
+  EVAL: M=3 (3) 
+  A=257 D=3 M=3
+43 @SP 
+  EVAL: A=0 
+  A=0 D=3 M=257
+44 M=M+1 
+  EVAL: M=258 (257+1) 
+  A=0 D=3 M=258
+45 @SP 
+  // add 
+  EVAL: A=0 
+  A=0 D=3 M=258
+46 M=M-1 
+  EVAL: M=257 (258-1) 
+  A=0 D=3 M=257
+47 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=3 M=3
+48 D=M 
+  EVAL: D=3 (3) 
+  A=257 D=3 M=3
+49 @SP 
+  EVAL: A=0 
+  A=0 D=3 M=257
+50 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=3 M=256
+51 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=3 M=2
+52 M=D+M 
+  EVAL: M=5 (3+2) 
+  A=256 D=3 M=5
+53 @SP 
+  EVAL: A=0 
+  A=0 D=3 M=256
+54 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=3 M=257
+55 @LCL 
+  // pop local 0 
+  // sum = sum + counter 
+  EVAL: A=1 
+  A=1 D=3 M=300
+56 D=M 
+  EVAL: D=300 (300) 
+  A=1 D=300 M=300
+57 @0 
+  EVAL: A=0 
+  A=0 D=300 M=257
+58 D=D+A 
+  EVAL: D=300 (300+0) 
+  A=0 D=300 M=257
+59 @SP 
+  EVAL: A=0 
+  A=0 D=300 M=257
+60 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=300 M=3
+61 M=D 
+  EVAL: M=300 (300) 
+  A=257 D=300 M=300
+62 @SP 
+  EVAL: A=0 
+  A=0 D=300 M=257
+63 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=300 M=256
+64 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=300 M=5
+65 D=M 
+  EVAL: D=5 (5) 
+  A=256 D=5 M=5
+66 @SP 
+  EVAL: A=0 
+  A=0 D=5 M=256
+67 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=5 M=257
+68 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=5 M=300
+69 A=M 
+  EVAL: A=300 (300) 
+  A=300 D=5 M=3
+70 M=D 
+  EVAL: M=5 (5) 
+  A=300 D=5 M=5
+71 @SP 
+  EVAL: A=0 
+  A=0 D=5 M=257
+72 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=5 M=256
+73 @ARG 
+  // push argument 0 
+  EVAL: A=2 
+  A=2 D=5 M=400
+74 D=M 
+  EVAL: D=400 (400) 
+  A=2 D=400 M=400
+75 @0 
+  EVAL: A=0 
+  A=0 D=400 M=256
+76 A=D+A 
+  EVAL: A=400 (400+0) 
+  A=400 D=400 M=2
+77 D=M 
+  EVAL: D=2 (2) 
+  A=400 D=2 M=2
+78 @SP 
+  EVAL: A=0 
+  A=0 D=2 M=256
+79 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=2 M=5
+80 M=D 
+  EVAL: M=2 (2) 
+  A=256 D=2 M=2
+81 @SP 
+  EVAL: A=0 
+  A=0 D=2 M=256
+82 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=2 M=257
+83 @1 
+  // push constant 1 
+  EVAL: A=1 
+  A=1 D=2 M=300
+84 D=A 
+  EVAL: D=1 (1) 
+  A=1 D=1 M=300
+85 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=257
+86 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=1 M=300
+87 M=D 
+  EVAL: M=1 (1) 
+  A=257 D=1 M=1
+88 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=257
+89 M=M+1 
+  EVAL: M=258 (257+1) 
+  A=0 D=1 M=258
+90 @SP 
+  // sub 
+  EVAL: A=0 
+  A=0 D=1 M=258
+91 M=M-1 
+  EVAL: M=257 (258-1) 
+  A=0 D=1 M=257
+92 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=1 M=1
+93 D=M 
+  EVAL: D=1 (1) 
+  A=257 D=1 M=1
+94 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=257
+95 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=1 M=256
+96 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=1 M=2
+97 M=M-D 
+  EVAL: M=1 (2-1) 
+  A=256 D=1 M=1
+98 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=256
+99 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=1 M=257
+100 @ARG 
+  // pop argument 0 
+  // counter-- 
+  EVAL: A=2 
+  A=2 D=1 M=400
+101 D=M 
+  EVAL: D=400 (400) 
+  A=2 D=400 M=400
+102 @0 
+  EVAL: A=0 
+  A=0 D=400 M=257
+103 D=D+A 
+  EVAL: D=400 (400+0) 
+  A=0 D=400 M=257
+104 @SP 
+  EVAL: A=0 
+  A=0 D=400 M=257
+105 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=400 M=1
+106 M=D 
+  EVAL: M=400 (400) 
+  A=257 D=400 M=400
+107 @SP 
+  EVAL: A=0 
+  A=0 D=400 M=257
+108 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=400 M=256
+109 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=400 M=1
+110 D=M 
+  EVAL: D=1 (1) 
+  A=256 D=1 M=1
+111 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=256
+112 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=1 M=257
+113 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=1 M=400
+114 A=M 
+  EVAL: A=400 (400) 
+  A=400 D=1 M=2
+115 M=D 
+  EVAL: M=1 (1) 
+  A=400 D=1 M=1
+116 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=257
+117 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=1 M=256
+118 @ARG 
+  // push argument 0 
+  EVAL: A=2 
+  A=2 D=1 M=400
+119 D=M 
+  EVAL: D=400 (400) 
+  A=2 D=400 M=400
+120 @0 
+  EVAL: A=0 
+  A=0 D=400 M=256
+121 A=D+A 
+  EVAL: A=400 (400+0) 
+  A=400 D=400 M=1
+122 D=M 
+  EVAL: D=1 (1) 
+  A=400 D=1 M=1
+123 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=256
+124 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=1 M=1
+125 M=D 
+  EVAL: M=1 (1) 
+  A=256 D=1 M=1
+126 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=256
+127 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=1 M=257
+128 @0 
+  // if-goto LOOP_START 
+  // If counter > 0, goto LOOP_START 
+  EVAL: A=0 
+  A=0 D=1 M=257
+129 D=A 
+  // push a zero onto the stack 
+  EVAL: D=0 (0) 
+  A=0 D=0 M=257
+130 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=257
+131 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=0 M=400
+132 M=D 
+  EVAL: M=0 (0) 
+  A=257 D=0 M=0
+133 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=257
+134 M=M+1 
+  EVAL: M=258 (257+1) 
+  A=0 D=0 M=258
+135 @SP 
+  // *esp 
+  // compare val1 (if-goto conditional) with val2 (zero) 
+  EVAL: A=0 
+  A=0 D=0 M=258
+136 M=M-1 
+  // *esp-- (*val2) 
+  EVAL: M=257 (258-1) 
+  A=0 D=0 M=257
+137 A=M 
+  // [val2] 
+  EVAL: A=257 (257) 
+  A=257 D=0 M=0
+138 D=M 
+  // d = [val2] 
+  EVAL: D=0 (0) 
+  A=257 D=0 M=0
+139 @SP 
+  // *esp (*val2) 
+  EVAL: A=0 
+  A=0 D=0 M=257
+140 M=M-1 
+  // *esp-- (*val1) 
+  EVAL: M=256 (257-1) 
+  A=0 D=0 M=256
+141 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=256 (256) 
+  A=256 D=0 M=1
+142 D=M-D 
+  // d = [val1] - [val2] 
+  // leave esp here (pop equivalent) 
+  EVAL: D=1 (1-0) 
+  A=256 D=1 M=1
+143 @BasicLoop.LOOP_START 
+  EVAL: A=25 
+  A=25 D=1 M=0
+24 D;JNE 
+  // jump if not zero 
+  EVAL: A=25 
+  A=25 D=1 M=0
+25 @ARG 
+  // push argument 0 
+  // (BasicLoop.LOOP_START) 
+  EVAL: A=2 
+  A=2 D=1 M=400
+26 D=M 
+  EVAL: D=400 (400) 
+  A=2 D=400 M=400
+27 @0 
+  EVAL: A=0 
+  A=0 D=400 M=256
+28 A=D+A 
+  EVAL: A=400 (400+0) 
+  A=400 D=400 M=1
+29 D=M 
+  EVAL: D=1 (1) 
+  A=400 D=1 M=1
+30 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=256
+31 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=1 M=1
+32 M=D 
+  EVAL: M=1 (1) 
+  A=256 D=1 M=1
+33 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=256
+34 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=1 M=257
+35 @LCL 
+  // push local 0 
+  EVAL: A=1 
+  A=1 D=1 M=300
+36 D=M 
+  EVAL: D=300 (300) 
+  A=1 D=300 M=300
+37 @0 
+  EVAL: A=0 
+  A=0 D=300 M=257
+38 A=D+A 
+  EVAL: A=300 (300+0) 
+  A=300 D=300 M=5
+39 D=M 
+  EVAL: D=5 (5) 
+  A=300 D=5 M=5
+40 @SP 
+  EVAL: A=0 
+  A=0 D=5 M=257
+41 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=5 M=0
+42 M=D 
+  EVAL: M=5 (5) 
+  A=257 D=5 M=5
+43 @SP 
+  EVAL: A=0 
+  A=0 D=5 M=257
+44 M=M+1 
+  EVAL: M=258 (257+1) 
+  A=0 D=5 M=258
+45 @SP 
+  // add 
+  EVAL: A=0 
+  A=0 D=5 M=258
+46 M=M-1 
+  EVAL: M=257 (258-1) 
+  A=0 D=5 M=257
+47 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=5 M=5
+48 D=M 
+  EVAL: D=5 (5) 
+  A=257 D=5 M=5
+49 @SP 
+  EVAL: A=0 
+  A=0 D=5 M=257
+50 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=5 M=256
+51 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=5 M=1
+52 M=D+M 
+  EVAL: M=6 (5+1) 
+  A=256 D=5 M=6
+53 @SP 
+  EVAL: A=0 
+  A=0 D=5 M=256
+54 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=5 M=257
+55 @LCL 
+  // pop local 0 
+  // sum = sum + counter 
+  EVAL: A=1 
+  A=1 D=5 M=300
+56 D=M 
+  EVAL: D=300 (300) 
+  A=1 D=300 M=300
+57 @0 
+  EVAL: A=0 
+  A=0 D=300 M=257
+58 D=D+A 
+  EVAL: D=300 (300+0) 
+  A=0 D=300 M=257
+59 @SP 
+  EVAL: A=0 
+  A=0 D=300 M=257
+60 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=300 M=5
+61 M=D 
+  EVAL: M=300 (300) 
+  A=257 D=300 M=300
+62 @SP 
+  EVAL: A=0 
+  A=0 D=300 M=257
+63 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=300 M=256
+64 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=300 M=6
+65 D=M 
+  EVAL: D=6 (6) 
+  A=256 D=6 M=6
+66 @SP 
+  EVAL: A=0 
+  A=0 D=6 M=256
+67 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=6 M=257
+68 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=6 M=300
+69 A=M 
+  EVAL: A=300 (300) 
+  A=300 D=6 M=5
+70 M=D 
+  EVAL: M=6 (6) 
+  A=300 D=6 M=6
+71 @SP 
+  EVAL: A=0 
+  A=0 D=6 M=257
+72 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=6 M=256
+73 @ARG 
+  // push argument 0 
+  EVAL: A=2 
+  A=2 D=6 M=400
+74 D=M 
+  EVAL: D=400 (400) 
+  A=2 D=400 M=400
+75 @0 
+  EVAL: A=0 
+  A=0 D=400 M=256
+76 A=D+A 
+  EVAL: A=400 (400+0) 
+  A=400 D=400 M=1
+77 D=M 
+  EVAL: D=1 (1) 
+  A=400 D=1 M=1
+78 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=256
+79 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=1 M=6
+80 M=D 
+  EVAL: M=1 (1) 
+  A=256 D=1 M=1
+81 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=256
+82 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=1 M=257
+83 @1 
+  // push constant 1 
+  EVAL: A=1 
+  A=1 D=1 M=300
+84 D=A 
+  EVAL: D=1 (1) 
+  A=1 D=1 M=300
+85 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=257
+86 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=1 M=300
+87 M=D 
+  EVAL: M=1 (1) 
+  A=257 D=1 M=1
+88 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=257
+89 M=M+1 
+  EVAL: M=258 (257+1) 
+  A=0 D=1 M=258
+90 @SP 
+  // sub 
+  EVAL: A=0 
+  A=0 D=1 M=258
+91 M=M-1 
+  EVAL: M=257 (258-1) 
+  A=0 D=1 M=257
+92 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=1 M=1
+93 D=M 
+  EVAL: D=1 (1) 
+  A=257 D=1 M=1
+94 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=257
+95 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=1 M=256
+96 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=1 M=1
+97 M=M-D 
+  EVAL: M=0 (1-1) 
+  A=256 D=1 M=0
+98 @SP 
+  EVAL: A=0 
+  A=0 D=1 M=256
+99 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=1 M=257
+100 @ARG 
+  // pop argument 0 
+  // counter-- 
+  EVAL: A=2 
+  A=2 D=1 M=400
+101 D=M 
+  EVAL: D=400 (400) 
+  A=2 D=400 M=400
+102 @0 
+  EVAL: A=0 
+  A=0 D=400 M=257
+103 D=D+A 
+  EVAL: D=400 (400+0) 
+  A=0 D=400 M=257
+104 @SP 
+  EVAL: A=0 
+  A=0 D=400 M=257
+105 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=400 M=1
+106 M=D 
+  EVAL: M=400 (400) 
+  A=257 D=400 M=400
+107 @SP 
+  EVAL: A=0 
+  A=0 D=400 M=257
+108 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=400 M=256
+109 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=400 M=0
+110 D=M 
+  EVAL: D=0 (0) 
+  A=256 D=0 M=0
+111 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=256
+112 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=0 M=257
+113 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=0 M=400
+114 A=M 
+  EVAL: A=400 (400) 
+  A=400 D=0 M=1
+115 M=D 
+  EVAL: M=0 (0) 
+  A=400 D=0 M=0
+116 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=257
+117 M=M-1 
+  EVAL: M=256 (257-1) 
+  A=0 D=0 M=256
+118 @ARG 
+  // push argument 0 
+  EVAL: A=2 
+  A=2 D=0 M=400
+119 D=M 
+  EVAL: D=400 (400) 
+  A=2 D=400 M=400
+120 @0 
+  EVAL: A=0 
+  A=0 D=400 M=256
+121 A=D+A 
+  EVAL: A=400 (400+0) 
+  A=400 D=400 M=0
+122 D=M 
+  EVAL: D=0 (0) 
+  A=400 D=0 M=0
+123 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=256
+124 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=0 M=0
+125 M=D 
+  EVAL: M=0 (0) 
+  A=256 D=0 M=0
+126 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=256
+127 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=0 M=257
+128 @0 
+  // if-goto LOOP_START 
+  // If counter > 0, goto LOOP_START 
+  EVAL: A=0 
+  A=0 D=0 M=257
+129 D=A 
+  // push a zero onto the stack 
+  EVAL: D=0 (0) 
+  A=0 D=0 M=257
+130 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=257
+131 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=0 M=400
+132 M=D 
+  EVAL: M=0 (0) 
+  A=257 D=0 M=0
+133 @SP 
+  EVAL: A=0 
+  A=0 D=0 M=257
+134 M=M+1 
+  EVAL: M=258 (257+1) 
+  A=0 D=0 M=258
+135 @SP 
+  // *esp 
+  // compare val1 (if-goto conditional) with val2 (zero) 
+  EVAL: A=0 
+  A=0 D=0 M=258
+136 M=M-1 
+  // *esp-- (*val2) 
+  EVAL: M=257 (258-1) 
+  A=0 D=0 M=257
+137 A=M 
+  // [val2] 
+  EVAL: A=257 (257) 
+  A=257 D=0 M=0
+138 D=M 
+  // d = [val2] 
+  EVAL: D=0 (0) 
+  A=257 D=0 M=0
+139 @SP 
+  // *esp (*val2) 
+  EVAL: A=0 
+  A=0 D=0 M=257
+140 M=M-1 
+  // *esp-- (*val1) 
+  EVAL: M=256 (257-1) 
+  A=0 D=0 M=256
+141 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=256 (256) 
+  A=256 D=0 M=0
+142 D=M-D 
+  // d = [val1] - [val2] 
+  // leave esp here (pop equivalent) 
+  EVAL: D=0 (0-0) 
+  A=256 D=0 M=0
+143 @BasicLoop.LOOP_START 
+  EVAL: A=25 
+  A=25 D=0 M=0
+144 D;JNE 
+  // jump if not zero 
+  EVAL: A=25 
+  A=25 D=0 M=0
+145 @LCL 
+  // push local 0 
+  EVAL: A=1 
+  A=1 D=0 M=300
+146 D=M 
+  EVAL: D=300 (300) 
+  A=1 D=300 M=300
+147 @0 
+  EVAL: A=0 
+  A=0 D=300 M=256
+148 A=D+A 
+  EVAL: A=300 (300+0) 
+  A=300 D=300 M=6
+149 D=M 
+  EVAL: D=6 (6) 
+  A=300 D=6 M=6
+150 @SP 
+  EVAL: A=0 
+  A=0 D=6 M=256
+151 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=6 M=0
+152 M=D 
+  EVAL: M=6 (6) 
+  A=256 D=6 M=6
+153 @SP 
+  EVAL: A=0 
+  A=0 D=6 M=256
+154 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=6 M=257

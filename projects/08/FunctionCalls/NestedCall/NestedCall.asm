@@ -564,8 +564,8 @@ M=M+1
 
 // (-84) return
 
-// (-86) pop argument 0 // return: move result to ARG[0] (soon to be last stack item)
-@ARG // pop argument 0 // return: move result to ARG[0] (soon to be last stack item)
+// (-86) pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
+@ARG // pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 D=M
 @0
 D=D+A
@@ -719,8 +719,8 @@ M=M+1
 
 // (-105) return
 
-// (-107) pop argument 0 // return: move result to ARG[0] (soon to be last stack item)
-@ARG // pop argument 0 // return: move result to ARG[0] (soon to be last stack item)
+// (-107) pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
+@ARG // pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 D=M
 @0
 D=D+A
