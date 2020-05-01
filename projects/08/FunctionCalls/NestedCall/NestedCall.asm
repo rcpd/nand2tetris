@@ -7,14 +7,14 @@ M=D
 (Sys.init) // function Sys.init 0
 
 // (-6) push constant 4000 // test THIS and THAT context save
-@4000 // push constant 4000 // test THIS and THAT context save
+@4000 // push constant 4000 // test THIS and THAT context save // function Sys.init 0
+
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-
 // (-8) pop pointer 0
 @3 // pop pointer 0
 D=A
@@ -67,15 +67,15 @@ M=M-1
 // (-15) call Sys.main 0
 (sys.Sys.main.1) // call Sys.main 0
 
-// (-17) push constant 9999 // call: if no args, create a space on the stack for the return
-@9999 // push constant 9999 // call: if no args, create a space on the stack for the return
+// (-17) push constant 9999 // call Sys.main // if no args, create a space on the stack for the return
+@9999 // push constant 9999 // call Sys.main // if no args, create a space on the stack for the return
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-@sys.Sys.main.1 // create the RIP pointer and push it to the stack
+@sys.Sys.main.1 // push RIP
 D=A
 @SP
 A=M
@@ -216,14 +216,14 @@ M=M-1
 (Sys.main) // function Sys.main 5
 
 // (-39) push constant 4001
-@4001 // push constant 4001
+@4001 // push constant 4001 // function Sys.main 5
+
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-
 // (-41) pop pointer 0
 @3 // pop pointer 0
 D=A
@@ -371,7 +371,7 @@ M=M+1
 
 // (-62) call Sys.add12 1
 (sys.Sys.add12.2) // call Sys.add12 1
-@sys.Sys.add12.2 // create the RIP pointer and push it to the stack
+@sys.Sys.add12.2 // call Sys.add12 // push RIP
 D=A
 @SP
 A=M
@@ -589,19 +589,19 @@ M=M-1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
 M=D // [esp] = *ARG[0]+1
-@LCL // *LCL // function return: restore caller stack (THAT)
+@LCL // *LCL // return: restore caller stack (THAT)
 A=M-1 // *LCL-1 (**THAT)
 D=M // d = [LCL-1] (*THAT)
 @THAT
 M=D // [THAT] = [LCL-1] (*THAT)
-@2 // function return: restore caller stack (THIS)
+@2 // return: restore caller stack (THIS)
 D=A // d=2
 @LCL // *LCL 
 A=M-D // *LCL-2 (**THIS)
 D=M // d = [LCL-2] (*THIS)
 @THIS
 M=D // [THIS] = [LCL-2] (*THIS)
-@3 // function return: restore caller stack (ARG)
+@3 // return: restore caller stack (ARG)
 D=A // d=3
 @LCL // *LCL 
 A=M-D // *LCL-3 (**ARG)
@@ -612,14 +612,14 @@ M=D // [ARG] = [LCL-3] (*ARG)
 D=M // d = [LCL]
 @R13 // *R13
 M=D // [R13] = [LCL]
-@4 // function return: restore caller stack (LCL)
+@4 // return: restore caller stack (LCL)
 D=A // d=4
 @LCL // *LCL 
 A=M-D // *LCL-4 (**LCL)
 D=M // d = [LCL-4] (*LCL)
 @LCL
 M=D // [LCL] = [LCL-4] (*LCL)
-@5 // unconditional jump to LCL-5 (RIP)
+@5 // return: unconditional jump to LCL-5 (RIP)
 D=A // d=5
 @R13 // *R13 (old *LCL)
 A=M-D // *LCL-5 (*LCL)
@@ -630,14 +630,14 @@ A=M // d = [LCL-5] (*LCL)
 (Sys.add12) // function Sys.add12 0
 
 // (-91) push constant 4002
-@4002 // push constant 4002
+@4002 // push constant 4002 // function Sys.add12 0
+
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-
 // (-93) pop pointer 0
 @3 // pop pointer 0
 D=A
@@ -745,19 +745,19 @@ M=M-1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
 M=D // [esp] = *ARG[0]+1
-@LCL // *LCL // function return: restore caller stack (THAT)
+@LCL // *LCL // return: restore caller stack (THAT)
 A=M-1 // *LCL-1 (**THAT)
 D=M // d = [LCL-1] (*THAT)
 @THAT
 M=D // [THAT] = [LCL-1] (*THAT)
-@2 // function return: restore caller stack (THIS)
+@2 // return: restore caller stack (THIS)
 D=A // d=2
 @LCL // *LCL 
 A=M-D // *LCL-2 (**THIS)
 D=M // d = [LCL-2] (*THIS)
 @THIS
 M=D // [THIS] = [LCL-2] (*THIS)
-@3 // function return: restore caller stack (ARG)
+@3 // return: restore caller stack (ARG)
 D=A // d=3
 @LCL // *LCL 
 A=M-D // *LCL-3 (**ARG)
@@ -768,14 +768,14 @@ M=D // [ARG] = [LCL-3] (*ARG)
 D=M // d = [LCL]
 @R13 // *R13
 M=D // [R13] = [LCL]
-@4 // function return: restore caller stack (LCL)
+@4 // return: restore caller stack (LCL)
 D=A // d=4
 @LCL // *LCL 
 A=M-D // *LCL-4 (**LCL)
 D=M // d = [LCL-4] (*LCL)
 @LCL
 M=D // [LCL] = [LCL-4] (*LCL)
-@5 // unconditional jump to LCL-5 (RIP)
+@5 // return: unconditional jump to LCL-5 (RIP)
 D=A // d=5
 @R13 // *R13 (old *LCL)
 A=M-D // *LCL-5 (*LCL)

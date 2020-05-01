@@ -3,7 +3,8 @@
 (SimpleFunction.test) // function SimpleFunction.test 2
 
 // (-6) push local 0
-@LCL // push local 0
+@LCL // push local 0 // function SimpleFunction.test 2
+
 D=M
 @0
 A=D+A
@@ -13,7 +14,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 // (-8) push local 1
 @LCL // push local 1
 D=M
@@ -119,19 +119,19 @@ M=M-1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
 M=D // [esp] = *ARG[0]+1
-@LCL // *LCL // function return: restore caller stack (THAT)
+@LCL // *LCL // return: restore caller stack (THAT)
 A=M-1 // *LCL-1 (**THAT)
 D=M // d = [LCL-1] (*THAT)
 @THAT
 M=D // [THAT] = [LCL-1] (*THAT)
-@2 // function return: restore caller stack (THIS)
+@2 // return: restore caller stack (THIS)
 D=A // d=2
 @LCL // *LCL 
 A=M-D // *LCL-2 (**THIS)
 D=M // d = [LCL-2] (*THIS)
 @THIS
 M=D // [THIS] = [LCL-2] (*THIS)
-@3 // function return: restore caller stack (ARG)
+@3 // return: restore caller stack (ARG)
 D=A // d=3
 @LCL // *LCL 
 A=M-D // *LCL-3 (**ARG)
@@ -142,14 +142,14 @@ M=D // [ARG] = [LCL-3] (*ARG)
 D=M // d = [LCL]
 @R13 // *R13
 M=D // [R13] = [LCL]
-@4 // function return: restore caller stack (LCL)
+@4 // return: restore caller stack (LCL)
 D=A // d=4
 @LCL // *LCL 
 A=M-D // *LCL-4 (**LCL)
 D=M // d = [LCL-4] (*LCL)
 @LCL
 M=D // [LCL] = [LCL-4] (*LCL)
-@5 // unconditional jump to LCL-5 (RIP)
+@5 // return: unconditional jump to LCL-5 (RIP)
 D=A // d=5
 @R13 // *R13 (old *LCL)
 A=M-D // *LCL-5 (*LCL)

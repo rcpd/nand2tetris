@@ -222,14 +222,28 @@ def run(asm_filepath, tst_params=None, debug=False):
         else:
             raise RuntimeError("Interpreter: Unexpected command: %s %s %s %s" % (hw["PC"], raw_cmd, "---", debug_cmd))
 
+        #  format primary debug output
         if debug:
+            # prine line debug cmd
+            debug_msg = "%s %s" % (hw["PC"]-1, debug_cmd.replace("//", "~~"))
+
+            # deref values and show eval / command result
             if assignment:
-                # ignore pep, thats what assignment flag is for
-                print("%s %s --- %s // EVAL: %s=%s (%s) // A: %s D: %s M: %s" %
-                      (hw["PC"]-1, raw_cmd, debug_cmd, dst, raw_eval_cmd, eval_result, hw["A"], hw["D"], hw["M"]))
+                # ignore pep warnings(s), thats what assignment flag is for
+                debug_msg += " // EVAL: %s=%s (%s)" % (dst, eval_result, raw_eval_cmd)
             else:
-                print("%s %s --- %s // EVAL: A=%s // A=%s D=%s M=%s" %
-                      (hw["PC"]-1, raw_cmd, debug_cmd, hw["A"], hw["A"], hw["D"], hw["M"]))
+                # if no assignment must be an A command
+                debug_msg += " // EVAL: A=%s" % hw["A"]
+
+            # show the state of the registers post-execute
+            debug_msg += " // A=%s D=%s M=%s" % (hw["A"], hw["D"], hw["M"])
+
+            if "// call" in debug_cmd:
+                # TODO: flesh out call stack implmentation
+                debug_msg += "// ENTERING CALL"
+
+            print(debug_msg.replace("//", "\n ").replace("~~", "\n  //"))
+
         cycle += 1  # always advance clock cycle
 
     if hw["PC"] == len(hw["ROM"]["raw"]):
@@ -310,25 +324,26 @@ if __name__ == '__main__':
         "../06/rect/rectL.asm",
     ]
 
-    debug_runs = [True, False]
+    # debug_runs = [True, False]
+    debug_runs = [True]
     # debug_runs = [False]
     for _debug in debug_runs:
         # transpile VM to ASM
-        translator.translate(_vm_dirpaths, _vm_bootstrap_paths, debug=_debug)
+        translator.translate(_vm_dirpaths, _vm_bootstrap_paths, debug=False)
 
         # compile all ASM to HACK and binary match if available
         _asm_filepaths = vm_asm_filepaths + binary_asm_filepaths
         for _asm_filepath in _asm_filepaths:
-            assembler.assemble(_asm_filepath, debug=_debug)
+            assembler.assemble(_asm_filepath, debug=False)
 
         # load & execute modules without test scripts
         for _asm_filepath in binary_asm_filepaths:
-            run(_asm_filepath, debug=_debug)
+            run(_asm_filepath, debug=False)
 
         # load & execute modules with test scripts
         for _asm_filepath in vm_asm_filepaths:
             _tst_filepath = _asm_filepath.replace(".asm", ".tst")
             _cmp_filepath = _asm_filepath.replace(".asm", ".cmp")
-            _tst_params = tester.load_tst(_tst_filepath, debug=_debug)
-            _tst_params["compare"] = tester.load_cmp(_cmp_filepath, debug=_debug)
+            _tst_params = tester.load_tst(_tst_filepath, debug=False)
+            _tst_params["compare"] = tester.load_cmp(_cmp_filepath, debug=False)
             run(_asm_filepath, tst_params=_tst_params, debug=_debug)
