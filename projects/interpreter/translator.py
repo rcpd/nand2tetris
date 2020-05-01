@@ -19,7 +19,7 @@ def push(asm, cmd, vm_segment, asm_segment, value, static_dict, offset_list, vm_
         asm += "A=M\n"  # [esp]
         asm += "M=D\n"  # [esp] = literal
         asm += "@SP\n"  # *esp
-        asm += "M=M+1\n"  # *esp = *esp++
+        asm += "M=M+1 // stacksize++\n"  # *esp = *esp++
     else:
         # retrieve a value from segment+offset and push it onto the stack
         if vm_segment == "temp":
@@ -46,7 +46,7 @@ def push(asm, cmd, vm_segment, asm_segment, value, static_dict, offset_list, vm_
         asm += "A=M\n"  # [esp]
         asm += "M=D\n"  # [esp] = [asm_segment+offset]
         asm += "@SP\n"  # *esp
-        asm += "M=M+1\n"  # *esp++
+        asm += "M=M+1 // stacksize++\n"  # *esp++
 
     return asm, comment_count
 
@@ -77,31 +77,27 @@ def pop(asm, cmd, vm_segment, asm_segment, value, static_dict, offset_list, vm_f
         asm += "@%s // %s\n" % (asm_segment, cmd)  # *asm_segment
         asm += "D=M\n"  # d = [asm_segment]
 
-    # retrieve the *dst (segment+offset) and temporarily store it at *esp
-    asm += "@%s\n" % value  # offset
-    asm += "D=D+A\n"  # d = [asm_segment+offset] // *dst
-    asm += "@SP\n"  # *esp
-    asm += "A=M\n"  # [esp]
-    asm += "M=D\n"  # [esp] = *dst
+    asm += "@%s // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset\n" % value  # offset
+    asm += "D=D+A // d = [asm_segment+offset] (*dst)\n"  #
+    asm += "@SP // *esp\n"  #
+    asm += "A=M // [esp]\n"  #
+    asm += "M=D // [esp] = *dst\n"  #
 
-    # retrieve the *src pointer from esp-1
-    asm += "@SP\n"  # *esp
-    asm += "M=M-1\n"  # *esp-- // *src
-    asm += "A=M\n"  # [src]
-    asm += "D=M\n"  # d = [src]
+    asm += "@SP // retrieve the *src pointer from esp-1 // *esp\n"
+    asm += "M=M-1 // *esp-- (*src)\n"
+    asm += "A=M // [src]\n"
+    asm += "D=M // d = [src]\n"
 
-    # restore esp
-    asm += "@SP\n"  # *esp
-    asm += "M=M+1\n"  # *esp++ // **dst
+    asm += "@SP // restore esp (*esp)\n"
+    asm += "M=M+1 // *esp++ (**dst)\n"
 
-    # copy [src] to [dst]
-    asm += "A=M\n"  # *dst
-    asm += "A=M\n"  # [dst]
-    asm += "M=D\n"  # [dst] = [src]
+    asm += "A=M // copy [src] to [dst] // *dst\n"
+    asm += "A=M // [dst]\n"
+    asm += "M=D // [dst] = [src] (pop)\n"
 
     # free the slot on the stack
-    asm += "@SP\n"  # *esp
-    asm += "M=M-1\n"  # *esp-- // *src
+    asm += "@SP // *esp\n"
+    asm += "M=M-1 // *esp-- (*src) // stacksize--\n"
 
     return asm, comment_count
 
@@ -794,54 +790,53 @@ def parse_static(vm_filepath, local_dict, static_dict, debug=False):
     return local_dict, static_dict
 
 
-def translate(vm_dirpaths, vm_bootstrap_paths=(), debug=False):
+def translate(vm_dir, vm_bootstrap_paths=(), debug=False):
     """
     translate vm files/dirs into asm
     """
     # walk the VM program directories
-    for vm_dir in vm_dirpaths:
-        vm_dir_filelist = []
-        comment_count = -1
-        asm = ""
-        guids = []
-        local_dict = {}
-        static_dict = {}
-        offset_list = []
+    vm_dir_filelist = []
+    comment_count = -1
+    asm = ""
+    guids = []
+    local_dict = {}
+    static_dict = {}
+    offset_list = []
 
-        vm_filelist = [
-            os.path.join(vm_dir, 'sys.vm'),
-            os.path.join(vm_dir, 'main.vm'),
-            os.path.join(vm_dir, vm_dir.split('\\')[-1]+'.vm'),
-            os.path.join(vm_dir, 'Class1.vm'),
-            os.path.join(vm_dir, 'Class2.vm'),
-        ]
+    vm_filelist = [
+        os.path.join(vm_dir, 'sys.vm'),
+        os.path.join(vm_dir, 'main.vm'),
+        os.path.join(vm_dir, vm_dir.split('\\')[-1]+'.vm'),
+        os.path.join(vm_dir, 'Class1.vm'),
+        os.path.join(vm_dir, 'Class2.vm'),
+    ]
 
-        for vm_filepath in vm_filelist:
-            if os.path.exists(vm_filepath):
-                local_dict, static_dict = parse_static(vm_filepath, local_dict, static_dict, debug=debug)
+    for vm_filepath in vm_filelist:
+        if os.path.exists(vm_filepath):
+            local_dict, static_dict = parse_static(vm_filepath, local_dict, static_dict, debug=debug)
 
-        # initialize offset array
-        for i in range(0, len(static_dict)):
-            offset_list.append(-1)
+    # initialize offset array
+    for i in range(0, len(static_dict)):
+        offset_list.append(-1)
 
-        # drop the size of each offset into array position
-        for i, key in enumerate(static_dict):
-            offset_list[i] = static_dict[key][1]
+    # drop the size of each offset into array position
+    for i, key in enumerate(static_dict):
+        offset_list[i] = static_dict[key][1]
 
-        # add each element to the previous one
-        new_value = 0
-        for i in range(0, len(offset_list)):
-            old_value = offset_list[i]
-            offset_list[i] = new_value
-            new_value = old_value + new_value
+    # add each element to the previous one
+    new_value = 0
+    for i in range(0, len(offset_list)):
+        old_value = offset_list[i]
+        offset_list[i] = new_value
+        new_value = old_value + new_value
 
-        for vm_filepath in vm_filelist:
-            if os.path.exists(vm_filepath):
-                if debug:
-                    print(vm_filepath)
-                asm, guids, comment_count = parse_asm(vm_filepath, asm, guids, local_dict, static_dict, offset_list,
-                                                      comment_count, debug=debug)
-                vm_dir_filelist.append(vm_filepath)
+    for vm_filepath in vm_filelist:
+        if os.path.exists(vm_filepath):
+            if debug:
+                print(vm_filepath)
+            asm, guids, comment_count = parse_asm(vm_filepath, asm, guids, local_dict, static_dict, offset_list,
+                                                  comment_count, debug=debug)
+            vm_dir_filelist.append(vm_filepath)
 
         # write asm_file
         bootstrap = "@261 // bootstrap: initialize SP as 261\n"
@@ -856,13 +851,16 @@ def translate(vm_dirpaths, vm_bootstrap_paths=(), debug=False):
             else:
                 asm_file.write(asm)
 
-        print("Translated VM file(s) in directory: %s" % vm_dir)
-        for vm_filepath in vm_dir_filelist:
-            print("\t%s" % vm_filepath)
+    print("Translated VM file(s) in directory: %s" % vm_dir)
+    for vm_filepath in vm_dir_filelist:
+        print("\t%s" % vm_filepath)
+
+    return static_dict
 
 
 if __name__ == "__main__":
     # regular VM programs
+    # TODO: standardise paths
     _vm_dirpaths = [
         r'..\07\MemoryAccess\BasicTest',
         r'..\07\MemoryAccess\PointerTest',
@@ -886,4 +884,5 @@ if __name__ == "__main__":
 
     debug_runs = [True, False]
     for _debug in debug_runs:
-        translate(_vm_dirpaths, _vm_bootstrap_paths, debug=_debug)
+        for _vm_dir in _vm_dirpaths:
+            translate(_vm_dir, _vm_bootstrap_paths, debug=_debug)

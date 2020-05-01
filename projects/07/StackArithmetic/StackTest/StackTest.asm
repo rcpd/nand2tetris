@@ -6,7 +6,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-5) push constant 17
 @17 // push constant 17
@@ -15,7 +15,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-7) eq
 @SP // eq // *esp 
@@ -51,7 +51,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-14) push constant 16
 @16 // push constant 16
@@ -60,7 +60,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-16) eq
 @SP // eq // *esp 
@@ -96,7 +96,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-23) push constant 17
 @17 // push constant 17
@@ -105,7 +105,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-25) eq
 @SP // eq // *esp 
@@ -141,7 +141,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-32) push constant 891
 @891 // push constant 891
@@ -150,7 +150,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-34) lt
 @SP // *esp // lt
@@ -186,7 +186,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-41) push constant 892
 @892 // push constant 892
@@ -195,7 +195,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-43) lt
 @SP // *esp // lt
@@ -231,7 +231,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-50) push constant 891
 @891 // push constant 891
@@ -240,7 +240,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-52) lt
 @SP // *esp // lt
@@ -276,7 +276,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-59) push constant 32766
 @32766 // push constant 32766
@@ -285,7 +285,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-61) gt
 @SP // *esp // gt
@@ -321,7 +321,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-68) push constant 32767
 @32767 // push constant 32767
@@ -330,7 +330,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-70) gt
 @SP // *esp // gt
@@ -366,7 +366,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-77) push constant 32766
 @32766 // push constant 32766
@@ -375,7 +375,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-79) gt
 @SP // *esp // gt
@@ -411,7 +411,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-86) push constant 31
 @31 // push constant 31
@@ -420,7 +420,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-88) push constant 53
 @53 // push constant 53
@@ -429,7 +429,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-90) add
 @SP // add
@@ -450,7 +450,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-94) sub
 @SP // sub
@@ -491,7 +491,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-102) or
 @SP // or

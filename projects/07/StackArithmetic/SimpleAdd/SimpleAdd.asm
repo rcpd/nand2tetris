@@ -6,7 +6,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-5) push constant 8
 @8 // push constant 8
@@ -15,7 +15,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-7) add
 @SP // add

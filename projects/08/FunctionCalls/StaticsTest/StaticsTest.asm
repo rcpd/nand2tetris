@@ -13,7 +13,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 // (-8) push constant 8
 @8 // push constant 8
 D=A
@@ -21,7 +21,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-11) call Class1.set 2
 (sys.Class1.set.1) // call Class1.set 2
@@ -93,22 +93,22 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 // (-13) pop temp 0 // Dumps the return value
 @5 // pop temp 0 // Dumps the return value
 D=A
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-15) push constant 23
 @23 // push constant 23
@@ -117,7 +117,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-17) push constant 15
 @15 // push constant 15
@@ -126,7 +126,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-20) call Class2.set 2
 (sys.Class2.set.2) // call Class2.set 2
@@ -198,22 +198,22 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 // (-22) pop temp 0 // Dumps the return value
 @5 // pop temp 0 // Dumps the return value
 D=A
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-25) call Class1.get 0
 (sys.Class1.get.3) // call Class1.get 0
@@ -225,7 +225,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 @sys.Class1.get.3 // push RIP
 D=A
 @SP
@@ -301,7 +301,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 @sys.Class2.get.4 // push RIP
 D=A
 @SP
@@ -387,26 +387,26 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 // (-44) pop static 0
 @16 // pop static 0 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
 D=A
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-46) push argument 1
 @ARG // push argument 1
@@ -418,27 +418,27 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-48) pop static 1
 @16 // pop static 1 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
 D=A
-@1
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-50) push constant 0
 @0 // push constant 0
@@ -447,29 +447,29 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-52) return
 
 // (-54) pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 @ARG // pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 D=M
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 @ARG // *ARG[0] // return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
@@ -524,7 +524,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 // (-61) push static 1
 @16 // push static 1 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
 D=A
@@ -535,7 +535,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-63) sub
 @SP // sub
@@ -554,22 +554,22 @@ M=M+1
 // (-67) pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 @ARG // pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 D=M
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 @ARG // *ARG[0] // return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
@@ -624,26 +624,26 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 // (-74) pop static 0
 @18 // pop static 0 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
 D=A
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-76) push argument 1
 @ARG // push argument 1
@@ -655,27 +655,27 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-78) pop static 1
 @18 // pop static 1 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
 D=A
-@1
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-80) push constant 0
 @0 // push constant 0
@@ -684,29 +684,29 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-82) return
 
 // (-84) pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 @ARG // pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 D=M
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 @ARG // *ARG[0] // return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
@@ -761,7 +761,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 // (-91) push static 1
 @18 // push static 1 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
 D=A
@@ -772,7 +772,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-93) sub
 @SP // sub
@@ -791,22 +791,22 @@ M=M+1
 // (-97) pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 @ARG // pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 D=M
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 @ARG // *ARG[0] // return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
