@@ -18,8 +18,8 @@ def parse(word, keyword, strings, output):
 
     # process symbols that have been parsed to single word
     if word in symbols:
-        print("<symbol> %s </symbol>" % word)
-        output.append("<symbol> %s </symbol>" % word)
+        print("<symbol> %s </symbol>" % word.replace("<", "&lt;").replace(">", "&gt;"))
+        output.append("<symbol> %s </symbol>" % word.replace("<", "&lt;").replace(">", "&gt;"))
         if word == ";":
             keyword = False  # disable once identifier(s) processed
         return output, keyword
@@ -42,7 +42,10 @@ def parse(word, keyword, strings, output):
 
     # process regular words (no symbols)
     if word:  # word might be '' after slicing
-        if word in types:
+        if word.isnumeric():
+            print("<integerConstant> %s </integerConstant>" % word)
+            output.append("<integerConstant> %s </integerConstant>" % word)
+        elif word in types:
             print("<identifier> %s </identifier>" % word)
             output.append("<identifier> %s </identifier>" % word)
         elif keyword and word not in keywords:
