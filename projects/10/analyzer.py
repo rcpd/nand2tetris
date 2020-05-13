@@ -11,12 +11,12 @@ def find_parent(tree, node):
 def main(debug=False):
     jack_filepaths = [
         r"ArrayTest\Main.jack",
-        # r"ExpressionLessSquare\Main.jack",
-        # r"ExpressionLessSquare\Square.jack",
-        # r"ExpressionLessSquare\SquareGame.jack",
-        # r"Square\Main.jack",
-        # r"Square\Square.jack",
-        # r"Square\SquareGame.jack"
+        r"ExpressionLessSquare\Main.jack",
+        r"ExpressionLessSquare\Square.jack",
+        r"ExpressionLessSquare\SquareGame.jack",
+        r"Square\Main.jack",
+        r"Square\Square.jack",
+        r"Square\SquareGame.jack"
     ]
 
     output = []
