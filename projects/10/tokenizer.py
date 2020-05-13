@@ -1,8 +1,10 @@
-
+import xml.etree.ElementTree as ET
 import re
 
+from xml.dom import minidom
 
-def parse(word, keyword, strings, output):
+
+def parse(word, keyword, strings, tokens, debug=False):
     keywords = ['class', 'constructor', 'function', 'method', 'field', 'static', 'var', 'int', 'char', 'boolean',
                 'void', 'true', 'false', 'null', 'this', 'let', 'do', 'if', 'else', 'while', 'return']
     symbols = ['{', '}', '(', ')', '[', ']', '.', ',', ';', '+', '-', '*', '/', '&', '|', '<', '>', '=', '~', '"']
@@ -10,54 +12,68 @@ def parse(word, keyword, strings, output):
 
     # process string_constant placeholders
     if re.match(r"__string\d+__", word):
-        print("<stringConstant> %s </stringConstant>" % strings[word])
-        output.append("<stringConstant> %s </stringConstant>" % strings[word])
-        return output, keyword
+        if debug:
+            print("<stringConstant> %s </stringConstant>" % strings[word])
+        child = ET.SubElement(tokens, 'stringConstant')
+        child.text = " %s " % strings[word]
+        return tokens, keyword
 
     # process symbols that have been parsed to single word
     if word in symbols:
-        print("<symbol> %s </symbol>" % word.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
-        output.append("<symbol> %s </symbol>" % word.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
+        if debug:
+            print("<symbol> %s </symbol>" % word.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;"))
+        child = ET.SubElement(tokens, 'symbol')
+        child.text = " %s " % word  # etree will escape
         if word == ";":
             keyword = False  # disable once identifier(s) processed
-        return output, keyword
+        return tokens, keyword
 
     # search for symbols in word
     else:
         for i, char in enumerate(word):
             if char in symbols:
                 if i == 0:  # can't slice [0:0]
-                    output, keyword = parse(word[0], keyword, strings, output)  # process symbol
-                    output, keyword = parse(word[1:], keyword, strings, output)
+                    tokens, keyword = parse(word[0], keyword, strings, tokens, debug=debug)  # process symbol
+                    tokens, keyword = parse(word[1:], keyword, strings, tokens, debug=debug)
                 else:
                     if word[:i]:
-                        output, keyword = parse(word[:i], keyword, strings, output)  # process word prior to symbol
+                        tokens, keyword = parse(word[:i], keyword, strings, tokens,
+                                                debug=debug)  # process word prior to symbol
                         word = word[i:]  # truncate word to symbol char onwards
-                        output, keyword = parse(word[0], keyword, strings, output)  # process symbol
+                        tokens, keyword = parse(word[0], keyword, strings, tokens, debug=debug)  # process symbol
                     if word[1:]:  # slices return '' if out of bounds
-                        output, keyword = parse(word[1:], keyword, strings, output)  # any remaining word data
-                return output, keyword
+                        tokens, keyword = parse(word[1:], keyword, strings, tokens,
+                                                debug=debug)  # any remaining word data
+                return tokens, keyword
 
     # process regular words (no symbols)
     if word:  # word might be '' after slicing
         if word.isnumeric():
-            print("<integerConstant> %s </integerConstant>" % word)
-            output.append("<integerConstant> %s </integerConstant>" % word)
+            if debug:
+                print("<integerConstant> %s </integerConstant>" % word)
+            child = ET.SubElement(tokens, 'integerConstant')
+            child.text = " %s " % word
         elif word in types:
-            print("<identifier> %s </identifier>" % word)
-            output.append("<identifier> %s </identifier>" % word)
+            if debug:
+                print("<identifier> %s </identifier>" % word)
+            child = ET.SubElement(tokens, 'identifier')
+            child.text = " %s " % word
         elif keyword and word not in keywords:
-            print("<identifier> %s </identifier>" % word)
-            output.append("<identifier> %s </identifier>" % word)
+            if debug:
+                print("<identifier> %s </identifier>" % word)
+            child = ET.SubElement(tokens, 'identifier')
+            child.text = " %s " % word
         elif word in keywords:
-            print("<keyword> %s </keyword>" % word)
-            output.append("<keyword> %s </keyword>" % word)
+            if debug:
+                print("<keyword> %s </keyword>" % word)
+            child = ET.SubElement(tokens, 'keyword')
+            child.text = " %s " % word
             keyword = word  # set until corresponding identifier processed
 
-    return output, keyword
+    return tokens, keyword
 
 
-def main():
+def main(debug=False):
     jack_filepaths = [
         r"ArrayTest\Main.jack",
         r"ExpressionLessSquare\Main.jack",
@@ -73,11 +89,9 @@ def main():
             jack_content = jack_file.readlines()
 
         block_comment = False
-        output = []
-        print("<tokens>")
-        output.append("<tokens>")
         strings = {}
         string_id = 0
+        tokens = ET.Element("tokens")
 
         for line in jack_content:
             line = line.strip()
@@ -94,7 +108,8 @@ def main():
             if block_comment:
                 continue
 
-            print("// line:", line)
+            if debug:
+                print("// line:", line)
             line = line.split("//")[0].strip()
 
             # string_constant parsing
@@ -108,21 +123,37 @@ def main():
 
                 while '"' in line:
                     line = line.replace('"', '')
-                print("// line post-replace:", line)
+                if debug:
+                    print("// line post-replace:", line)
 
             words = line.split()
             keyword = False
-            print("// words:", words)
+            if debug:
+                print("// words:", words)
 
             for word in words:
-                output, keyword = parse(word, keyword, strings, output)
+                tokens, keyword = parse(word, keyword, strings, tokens, debug=debug)
 
-        print("</tokens>")
-        output.append("</tokens>")
-        with open(filepath.replace(".jack", "T_out.xml"), "w") as output_file:
-            for line in output:
-                output_file.write(line + "\n")
+        # write/check output
+        output_filepath = filepath.replace(".jack", "T_out.xml")
+        match_filepath = filepath.replace(".jack", "T.xml")
+        tree_string = ET.tostring(tokens)
+        raw_xml = minidom.parseString(tree_string)
+        pretty_xml = raw_xml.toprettyxml(indent="").replace(r'<?xml version="1.0" ?>', '').strip()
+        pretty_xml += "\n"
+
+        print("Writing: %s" % output_filepath)
+        if debug:
+            print(pretty_xml)
+
+        with open(output_filepath, "w") as output_file:
+            output_file.write(pretty_xml)
+        with open(match_filepath, "r") as match_file:
+            match_contents = match_file.read()
+
+        if match_contents != pretty_xml:
+            raise RuntimeError("%s did not match solution file" % output_file)
 
 
 if __name__ == '__main__':
-    main()
+    main(debug=False)
