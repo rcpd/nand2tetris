@@ -73,7 +73,40 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                # letStatement/doStatement/whileStatement  # TODO: how to close do/while statement?
+                # open expression
+                elif input_list[i][0] == "symbol" and input_list[i][1] == "=":
+                    # insert current token
+                    child = ET.SubElement(parent, input_tuple[0])
+                    child.text = " %s " % input_tuple[1]
+
+                    # inject expression & update parent(s)
+                    parent = ET.SubElement(parent, "expression")
+
+                # open expressionList
+                elif parent.tag == "term" and input_list[i][0] == "symbol" and input_list[i][1] == "(":
+                    # insert current token
+                    child = ET.SubElement(parent, input_tuple[0])
+                    child.text = " %s " % input_tuple[1]
+
+                    # inject expressionList > expression > term & update parent(s)
+                    parent = ET.SubElement(parent, "expressionList")
+                    parent = ET.SubElement(parent, "expression")
+
+                # open term
+                elif parent.tag == "expression" and \
+                        input_list[i][0] in ("identifier", "stringConstant", "integerConstant"):
+                    # inject term
+                    parent = ET.SubElement(parent, "term")
+
+                    # insert current token
+                    child = ET.SubElement(parent, input_tuple[0])
+                    child.text = " %s " % input_tuple[1]
+
+                    # read ahead and revert parent only if single term
+                    if input_list[j][0] != "symbol" or (input_list[j][0] == "symbol" and input_list[j][1] == ")"):
+                        parent = find_parent(output_root, parent)
+
+                # open letStatement/doStatement/whileStatement  # TODO: how to close do/while statement?
                 elif input_list[i][0] == "keyword" and input_list[i][1] in ("let", "do", "while"):
                     # if required inject statements & update parent
                     if parent.tag != "statements":
