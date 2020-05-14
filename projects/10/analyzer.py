@@ -39,7 +39,7 @@ def main(debug=False):
 
             # TODO: debug
             try:
-                if input_list[i][1] == "constructor":
+                if input_list[i-2][1] == "(" and input_list[i-1][1] == "x" and input_list[i][1] == ",":
                     print("bp")
             except IndexError:
                 pass
@@ -172,11 +172,23 @@ def main(debug=False):
 
                 # close term: symbols except "." and "("
                 elif parent.tag == "term" and input_list[i][0] == "symbol" \
-                    and input_list[i][1] not in (".", "(", "["):
+                    and input_list[i][1] not in (".", "(", "[", ","):
                     # close parent and insert current token
                     parent = find_parent(output_root, parent)
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
+
+                # close/open term/expression: ,
+                elif parent.tag == "term" and input_tuple == ("symbol", ","):
+                    # close parents and insert current token
+                    parent = find_parent(output_root, parent)
+                    parent = find_parent(output_root, parent)
+                    child = ET.SubElement(parent, input_tuple[0])
+                    child.text = " %s " % input_tuple[1]
+
+                    # insert new tokens and update parents
+                    parent = ET.SubElement(parent, "expression")
+                    parent = ET.SubElement(parent, "term")
 
                 # open expression/expressionList
                 elif (input_list[i][0] == "symbol" and input_list[i][1] == "=") \
@@ -203,8 +215,7 @@ def main(debug=False):
                     child.text = " %s " % input_tuple[1]
 
                 # open term
-                elif parent.tag == "expression" and \
-                        input_list[i][0] in ("identifier", "stringConstant", "integerConstant"):
+                elif parent.tag == "expression":
                     # insert new token and update parent
                     parent = ET.SubElement(parent, "term")
 
