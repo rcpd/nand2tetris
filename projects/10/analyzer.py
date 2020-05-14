@@ -39,7 +39,7 @@ def main(debug=False):
 
             # TODO: debug
             try:
-                if input_list[i][1] == "Keyboard":
+                if input_list[i-1][1] == "HOW MANY NUMBERS?":
                     print("bp")
             except IndexError:
                 pass
@@ -48,15 +48,13 @@ def main(debug=False):
                 print("// line:", input_tuple[0], input_tuple[1])
 
             if j < len(input_list):
-                # open subroutineDec (function def)  # TODO: how to close?
+                # open subroutineDec
                 if parent.tag == "class" and input_list[j][0] == "keyword" and input_list[j][1] == "function":
                     # insert current token
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    # inject new token & update parent
-                    if debug:
-                        print("// insert:", "subroutineDec")
+                    # # insert new token and update parent
                     parent = ET.SubElement(parent, "subroutineDec")
 
                 # close varDec
@@ -68,28 +66,34 @@ def main(debug=False):
 
                 # open varDec
                 elif input_list[i][0] == "keyword" and input_list[i][1] == "var":
-                    # inject new token & update parent
-                    if debug:
-                        print("// insert:", "varDec")
+                    # # insert new token and update parent
                     parent = ET.SubElement(parent, "varDec")
 
                     # insert current token
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                # close () expression/expressionList
-                elif parent.tag in ("expression", "expressionList") \
+                # close term/expression/expressionList ()
+                elif parent.tag in ("term", "expression", "expressionList") \
                     and input_list[i][0] == "symbol" and input_list[i][1] == ")":
-                    # revert parent until all desired tags closed
-                    for k in range(0, 2):
-                        if parent.tag in ("expression", "expressionList"):
+                    # revert parent until all tags closed
+                    for k in range(0, 3):
+                        if parent.tag in ("term", "expression", "expressionList"):
                             parent = find_parent(output_root, parent)
 
                     # insert current token
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                # close ; term/expression/letStatement
+                # close term (symbols except ".")
+                elif parent.tag == "term" and input_list[i][0] == "symbol" \
+                    and (input_list[i][1] != "." and input_list[i][1] != "("):
+                    # revert parent then insert current token
+                    parent = find_parent(output_root, parent)
+                    child = ET.SubElement(parent, input_tuple[0])
+                    child.text = " %s " % input_tuple[1]
+
+                # close term/expression/letStatement ;
                 elif parent.tag in ("term", "expression") and input_list[i][0] == "symbol" and input_list[i][1] == ";":
                     # revert parent until all desired tags closed
                     for k in range(0, 2):
@@ -104,7 +108,7 @@ def main(debug=False):
                     if parent.tag == "letStatement":  #
                         parent = find_parent(output_root, parent)
 
-                # close ; letStatement
+                # close letStatement ;
                 elif parent.tag == "letStatement" and input_list[i][0] == "symbol" and input_list[i][1] == ";":
                     # insert current token and revert parent
                     child = ET.SubElement(parent, input_tuple[0])
@@ -118,7 +122,7 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    # inject expression & update parent
+                    # # insert new token and update parent
                     parent = ET.SubElement(parent, "expression")
 
                 # open expressionList
@@ -127,34 +131,28 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    # inject expressionList > expression > term & update parent(s)
+                    # insert new tokens & update parents
                     parent = ET.SubElement(parent, "expressionList")
                     parent = ET.SubElement(parent, "expression")
 
                 # open term
                 elif parent.tag == "expression" and \
                         input_list[i][0] in ("identifier", "stringConstant", "integerConstant"):
-                    # inject term
+                    # # insert new token and update parent
                     parent = ET.SubElement(parent, "term")
 
                     # insert current token
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    # read ahead and revert parent only if single term
-                    if input_list[j][0] != "symbol" or (input_list[j][0] == "symbol" and input_list[j][1] == ")"):
-                        parent = find_parent(output_root, parent)
-
                 # open letStatement/doStatement/whileStatement
                 elif input_list[i][0] == "keyword" and input_list[i][1] in ("let", "do", "while"):
-                    # if required inject statements & update parent
+                    # if required insert statements & update parent
                     if parent.tag != "statements":
-                        # inject new token & update parent
-                        if debug:
-                            print("// insert:", "statements")
+                        # insert new token and update parent
                         parent = ET.SubElement(parent, "statements")
 
-                    # inject letStatement & update parent
+                    # insert new token and update parent
                     parent = ET.SubElement(parent, input_list[i][1]+"Statement")
 
                     # insert current token
@@ -168,21 +166,16 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    # populate subroutineBody for function def
-                    # inject new token & update parent
-                    if debug:
-                        print("// insert:", "subroutineBody")
+                    # insert new token and update parent
                     parent = ET.SubElement(parent, "subroutineBody")
 
-                # populate parameterList for function def
+                # open parameterList
                 elif parent.tag == "subroutineDec" and input_list[i][0] == "symbol" and input_list[i][1] == "(":
                     # insert current token
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    # inject new token & update parent
-                    if debug:
-                        print("// insert:", "parameterList")
+                    # insert new token and update parent
                     parent = ET.SubElement(parent, "parameterList")
 
                 # insert current token
