@@ -67,9 +67,24 @@ def main(debug=False):
                             parent = find_parent(output_root, parent)
 
                     elif parent.tag in ("varDec", "classVarDec", "doStatement", "returnStatement"):
+                        # insert current token and update parent
                         child = ET.SubElement(parent, input_tuple[0])
                         child.text = " %s " % input_tuple[1]
                         parent = find_parent(output_root, parent)
+
+                # open class definition: class className {
+                elif input_list[i][0] == "keyword" and input_list[i][1] == "class":
+                    # insert current token
+                    child = ET.SubElement(parent, input_tuple[0])
+                    child.text = " %s " % input_tuple[1]
+                elif input_list[i-1][0] == "keyword" and input_list[i-1][1] == "class":
+                    # insert current token
+                    child = ET.SubElement(parent, input_tuple[0])
+                    child.text = " %s " % input_tuple[1]
+                elif input_list[i-2][0] == "keyword" and input_list[i-2][1] == "class":
+                    # insert current token
+                    child = ET.SubElement(parent, input_tuple[0])
+                    child.text = " %s " % input_tuple[1]
 
                 # open subroutineDec
                 elif parent.tag == "class" and input_list[i][0] == "keyword" and input_list[i][1] == "function":
@@ -81,15 +96,17 @@ def main(debug=False):
                     child.text = " %s " % input_tuple[1]
 
                 # open classVarDec
-                elif parent.tag == "class" and input_list[i][0] == "symbol" and input_list[i][1] == "{":
-                    # only process if there are elements to add
-                    if not (input_list[j][0] == "keyword" and input_list[j][1] == "function"):
-                        # insert current token
-                        child = ET.SubElement(parent, input_tuple[0])
-                        child.text = " %s " % input_tuple[1]
+                elif parent.tag == "class":
+                    if input_list[i][0] == "keyword" and input_list[i][0] not in ("function", "method", "constructor"):
+                        # only process if there are elements to add
+                        if not (input_list[j][0] == "keyword" and input_list[j][1] in
+                                ("function", "method", "constructor")):
+                            # insert new token and update parent
+                            parent = ET.SubElement(parent, "classVarDec")
 
-                        # insert new token and update parent
-                        parent = ET.SubElement(parent, "classVarDec")
+                            # insert current token
+                            child = ET.SubElement(parent, input_tuple[0])
+                            child.text = " %s " % input_tuple[1]
                     else:
                         # insert current token
                         child = ET.SubElement(parent, input_tuple[0])
