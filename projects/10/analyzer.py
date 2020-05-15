@@ -217,6 +217,17 @@ def main(debug=False):
                         child.text = " %s " % input_tuple[1]
 
                         if parent.tag not in ("letStatement", "whileStatement", "ifStatement") and input_list[i][1] != "[":
+                            # test if already part of expressionList
+                            # term > expression > expressionList
+                            if parent.tag == "term":
+                                grandparent = find_parent(output_root, parent)
+                                if grandparent.tag == "expression":
+                                    great_grandparent = find_parent(output_root, grandparent)
+                                    if great_grandparent.tag == "expressionList":
+                                        # insert new token and update parent
+                                        parent = ET.SubElement(parent, "expression")
+                                        continue
+
                             parent = ET.SubElement(parent, "expressionList")
 
                         # insert new token and update parent
