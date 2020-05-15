@@ -23,6 +23,8 @@ def find_ancestor(tree, node, ancestors):
 
 
 def main(debug=False):
+    operators = ['+', '-', '*', '/', '&', '|', '<', '>', '~']
+
     jack_filepaths = [
         r"ArrayTest\Main.jack",
         r"ExpressionLessSquare\Main.jack",
@@ -53,7 +55,7 @@ def main(debug=False):
 
             # TODO: debug
             try:
-                if input_list[i-1][1] == "*" and input_list[i][1] == "(":
+                if input_list[i][1] == "-" and input_list[j][1] == "j":
                     print("bp")
             except IndexError:
                 pass
@@ -177,7 +179,7 @@ def main(debug=False):
                     and input_list[i][0] == "symbol" and input_list[i][1] in (")", "]"):
                     # close parent until all tags closed
                     for tag in ("term", "expression", "expressionList"):
-                        if tag == parent.tag:
+                        while tag == parent.tag:
                             parent = find_parent(output_root, parent)
 
                     # insert current token
@@ -240,7 +242,7 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                # open term
+                # open term / nested term
                 elif parent.tag == "expression":
                     # insert new token and update parent
                     parent = ET.SubElement(parent, "term")
@@ -248,6 +250,10 @@ def main(debug=False):
                     # insert current token
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
+
+                    if input_list[i][0] == "symbol" and input_list[i][1] in operators:
+                        # insert new token and update parent
+                        parent = ET.SubElement(parent, "term")
 
                 # open statements (letStatement/doStatement/whileStatement/ifStatement)
                 elif input_list[i][0] == "keyword" and input_list[i][1] in ("let", "do", "while", "if", "return"):
