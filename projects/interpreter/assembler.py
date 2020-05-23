@@ -152,7 +152,7 @@ def assemble(asm_filepath, debug=False):
             elif operation == "A" or operation == "M":
                 binary_line += "110000"
             elif operation == "!D":
-                binary_line += "001111"
+                binary_line += "001101"
             elif operation == "!A" or operation == "!M":
                 binary_line += "110001"
             elif operation == "-D":
