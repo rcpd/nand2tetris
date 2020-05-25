@@ -27,14 +27,23 @@ def main(debug=False):
     operators = ['+', '-', '*', '/', '&', '|', '<', '>', '~']
 
     jack_filepaths = [
-        r"Seven\Main.jack",
+        r"..\09\Average\Main.jack",
+        r"..\09\Fraction\Main.jack",
+        r"..\09\Fraction\Fraction.jack",
+        r"..\09\HelloWorld\Main.jack",
+        r"..\09\List\Main.jack",
+        r"..\09\List\List.jack",
+        r"..\09\Square\Main.jack",
+        r"..\09\Square\Square.jack",
+        r"..\09\Square\SquareGame.jack",
         r"..\10\ArrayTest\Main.jack",
         r"..\10\ExpressionLessSquare\Main.jack",
         r"..\10\ExpressionLessSquare\Square.jack",
         r"..\10\ExpressionLessSquare\SquareGame.jack",
         r"..\10\Square\Main.jack",
         r"..\10\Square\Square.jack",
-        r"..\10\Square\SquareGame.jack"
+        r"..\10\Square\SquareGame.jack",
+        r"..\11\Seven\Main.jack",
     ]
 
     for filepath in jack_filepaths:
@@ -85,14 +94,6 @@ def main(debug=False):
 
                 # open class definition: class className {
                 elif input_list[i][0] == "keyword" and input_list[i][1] == "class":
-                    # insert current token
-                    child = ET.SubElement(parent, input_tuple[0])
-                    child.text = " %s " % input_tuple[1]
-                elif input_list[i-1][0] == "keyword" and input_list[i-1][1] == "class":
-                    # insert current token
-                    child = ET.SubElement(parent, input_tuple[0])
-                    child.text = " %s " % input_tuple[1]
-                elif input_list[i-2][0] == "keyword" and input_list[i-2][1] == "class":
                     # insert current token
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
