@@ -69,21 +69,31 @@ def load_tst(tst_filepath, debug=False):
                     set_element = raw_cmd.split(" ")[1]
                 else:
                     set_var = test_cmd.split(" ")[1]
-                    set_element = test_cmd.split(" ")[2].replace(",", "").replace(";", "")
+                    set_element = test_cmd.split(" ")[2]
 
                 set_var = set_var.replace("sp", "0").replace("local", "1").replace("argument", "2") \
                     .replace("this", "3").replace("that", "4")
+            elif test_cmd.startswith("set PC "):
+                pass
             else:
                 raise RuntimeError("Tester: Unexpected set command: %s" % test_cmd)
 
-            test_params["RAM"][int(set_var)] = int(set_element)
+            test_params["RAM"][int(set_var)] = int(set_element.replace(",", "").replace(";", ""))
 
             if debug:
                 print(set_var, set_element)
         elif test_cmd.startswith("repeat "):
-            test_params["MAX"] = int(test_cmd.split(" ")[1])
+            try:
+                test_params["MAX"] = int(test_cmd.split(" ")[1])
+            except ValueError:
+                if test_cmd.split(" ")[1] == "{":
+                    pass
+                else:
+                    raise
             if debug:
                 print(test_params["MAX"])
+        elif test_cmd.startswith("echo "):
+            pass
         else:
             raise NotImplementedError("Tester: %s" % test_cmd)
 
@@ -124,9 +134,9 @@ def load_cmp(cmp_filepath, debug=False):
         print(cmp_dict)
 
     if not len(address_list) or not len(value_list):
-        raise RuntimeError("Tester: Address or Value parsing error (no values)")
+        raise RuntimeError("Tester: Address or Value parsing error (no values): %s" % cmp_filepath)
     if len(address_list) != len(value_list):
-        raise RuntimeError("Tester: Address/Value mismatch in cmp file parsing")
+        raise RuntimeError("Tester: Address/Value mismatch in cmp file parsing: %s" % cmp_filepath)
 
     print("Tester: loaded test targets %s" % cmp_filepath)
     return cmp_dict
@@ -134,6 +144,10 @@ def load_cmp(cmp_filepath, debug=False):
 
 if __name__ == '__main__':
     tst_filepaths = [
+        # TODO: week 5 and below use different multi row format
+        # "../04/fill/fill.tst",  # no cmp, no meaningful test
+        # "../04/mult/mult.tst",
+
         "../07/MemoryAccess/BasicTest/BasicTest.tst",
         "../07/MemoryAccess/PointerTest/PointerTest.tst",
         "../07/MemoryAccess/StaticTest/StaticTest.tst",
