@@ -120,10 +120,6 @@ def main(debug=False):
                         # insert current token
                         child = ET.SubElement(parent, input_tuple[0])
                         child.text = " %s " % input_tuple[1]
-                    else:
-                        # insert current token
-                        child = ET.SubElement(parent, input_tuple[0])
-                        child.text = " %s " % input_tuple[1]
 
                 # open varDec
                 elif input_list[i][0] == "keyword" and input_list[i][1] == "var":

@@ -28,8 +28,41 @@ def find_ancestor(tree, node, ancestors):
     return node
 
 
-def compile_class(name):
-    pass
+def compile_class(input_list, j, class_dict):
+    # symbol_dict = {"name": "var_name", "type": "int", "kind": "field", "index": 0}
+    # class_dict = {"class_name": {"var_list": [], "func_dict": {"func_name": []}}}
+
+    if input_list[j][1] not in class_dict:
+        class_dict[input_list[j][1]] = {"var_list": [], "func_dict": {"func_name": []}}
+    else:
+        raise RuntimeError()
+
+    return class_dict
+
+
+def compile_function(input_list, i, class_dict):
+    # TODO
+    return class_dict
+
+
+def compile_classvardec(input_list, i, class_dict):
+    # TODO
+    return class_dict
+
+
+def compile_vardec(input_list, i, class_dict):
+    # TODO
+    return class_dict
+
+
+def compile_expression(input_list, i, class_dict):
+    # TODO
+    return class_dict
+
+
+def compile_statement(input_list, i, class_dict):
+    # TODO
+    return class_dict
 
 
 def main(debug=False):
@@ -60,6 +93,10 @@ def main(debug=False):
         input_root = input_tree.getroot()
         output_root = ET.Element("class")
         input_list = []
+
+        # TODO: initialize properly (example only)
+        symbol_dict = {"name": "var_name", "type": "int", "kind": "field", "index": 0}
+        class_dict = {"class_name": {"var_list": [symbol_dict], "func_dict": {"func_name": [symbol_dict]}}}
 
         # read the token XML into something else more easily traversed
         for input_child in input_root:
@@ -108,21 +145,24 @@ def main(debug=False):
                     child.text = " %s " % input_tuple[1]
 
                     if input_list[j][0] == "identifier":
-                        compile_class(input_list[j][1])
+                        class_dict = compile_class(input_list, j, class_dict)
                     else:
                         raise RuntimeError()
 
                 # open subroutineDec
                 elif parent.tag == "class" and input_list[i][0] == "keyword" \
-                    and input_list[i][1] in ("function", "method", "constructor"):
+                        and input_list[i][1] in ("function", "method", "constructor"):
                     # insert new parent and current token as child
                     parent = ET.SubElement(parent, "subroutineDec")
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
+                    if input_list[j][0] == "keyword" and input_list[j+1][0] == "identifier":
+                        class_dict = compile_function(input_list, i, class_dict)
+
                 # open classVarDec
-                elif parent.tag == "class" and input_list[i][0] == "keyword"\
-                    and input_list[i][1] not in ("function", "method", "constructor"):
+                elif parent.tag == "class" and input_list[i][0] == "keyword" \
+                        and input_list[i][1] not in ("function", "method", "constructor"):
                     # only process if there are elements to add
                     if not (input_list[j][0] == "keyword" and input_list[j][1] in
                             ("function", "method", "constructor")):
@@ -130,10 +170,8 @@ def main(debug=False):
                         parent = ET.SubElement(parent, "classVarDec")
                         child = ET.SubElement(parent, input_tuple[0])
                         child.text = " %s " % input_tuple[1]
-                    else:
-                        # insert current token
-                        child = ET.SubElement(parent, input_tuple[0])
-                        child.text = " %s " % input_tuple[1]
+
+                        class_dict = compile_classvardec(input_list, i, class_dict)
 
                 # open varDec
                 elif input_list[i][0] == "keyword" and input_list[i][1] == "var":
@@ -142,9 +180,11 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
+                    class_dict = compile_vardec(input_list, i, class_dict)
+
                 # close statements/whileStatement/subroutineBody/subroutineDec }
                 elif parent.tag in ("statements", "whileStatement", "ifStatement", "subroutineBody") \
-                    and input_list[i][0] == "symbol" and input_list[i][1] == "}":
+                        and input_list[i][0] == "symbol" and input_list[i][1] == "}":
 
                     if parent.tag == "statements":
                         # close parent and insert current token
@@ -168,7 +208,7 @@ def main(debug=False):
 
                 # close expression (nested in term)
                 elif parent.tag == "term" and input_list[i][0] == "symbol" and input_list[i][1] in "]" \
-                    and find_parent(output_root, find_parent(output_root, parent)).tag == "term":
+                        and find_parent(output_root, find_parent(output_root, parent)).tag == "term":
                     # close parent until all tags closed
                     for tag in ("term", "expression", "expressionList"):
                         if tag == parent.tag:
@@ -180,7 +220,7 @@ def main(debug=False):
 
                 # close term/expression/expressionList ) or ]
                 elif parent.tag in ("term", "expression", "expressionList") \
-                    and input_list[i][0] == "symbol" and input_list[i][1] in (")", "]"):
+                        and input_list[i][0] == "symbol" and input_list[i][1] in (")", "]"):
                     # close parent until all tags closed
                     for tag in ("term", "expression", "expressionList"):
                         while tag == parent.tag:
@@ -192,7 +232,7 @@ def main(debug=False):
 
                 # close term: symbols except "." and "("
                 elif parent.tag == "term" and input_list[i][0] == "symbol" \
-                    and input_list[i][1] not in (".", "(", "[", ","):
+                        and input_list[i][1] not in (".", "(", "[", ","):
                     # close parent and insert current token
                     parent = find_parent(output_root, parent)
                     child = ET.SubElement(parent, input_tuple[0])
@@ -220,8 +260,10 @@ def main(debug=False):
                         child = ET.SubElement(parent, input_tuple[0])
                         child.text = " %s " % input_tuple[1]
 
+                        class_dict = compile_expression(input_list, i, class_dict)
+
                         if parent.tag not in ("letStatement", "whileStatement", "ifStatement") \
-                            and input_list[i][1] != "[":
+                                and input_list[i][1] != "[":
                             # test if already part of expressionList
                             # term > expression > expressionList
                             if parent.tag == "term":
@@ -248,13 +290,13 @@ def main(debug=False):
 
                 # open expression (return)
                 elif parent.tag == "returnStatement" and input_tuple != ("keyword", "return"):
-                    # insert new tokens and update parents
+                    # insert new tokens and update parents with current token as child
                     parent = ET.SubElement(parent, "expression")
                     parent = ET.SubElement(parent, "term")
-
-                    # insert current token
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
+
+                    class_dict = compile_expression(input_list, i, class_dict)
 
                 # open term / nested term
                 elif parent.tag == "expression":
@@ -280,6 +322,8 @@ def main(debug=False):
                     # insert current token
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
+
+                    class_dict = compile_statement(input_list, i, class_dict)
 
                 # close parameterList
                 elif parent.tag == "parameterList" and input_list[i][0] == "symbol" and input_list[i][1] == ")":
@@ -336,4 +380,3 @@ def main(debug=False):
 
 if __name__ == '__main__':
     main(debug=False)
-
