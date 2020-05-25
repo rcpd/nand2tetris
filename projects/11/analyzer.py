@@ -1,4 +1,5 @@
 import xml.etree.ElementTree as ET
+import os
 
 from xml.dom import minidom
 
@@ -26,13 +27,14 @@ def main(debug=False):
     operators = ['+', '-', '*', '/', '&', '|', '<', '>', '~']
 
     jack_filepaths = [
-        r"ArrayTest\Main.jack",
-        r"ExpressionLessSquare\Main.jack",
-        r"ExpressionLessSquare\Square.jack",
-        r"ExpressionLessSquare\SquareGame.jack",
-        r"Square\Main.jack",
-        r"Square\Square.jack",
-        r"Square\SquareGame.jack"
+        r"Seven\Main.jack",
+        r"..\10\ArrayTest\Main.jack",
+        r"..\10\ExpressionLessSquare\Main.jack",
+        r"..\10\ExpressionLessSquare\Square.jack",
+        r"..\10\ExpressionLessSquare\SquareGame.jack",
+        r"..\10\Square\Main.jack",
+        r"..\10\Square\Square.jack",
+        r"..\10\Square\SquareGame.jack"
     ]
 
     for filepath in jack_filepaths:
@@ -318,11 +320,13 @@ def main(debug=False):
 
         with open(output_filepath, "w") as output_file:
             output_file.write(pretty_xml)
-        with open(match_filepath, "r") as match_file:
-            match_contents = match_file.read()
 
-        if match_contents != pretty_xml:
-            raise RuntimeError("%s did not match solution file" % output_file)
+        if os.path.exists(match_filepath):
+            with open(match_filepath, "r") as match_file:
+                match_contents = match_file.read()
+
+            if match_contents != pretty_xml:
+                raise RuntimeError("%s did not match solution file" % output_file)
 
 
 if __name__ == '__main__':
