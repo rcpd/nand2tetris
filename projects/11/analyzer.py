@@ -309,7 +309,6 @@ def main(debug=False):
         tree_string = ET.tostring(output_root).strip()
         raw_xml = minidom.parseString(tree_string)
         pretty_xml = raw_xml.toprettyxml(indent="  ").replace(r'<?xml version="1.0" ?>'+'\n', '')
-        # pretty_xml += "\n"
 
         print("Writing: %s" % output_filepath)
         if debug:
