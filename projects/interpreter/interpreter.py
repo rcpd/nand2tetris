@@ -377,7 +377,7 @@ if __name__ == '__main__':
 
     _vm_dirpaths = _vm_dirpaths + _vm_bootstrap_paths
 
-    vm_asm_filepaths = [
+    vm_asm_filepaths = [  # test scripts
         # "../07/MemoryAccess/BasicTest/BasicTest.asm",
         # "../07/MemoryAccess/PointerTest/PointerTest.asm",
         # "../07/MemoryAccess/StaticTest/StaticTest.asm",
@@ -392,7 +392,7 @@ if __name__ == '__main__':
         # "../08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
     ]
 
-    binary_asm_filepaths = [
+    binary_asm_filepaths = [  # compilation only
         # "../04/fill/fill.asm",
         # "../04/mult/mult.asm",
         # "../06/add/add.asm",
@@ -402,6 +402,7 @@ if __name__ == '__main__':
         # "../06/pong/pongL.asm",
         # "../06/rect/rect.asm",
         # "../06/rect/rectL.asm",
+        r"../11/Seven/Seven.asm",
     ]
 
     # debug_runs = [True, False]
