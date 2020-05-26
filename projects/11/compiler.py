@@ -38,7 +38,14 @@ def find_ancestor(tree, node, ancestors):
     return node
 
 
-def compile_class(input_list, i, class_dict, pre=False):
+def store_pcode(pcode, cmd, debug=True):
+    if debug:
+        print(cmd)
+    pcode.append(cmd+"\n")
+    return pcode
+
+
+def compile_class(pcode, input_list, i, class_dict, pre=False):
     """
     input_list[i][0] == "keyword" and input_list[i][1] == "class"
     input_list[j][0] == "identifier"
@@ -49,11 +56,11 @@ def compile_class(input_list, i, class_dict, pre=False):
         class_dict[class_name] = {"arg_list": []}
 
     if not pre:
-        print("// class %s" % class_name)
-    return class_dict, class_name
+        store_pcode(pcode, "// class %s" % class_name)
+    return pcode, class_dict, class_name
 
 
-def compile_function(input_list, i, class_dict, class_name, pre=False):
+def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
     """
     # parent.tag == "class"
     # input_list[i][0] == "keyword" and input_list[i][1] in ("function", "method", "constructor")
@@ -80,23 +87,23 @@ def compile_function(input_list, i, class_dict, class_name, pre=False):
         raise RuntimeError
 
     if not pre:
-        print("%s %s.%s %s" % (input_list[i-2][1], class_name, input_list[i][1],
-                               len(class_dict[class_name][input_list[i][1]]["arg_list"])))
-    return class_dict, func_name
+        store_pcode(pcode, "%s %s.%s %s" % (input_list[i-2][1], class_name, input_list[i][1],
+                                             len(class_dict[class_name][input_list[i][1]]["arg_list"])))
+    return pcode, class_dict, func_name
 
 
-def compile_classvardec(input_list, i, class_dict):
+def compile_classvardec(pcode, input_list, i, class_dict):
     # TODO
-    return class_dict
+    return pcode, class_dict
 
 
-def compile_vardec(input_list, i, class_dict, class_name, func_name):
+def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name):
     """
     input_list[i][0] == "keyword" and input_list[i][1] == "var":
     """
     if input_list[i+1][0] == "keyword" and input_list[i+2][0] == "identifier":
         # var <type> <name>
-        print("// var %s %s (local)" % (input_list[i+1][1], input_list[i+2][1]))
+        store_pcode(pcode, "// var %s %s (local)" % (input_list[i+1][1], input_list[i+2][1]))
 
         # update func/kind index
         if input_list[i+1][1] not in class_dict[class_name][func_name]["index_dict"]:
@@ -111,15 +118,15 @@ def compile_vardec(input_list, i, class_dict, class_name, func_name):
     else:
         raise RuntimeError(input_list[i+1])
 
-    return class_dict
+    return pcode, class_dict
 
 
-def compile_expression(input_list, i):
+def compile_expression(pcode, input_list, i):
     j = i  # i = opening symbol, j = closing symbol
     while input_list[j][1] != ";":
         # recurse until all brackets unpacked
         if input_list[j][1] == "(" and input_list[j+1][1] != ")":
-            compile_expression(input_list, j+1)
+            pcode, compile_expression(pcode, input_list, j+1)
         j += 1
     
     # process expression
@@ -127,31 +134,31 @@ def compile_expression(input_list, i):
         inc = 0
         # parse x <op> y expressions
         if input_list[i][0] == "integerConstant":  # TODO: or identifier?
-            print("push constant %s" % input_list[i][1])  # parse x
+            store_pcode(pcode, "push constant %s" % input_list[i][1])  # parse x
             inc += 1
             if input_list[i+1][1] in operators:
                 if input_list[i+2][0] == "integerConstant":  # TODO: or identifier?
-                    print("push constant %s" % input_list[i+2][1])  # parse y
+                    store_pcode(pcode, "push constant %s" % input_list[i+2][1])  # parse y
                     inc += 1
                 elif input_list[i+2][1] == "(":
                     pass
                 else:
                     raise RuntimeError(input_list[i])
-                print("%s" % op_map[input_list[i+1][1]])  # parse op
+                store_pcode(pcode, "%s" % op_map[input_list[i+1][1]])  # parse op
                 inc += 1
         elif input_list[i][1] == ",":  # TODO: check push order
             inc += 1
         elif input_list[i][1] == "-" and input_list[i+1][0] == "integerConstant":
-            print("push constant %s" % input_list[i+1][1])
-            print("neg")
+            store_pcode(pcode, "push constant %s" % input_list[i+1][1])
+            store_pcode(pcode, "neg")
             inc += 2
         else:
             raise RuntimeError(input_list[i])
         i += inc
-    return
+    return pcode
 
 
-def compile_statement(input_list, i, class_dict, class_name):
+def compile_statement(pcode, input_list, i, class_dict, class_name):
     """
     input_list[i][0] == "keyword" and input_list[i][1] in ("let", "do", "while", "if", "return")
     """
@@ -162,15 +169,15 @@ def compile_statement(input_list, i, class_dict, class_name):
                 if input_list[i+1][1] == "." and input_list[i+2][0] == "identifier"\
                         and input_list[i+3][1] == "(":
                     if input_list[i+4][1] != ")":
-                        compile_expression(input_list, i+4)
+                        pcode = compile_expression(pcode, input_list, i+4)
                     num_args = len(class_dict[input_list[i][1]][input_list[i+2][1]]["arg_list"])
-                    print("call %s.%s %s" % (input_list[i][1], input_list[i+2][1], num_args))
+                    store_pcode(pcode, "call %s.%s %s" % (input_list[i][1], input_list[i+2][1], num_args))
             i += 1
     elif input_list[i][1] == "return":
-        print("return")
+        store_pcode(pcode, "return")
     else:
         raise RuntimeError(input_list[i])
-    return class_dict
+    return pcode, class_dict
 
 
 def main(debug=False):
@@ -202,6 +209,7 @@ def main(debug=False):
         input_root = input_tree.getroot()
         output_root = ET.Element("class")
         input_list = []
+        pcode = []
 
         # read the token XML into something else more easily traversed
         for input_child in input_root:
@@ -223,15 +231,15 @@ def main(debug=False):
         for i, token in enumerate(input_list):
             if token[0] == "keyword":
                 if token[1] == "class" and input_list[i+1][0] == "identifier":
-                    class_dict, class_name = compile_class(input_list, i+1, class_dict, pre=True)
+                    pcode, class_dict, class_name = compile_class(pcode, input_list, i+1, class_dict, pre=True)
                 elif token[1] in ("function", "method") and input_list[i+2][0] == "identifier":
-                    class_dict, func_name = compile_function(input_list, i+2, class_dict, class_name, pre=True)
+                    pcode, class_dict, func_name = compile_function(pcode, input_list, i+2, class_dict, class_name, pre=True)
 
         for i, input_tuple in enumerate(input_list):
             j = i+1  # next token
 
             if debug:
-                print("// line:", input_tuple[0], input_tuple[1])
+                store_pcode(pcode, "// line: %s %s" % (input_tuple[0], input_tuple[1]))
 
             # process tokens
             try:
@@ -265,7 +273,7 @@ def main(debug=False):
                     child.text = " %s " % input_tuple[1]
 
                     if input_list[j][0] == "identifier":
-                        class_dict, class_name = compile_class(input_list, j, class_dict)
+                        pcode, class_dict, class_name = compile_class(pcode, input_list, j, class_dict)
                     else:
                         raise RuntimeError()
 
@@ -278,7 +286,7 @@ def main(debug=False):
                     child.text = " %s " % input_tuple[1]
 
                     if input_list[j][0] == "keyword" and input_list[j+1][0] == "identifier":
-                        class_dict, func_name = compile_function(input_list, j+1, class_dict, class_name)
+                        pcode, class_dict, func_name = compile_function(pcode, input_list, j+1, class_dict, class_name)
 
                 # open classVarDec
                 elif parent.tag == "class" and input_list[i][0] == "keyword" \
@@ -291,7 +299,7 @@ def main(debug=False):
                         child = ET.SubElement(parent, input_tuple[0])
                         child.text = " %s " % input_tuple[1]
 
-                        # class_dict = compile_classvardec(input_list, i, class_dict)
+                        # pcode, class_dict = compile_classvardec(pcode, input_list, i, class_dict)
 
                 # open varDec
                 elif input_list[i][0] == "keyword" and input_list[i][1] == "var":
@@ -300,7 +308,7 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    class_dict = compile_vardec(input_list, i, class_dict, class_name, func_name)
+                    pcode, class_dict = compile_vardec(pcode, input_list, i, class_dict, class_name, func_name)
 
                 # close statements/whileStatement/subroutineBody/subroutineDec }
                 elif parent.tag in ("statements", "whileStatement", "ifStatement", "subroutineBody") \
@@ -380,7 +388,7 @@ def main(debug=False):
                         child = ET.SubElement(parent, input_tuple[0])
                         child.text = " %s " % input_tuple[1]
 
-                        # compile_expression(input_list, i)
+                        # pcode = compile_expression(pcode, input_list, i)
 
                         if parent.tag not in ("letStatement", "whileStatement", "ifStatement") \
                                 and input_list[i][1] != "[":
@@ -416,7 +424,7 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    # compile_expression(input_list, i)
+                    # pcode = compile_expression(pcode, input_list, i)
 
                 # open term / nested term
                 elif parent.tag == "expression":
@@ -443,7 +451,7 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    class_dict = compile_statement(input_list, i, class_dict, class_name)
+                    pcode, class_dict = compile_statement(pcode, input_list, i, class_dict, class_name)
 
                 # close parameterList
                 elif parent.tag == "parameterList" and input_list[i][0] == "symbol" and input_list[i][1] == ")":
@@ -475,26 +483,12 @@ def main(debug=False):
                 else:
                     raise
 
-        # write/check output
-        output_filepath = filepath.replace(".jack", "_out.xml")
-        match_filepath = filepath.replace(".jack", ".xml")
-        tree_string = ET.tostring(output_root).strip()
-        raw_xml = minidom.parseString(tree_string)
-        pretty_xml = raw_xml.toprettyxml(indent="  ").replace(r'<?xml version="1.0" ?>'+'\n', '')
-
+        # write output
+        output_filepath = filepath.replace(".jack", ".vm")
         print("Writing: %s" % output_filepath)
-        if debug:
-            print(pretty_xml)
 
         with open(output_filepath, "w") as output_file:
-            output_file.write(pretty_xml)
-
-        if os.path.exists(match_filepath):
-            with open(match_filepath, "r") as match_file:
-                match_contents = match_file.read()
-
-            if match_contents != pretty_xml:
-                raise RuntimeError("%s did not match solution file" % output_file)
+            output_file.writelines(pcode)
 
 
 if __name__ == '__main__':
