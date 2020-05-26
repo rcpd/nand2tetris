@@ -1,6 +1,11 @@
 """
 Compile a JACK program into a VM program (pcode) from the token stream initially generated
 by tokenizer/analyzer.
+
+class_dict = {"class_name": {"arg_list": [], "func_name": {"type": "func", "kind": "void",
+"arg_list": []}, "index_dict": {"local", 0}}}}
+arg_list: [{"name": "var_name": "type": "int", "kind": "local", "index": 0}}]
+
 """
 
 import os
@@ -33,48 +38,51 @@ def find_ancestor(tree, node, ancestors):
     return node
 
 
-def compile_class(input_list, j, class_dict):
+def compile_class(input_list, i, class_dict, pre=False):
     """
     input_list[i][0] == "keyword" and input_list[i][1] == "class"
     input_list[j][0] == "identifier"
     """
     # define class_name and initialize symbol table
-    class_name = input_list[j][1]
+    class_name = input_list[i][1]
     if class_name not in class_dict:
-        class_dict[class_name] = {"arg_list": [], "func_dict": {}}
-    else:
-        raise RuntimeError()
+        class_dict[class_name] = {"arg_list": []}
 
-    print("// class %s" % class_name)
-    return class_name, class_dict
+    if not pre:
+        print("// class %s" % class_name)
+    return class_dict, class_name
 
 
-def compile_function(input_list, i, class_dict, class_name):
+def compile_function(input_list, i, class_dict, class_name, pre=False):
     """
     # parent.tag == "class"
     # input_list[i][0] == "keyword" and input_list[i][1] in ("function", "method", "constructor")
     # if input_list[j][0] == "keyword" and input_list[j+1][0] == "identifier":
     """
+    func_name = input_list[i][1]
     # define function symbol
-    if input_list[i][1] in ("function", "method"):
-        func_name = input_list[i+2][1]
-        arg_list = []
-        class_dict[class_name]["func_dict"] = \
-            {input_list[i+2][1]: {"type": input_list[i][1], "kind": input_list[i+1][1], "arg_list": arg_list}}
-    elif input_list[i][1] == "constructor":
+    if input_list[i-2][1] in ("function", "method"):
+        class_dict[class_name][input_list[i][1]] = {"type": input_list[i-2][1], "kind": input_list[i-1][1],
+                                                    "arg_list": [], "index_dict": {}}
+        # define function arguments
+        if input_list[i+1][1] == "(":
+            if input_list[i+2][1] != ")":
+                pass  # TODO: process function arguments
+        else:
+            raise RuntimeError
+
+    elif input_list[i-2][1] == "constructor":
         pass
+    elif input_list[i-1][1] == ".":
+        if func_name not in class_dict[class_name]:
+            class_dict[class_name][func_name] = {"type": "", "kind": "", "arg_list": [], "index_dict": {}}
     else:
         raise RuntimeError
 
-    # define function arguments
-    if input_list[i+3][1] == "(":
-        if input_list[i+4][1] != ")":
-            pass  # TODO: process function arguments
-    else:
-        raise RuntimeError
-    # function Main.main 0
-    print("%s %s.%s %s" % (input_list[i][1], class_name, input_list[i+2][1], len(arg_list)))
-    return class_dict
+    if not pre:
+        print("%s %s.%s %s" % (input_list[i-2][1], class_name, input_list[i][1],
+                               len(class_dict[class_name][input_list[i][1]]["arg_list"])))
+    return class_dict, func_name
 
 
 def compile_classvardec(input_list, i, class_dict):
@@ -82,8 +90,27 @@ def compile_classvardec(input_list, i, class_dict):
     return class_dict
 
 
-def compile_vardec(input_list, i, class_dict):
-    # TODO
+def compile_vardec(input_list, i, class_dict, class_name, func_name):
+    """
+    input_list[i][0] == "keyword" and input_list[i][1] == "var":
+    """
+    if input_list[i+1][0] == "keyword" and input_list[i+2][0] == "identifier":
+        # var <type> <name>
+        print("// var %s %s (local)" % (input_list[i+1][1], input_list[i+2][1]))
+
+        # update func/kind index
+        if input_list[i+1][1] not in class_dict[class_name][func_name]["index_dict"]:
+            class_dict[class_name][func_name]["index_dict"]["local"] = 0
+        else:
+            class_dict[class_name][func_name]["index_dict"]["local"] += 1
+
+        # add var to func_dict
+        class_dict[class_name][func_name]["arg_list"].append(
+            {"name": input_list[i+2][1], "kind": input_list[i+1][1], "index":
+                class_dict[class_name][func_name]["index_dict"]["local"]})
+    else:
+        raise RuntimeError(input_list[i+1])
+
     return class_dict
 
 
@@ -112,6 +139,12 @@ def compile_expression(input_list, i):
                     raise RuntimeError(input_list[i])
                 print("%s" % op_map[input_list[i+1][1]])  # parse op
                 inc += 1
+        elif input_list[i][1] == ",":  # TODO: check push order
+            inc += 1
+        elif input_list[i][1] == "-" and input_list[i+1][0] == "integerConstant":
+            print("push constant %s" % input_list[i+1][1])
+            print("neg")
+            inc += 2
         else:
             raise RuntimeError(input_list[i])
         i += inc
@@ -130,13 +163,13 @@ def compile_statement(input_list, i, class_dict, class_name):
                         and input_list[i+3][1] == "(":
                     if input_list[i+4][1] != ")":
                         compile_expression(input_list, i+4)
-                    num_args = len(class_dict[input_list[i][1]]["func_dict"][input_list[i+2][1]]["arg_list"])
+                    num_args = len(class_dict[input_list[i][1]][input_list[i+2][1]]["arg_list"])
                     print("call %s.%s %s" % (input_list[i][1], input_list[i+2][1], num_args))
             i += 1
     elif input_list[i][1] == "return":
         print("return")
     else:
-        raise RuntimeError
+        raise RuntimeError(input_list[i])
     return class_dict
 
 
@@ -158,10 +191,13 @@ def main(debug=False):
         # r"..\10\Square\Main.jack",
         # r"..\10\Square\Square.jack",
         # r"..\10\Square\SquareGame.jack",
+
         r"..\11\Seven\Main.jack",
+        r"..\11\ConvertToBin\Main.jack",
     ]
 
     for filepath in jack_filepaths:
+        print("\nParsing: %s" % filepath)
         input_tree = ET.parse(filepath.replace(".jack", "T_out.xml"))
         input_root = input_tree.getroot()
         output_root = ET.Element("class")
@@ -178,13 +214,18 @@ def main(debug=False):
         parent = output_root
 
         class_name = None
-        # TODO: look this up
-        # symbol_dict = {"name": "var_name", "type": "int", "kind": "field", "index": 0}
-        # class_dict = {"class_name": {"arg_list": [], "func_dict": {"func_name": {"type": "func", "kind": "void", "arg_list": []}}}}
+        func_name = None
         class_dict = {
-            "Output": {"arg_list": [],
-                       "func_dict": {"printInt": {"type": "function", "kind": "void", "arg_list": ["i"]}}}
-        }
+            "Output": {"arg_list": [],  # TODO: look this up
+                       "printInt": {"type": "function", "kind": "void", "arg_list": ["i"], "index_dict": {}}}}
+
+        # pre-process stream for class/function definitions
+        for i, token in enumerate(input_list):
+            if token[0] == "keyword":
+                if token[1] == "class" and input_list[i+1][0] == "identifier":
+                    class_dict, class_name = compile_class(input_list, i+1, class_dict, pre=True)
+                elif token[1] in ("function", "method") and input_list[i+2][0] == "identifier":
+                    class_dict, func_name = compile_function(input_list, i+2, class_dict, class_name, pre=True)
 
         for i, input_tuple in enumerate(input_list):
             j = i+1  # next token
@@ -224,7 +265,7 @@ def main(debug=False):
                     child.text = " %s " % input_tuple[1]
 
                     if input_list[j][0] == "identifier":
-                        class_name, class_dict = compile_class(input_list, j, class_dict)
+                        class_dict, class_name = compile_class(input_list, j, class_dict)
                     else:
                         raise RuntimeError()
 
@@ -237,7 +278,7 @@ def main(debug=False):
                     child.text = " %s " % input_tuple[1]
 
                     if input_list[j][0] == "keyword" and input_list[j+1][0] == "identifier":
-                        class_dict = compile_function(input_list, i, class_dict, class_name)
+                        class_dict, func_name = compile_function(input_list, j+1, class_dict, class_name)
 
                 # open classVarDec
                 elif parent.tag == "class" and input_list[i][0] == "keyword" \
@@ -250,7 +291,7 @@ def main(debug=False):
                         child = ET.SubElement(parent, input_tuple[0])
                         child.text = " %s " % input_tuple[1]
 
-                        class_dict = compile_classvardec(input_list, i, class_dict)
+                        # class_dict = compile_classvardec(input_list, i, class_dict)
 
                 # open varDec
                 elif input_list[i][0] == "keyword" and input_list[i][1] == "var":
@@ -259,7 +300,7 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    class_dict = compile_vardec(input_list, i, class_dict)
+                    class_dict = compile_vardec(input_list, i, class_dict, class_name, func_name)
 
                 # close statements/whileStatement/subroutineBody/subroutineDec }
                 elif parent.tag in ("statements", "whileStatement", "ifStatement", "subroutineBody") \

@@ -44,6 +44,7 @@ def main(debug=False):
         r"..\10\Square\Square.jack",
         r"..\10\Square\SquareGame.jack",
         r"..\11\Seven\Main.jack",
+        r"..\11\ConvertToBin\Main.jack",
     ]
 
     for filepath in jack_filepaths:
