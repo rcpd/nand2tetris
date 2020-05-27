@@ -2,16 +2,13 @@
 Compile a JACK program into a VM program (pcode) from the token stream initially generated
 by tokenizer/analyzer.
 
-class_dict = {"class_name": {"arg_list": [], "func_name": {"type": "func", "kind": "void",
-"arg_list": []}, "index_dict": {"local", 0}}}}
-arg_list: [{"name": "var_name": "type": "int", "kind": "local", "index": 0}}]
+class_dict = {"class_name": {"args": {}, "func_name": {"type": "func", "kind": "void",
+"args": {}}, "index_dict": {"local", 0}}}}
+args: {"var_name": {"type": "int", "kind": "local", "index": 0}}
 
 """
 
-import os
 import xml.etree.ElementTree as ET
-
-from xml.dom import minidom
 
 
 operators = ["+", "-", "*", "/", "&", "|", "<", ">", "~"]
@@ -53,10 +50,11 @@ def compile_class(pcode, input_list, i, class_dict, pre=False):
     # define class_name and initialize symbol table
     class_name = input_list[i][1]
     if class_name not in class_dict:
-        class_dict[class_name] = {"arg_list": []}
+        class_dict[class_name] = {"args": {}}
 
     if not pre:
         store_pcode(pcode, "// class %s" % class_name)
+
     return pcode, class_dict, class_name
 
 
@@ -70,11 +68,24 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
     # define function symbol
     if input_list[i-2][1] in ("function", "method"):
         class_dict[class_name][input_list[i][1]] = {"type": input_list[i-2][1], "kind": input_list[i-1][1],
-                                                    "arg_list": [], "index_dict": {}}
+                                                    "args": {}, "index_dict": {}}
         # define function arguments
         if input_list[i+1][1] == "(":
-            if input_list[i+2][1] != ")":
-                pass  # TODO: process function arguments
+            while input_list[i+2][1] != ")":
+                if input_list[i+2][1] == ",":
+                    i += 1
+                    continue
+                if input_list[i+2][0] == "keyword" and input_list[i+3][0] == "identifier":
+                    # update func/arg index
+                    if "argument" not in class_dict[class_name][func_name]["index_dict"]:
+                        class_dict[class_name][func_name]["index_dict"]["argument"] = 0
+                    else:
+                        class_dict[class_name][func_name]["index_dict"]["argument"] += 1
+
+                    class_dict[class_name][func_name]["args"][input_list[i+3][1]] = \
+                        {"type": "argument", "kind": input_list[i+2][1],
+                         "index": class_dict[class_name][func_name]["index_dict"]["argument"]}
+                    i += 2
         else:
             raise RuntimeError
 
@@ -82,13 +93,13 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
         pass
     elif input_list[i-1][1] == ".":
         if func_name not in class_dict[class_name]:
-            class_dict[class_name][func_name] = {"type": "", "kind": "", "arg_list": [], "index_dict": {}}
+            class_dict[class_name][func_name] = {"type": "", "kind": "", "args": {}, "index_dict": {}}
     else:
         raise RuntimeError
 
     if not pre:
         store_pcode(pcode, "%s %s.%s %s" % (input_list[i-2][1], class_name, input_list[i][1],
-                                             len(class_dict[class_name][input_list[i][1]]["arg_list"])))
+                                            len(class_dict[class_name][input_list[i][1]]["args"])))
     return pcode, class_dict, func_name
 
 
@@ -112,33 +123,41 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name):
             class_dict[class_name][func_name]["index_dict"]["local"] += 1
 
         # add var to func_dict
-        class_dict[class_name][func_name]["arg_list"].append(
-            {"name": input_list[i+2][1], "kind": input_list[i+1][1], "index":
-                class_dict[class_name][func_name]["index_dict"]["local"]})
+        class_dict[class_name][func_name]["args"][input_list[i+2][1]] = \
+            {"type": "local", "kind": input_list[i+1][1],
+             "index": class_dict[class_name][func_name]["index_dict"]["local"]}
+
     else:
         raise RuntimeError(input_list[i+1])
 
     return pcode, class_dict
 
 
-def compile_expression(pcode, input_list, i):
+def compile_expression(pcode, input_list, i, class_dict, class_name, func_name):
     j = i  # i = opening symbol, j = closing symbol
     while input_list[j][1] != ";":
         # recurse until all brackets unpacked
         if input_list[j][1] == "(" and input_list[j+1][1] != ")":
-            pcode, compile_expression(pcode, input_list, j+1)
+            pcode, compile_expression(pcode, input_list, j+1, class_dict, class_name, func_name)
         j += 1
     
     # process expression
+    # TODO: remove duplication of single vs multi term parse
     while input_list[i][1] not in ("(", ")"):
         inc = 0
         # parse x <op> y expressions
-        if input_list[i][0] == "integerConstant":  # TODO: or identifier?
-            store_pcode(pcode, "push constant %s" % input_list[i][1])  # parse x
+        if input_list[i][0] == "integerConstant":
+            # parse x
+            store_pcode(pcode, "push constant %s" % input_list[i][1])
             inc += 1
             if input_list[i+1][1] in operators:
-                if input_list[i+2][0] == "integerConstant":  # TODO: or identifier?
-                    store_pcode(pcode, "push constant %s" % input_list[i+2][1])  # parse y
+                # parse y
+                if input_list[i+2][0] == "integerConstant":
+                    store_pcode(pcode, "push constant %s" % input_list[i+2][1])
+                    inc += 1
+                elif input_list[i+2][0] == "identifier":
+                    var = class_dict[class_name][func_name]["args"][input_list[i][1]]
+                    store_pcode(pcode, "push %s %s" % (var["type"], var["index"]))
                     inc += 1
                 elif input_list[i+2][1] == "(":
                     pass
@@ -146,6 +165,10 @@ def compile_expression(pcode, input_list, i):
                     raise RuntimeError(input_list[i])
                 store_pcode(pcode, "%s" % op_map[input_list[i+1][1]])  # parse op
                 inc += 1
+        elif input_list[i][0] == "identifier":
+            var = class_dict[class_name][func_name]["args"][input_list[i][1]]
+            store_pcode(pcode, "push %s %s" % (var["type"], var["index"]))
+            inc += 1
         elif input_list[i][1] == ",":  # TODO: check push order
             inc += 1
         elif input_list[i][1] == "-" and input_list[i+1][0] == "integerConstant":
@@ -158,25 +181,46 @@ def compile_expression(pcode, input_list, i):
     return pcode
 
 
-def compile_statement(pcode, input_list, i, class_dict, class_name):
+def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
     """
     input_list[i][0] == "keyword" and input_list[i][1] in ("let", "do", "while", "if", "return")
     """
     if input_list[i][1] == "do":
-        while input_list[i][1] != ";":
-            if input_list[i][0] == "identifier":
-                # call
-                if input_list[i+1][1] == "." and input_list[i+2][0] == "identifier"\
-                        and input_list[i+3][1] == "(":
-                    if input_list[i+4][1] != ")":
-                        pcode = compile_expression(pcode, input_list, i+4)
-                    num_args = len(class_dict[input_list[i][1]][input_list[i+2][1]]["arg_list"])
-                    store_pcode(pcode, "call %s.%s %s" % (input_list[i][1], input_list[i+2][1], num_args))
-            i += 1
+        pcode, class_dict = compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_name)
+    elif input_list[i][1] == "let":
+        # let value = Memory.peek(8000);
+        if input_list[i+2][1] == "=":
+            # handle right side of assignment first
+            pcode, class_dict = compile_sub_statement(pcode, input_list, i+3, class_dict, class_name, func_name)
+
+            if input_list[i+1][0] == "identifier":
+                # pop result into destination segment
+                var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
+                store_pcode(pcode, "pop %s %s" % (var["type"], var["index"]))
+        else:
+            raise RuntimeError(input_list[i+2][1])
+
     elif input_list[i][1] == "return":
         store_pcode(pcode, "return")
     else:
         raise RuntimeError(input_list[i])
+    return pcode, class_dict
+
+
+def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_name):
+    """
+    Compile common components of statements
+    """
+    while input_list[i][1] != ";":
+        if input_list[i][0] == "identifier":
+            # call
+            if input_list[i+1][1] == "." and input_list[i+2][0] == "identifier"\
+                    and input_list[i+3][1] == "(":
+                if input_list[i+4][1] != ")":
+                    pcode = compile_expression(pcode, input_list, i+4, class_dict, class_name, func_name)
+                num_args = class_dict[input_list[i][1]][input_list[i+2][1]]["index_dict"]["argument"]
+                store_pcode(pcode, "call %s.%s %s" % (input_list[i][1], input_list[i+2][1], num_args + 1))
+        i += 1
     return pcode, class_dict
 
 
@@ -224,8 +268,12 @@ def main(debug=False):
         class_name = None
         func_name = None
         class_dict = {
-            "Output": {"arg_list": [],  # TODO: look this up
-                       "printInt": {"type": "function", "kind": "void", "arg_list": ["i"], "index_dict": {}}}}
+            # TODO: look these up programatically
+            "Output": {"args": {}, "printInt": {"type": "function", "kind": "void", "args": {"i": {"type": "int",
+                       "kind": "argument", "index": 0}}, "index_dict": {"argument": 0}}},
+            "Memory": {"args": {}, "peek": {"type": "function", "kind": "void", "args": {"i": {"type": "int",
+                       "kind": "argument", "index": 0}}, "index_dict": {"argument": 0}}},
+        }
 
         # pre-process stream for class/function definitions
         for i, token in enumerate(input_list):
@@ -233,7 +281,8 @@ def main(debug=False):
                 if token[1] == "class" and input_list[i+1][0] == "identifier":
                     pcode, class_dict, class_name = compile_class(pcode, input_list, i+1, class_dict, pre=True)
                 elif token[1] in ("function", "method") and input_list[i+2][0] == "identifier":
-                    pcode, class_dict, func_name = compile_function(pcode, input_list, i+2, class_dict, class_name, pre=True)
+                    pcode, class_dict, func_name = \
+                        compile_function(pcode, input_list, i+2, class_dict, class_name, pre=True)
 
         for i, input_tuple in enumerate(input_list):
             j = i+1  # next token
@@ -451,7 +500,7 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    pcode, class_dict = compile_statement(pcode, input_list, i, class_dict, class_name)
+                    pcode, class_dict = compile_statement(pcode, input_list, i, class_dict, class_name, func_name)
 
                 # close parameterList
                 elif parent.tag == "parameterList" and input_list[i][0] == "symbol" and input_list[i][1] == ")":
