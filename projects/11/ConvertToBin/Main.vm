@@ -24,6 +24,7 @@ neg
 pop local 2 // loop
 
 // while <expression>
+push local 2 // loop
 if-goto WHILE_START_convert
 goto WHILE_END_convert
 label WHILE_START_convert
@@ -39,6 +40,7 @@ pop local 0 // mask
 push local 1 // position
 push constant 16
 gt
+not
 if-goto IF_TRUE_convert
 goto IF_FALSE_convert
 label IF_TRUE_convert
@@ -47,6 +49,7 @@ label IF_TRUE_convert
 push argument 0 // value
 push local 0 // mask
 and
+not
 if-goto IF_TRUE_convert
 goto IF_FALSE_convert
 label IF_TRUE_convert
