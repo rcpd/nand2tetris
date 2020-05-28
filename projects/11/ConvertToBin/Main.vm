@@ -63,3 +63,17 @@ push local 1 // position
 add
 push constant 0
 call Memory.poke 2
+
+// end_if
+label IF_FALSE_convert
+push constant 0
+pop local 2 // loop
+
+// end_if
+label IF_FALSE_convert
+
+// end_while
+label WHILE_END_convert
+return
+
+function Main.nextMask 1
