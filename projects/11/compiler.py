@@ -242,7 +242,9 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
             raise RuntimeError(input_list[i+2])
 
     elif input_list[i][1] == "return":
-        store_pcode(pcode, "return")  # FIXME: return twice if expr?
+        if input_list[i+1][1] != ";":
+            pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
+        store_pcode(pcode, "return")
     elif input_list[i][1] == "while":
         store_pcode(pcode, "\n// while <expression>")
         while input_list[i][1] != "(":
@@ -259,9 +261,6 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
         store_pcode(pcode, "if-goto IF_TRUE_%s" % func_name)  # TODO: label_dict
         store_pcode(pcode, "goto IF_FALSE_%s" % func_name)
         store_pcode(pcode, "label IF_TRUE_%s" % func_name)
-    elif input_list[i][1] == "else":  # FIXME: else not invoked
-        store_pcode(pcode, "\n// else")
-        store_pcode(pcode, "label IF_FALSE_%s" % func_name)
     else:
         raise RuntimeError(input_list[i])
     return pcode, class_dict
@@ -461,8 +460,8 @@ def main(debug=False):
                         # don't close if } followed by else
                         if not (input_list[j][0] == "keyword" and input_list[j][1] == "else"):
                             parent = find_parent(output_root, parent)
-                            store_pcode(pcode, "\n// end_if")
-                            # FIXME: invoked twice if "else" statement
+                        else:
+                            store_pcode(pcode, "\n// else")
                             store_pcode(pcode, "label IF_FALSE_%s" % func_name)  # TODO: label_dict
 
                     if parent.tag == "whileStatement":
