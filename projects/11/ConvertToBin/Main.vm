@@ -41,39 +41,9 @@ push local 1 // position
 push constant 16
 gt
 not
+push local 1 // position
+push constant 16
+gt
 if-goto IF_TRUE_convert
 goto IF_FALSE_convert
 label IF_TRUE_convert
-
-// if <expression>
-push argument 0 // value
-push local 0 // mask
-and
-not
-if-goto IF_TRUE_convert
-goto IF_FALSE_convert
-label IF_TRUE_convert
-push constant 8000
-push local 1 // position
-add
-push constant 1
-call Memory.poke 2
-push constant 8000
-push local 1 // position
-add
-push constant 0
-call Memory.poke 2
-
-// end_if
-label IF_FALSE_convert
-push constant 0
-pop local 2 // loop
-
-// end_if
-label IF_FALSE_convert
-
-// end_while
-label WHILE_END_convert
-return
-
-function Main.nextMask 1

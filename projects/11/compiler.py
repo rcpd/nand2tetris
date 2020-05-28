@@ -11,9 +11,9 @@ args: {"var_name": {"type": "int", "kind": "local", "index": 0}}
 import xml.etree.ElementTree as ET
 
 
-operators = ["+", "-", "*", "/", "&", "|", "<", ">", "~"]
+operators = ["+", "-", "*", "/", "&", "|", "<", ">", "~", "="]
 op_map = {"+": "add", "-": "sub", "*": "call Math.multiply 2", "/": "call Math.divide 2", "&": "and", "|": "or",
-          "~": "not", "<": "lt", ">": "gt"}
+          "~": "not", "<": "lt", ">": "gt", "=": "eq"}
 
 
 def find_parent(tree, node):
@@ -156,17 +156,25 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name):
     return pcode, class_dict
 
 
-def compile_expression(pcode, input_list, i, class_dict, class_name, func_name):
-    j = i
+def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, sub=False):
+    j = i  # i = start pos, j = search pos
+    # recurse until all brackets unpacked
     while input_list[j][1] not in (";", "{"):
-        # recurse until all brackets unpacked
+        # print("DEBUG_OUTER: %s" % input_list[j][1])  # TODO: remove debug
         if input_list[j][1] == "(" and input_list[j+1][1] != ")":
-            if i != j:  # avoid double tapping expression
-                pcode, compile_expression(pcode, input_list, j+1, class_dict, class_name, func_name)
+            pcode = compile_expression(pcode, input_list, j+1, class_dict, class_name, func_name, sub=True)
         j += 1
 
     # process expression
-    while input_list[i][1] not in ("(", ")", ";", "{"):
+    # FIXME: expression double tap
+    # FIXME: "= 0" test not run
+
+    if input_list[i][1] in ("(", ")", ";", "{"):
+        # print("DEBUG_INNER_SKIP: %s" % input_list[i][1])  # TODO: remove debug
+        pass
+
+    while input_list[i][1] not in (")", ";", "{"):
+        # print("DEBUG_INNER: %s" % input_list[i][1])  # TODO: remove debug
         k = 0
         # parse x <op> y expressions
         if input_list[i][0] == "integerConstant":
@@ -178,9 +186,11 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name):
             k += 1
         elif input_list[i][1] in operators:
             if input_list[i+1][0] == "integerConstant":
+                # print("DEBUG_INNER: %s" % input_list[i+1][1])  # TODO: remove debug
                 store_pcode(pcode, "push constant %s" % input_list[i+1][1])
                 k += 1
             elif input_list[i+1][0] == "identifier":
+                # print("DEBUG_INNER: %s" % input_list[i+1][1])  # TODO: remove debug
                 var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
                 store_pcode(pcode, "push %s %s // %s" % (var["type"], var["index"], input_list[i+1][1]))
                 k += 1
@@ -191,6 +201,14 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name):
 
             store_pcode(pcode, "%s" % op_map[input_list[i][1]])  # parse op
             k += 1
+        elif input_list[i][1] == "(":
+            if sub and k == 0:
+                # if "(" returned on first pos seek past previous expression
+                while input_list[i+k][1] != ")":
+                    k += 1  # lands on ")"
+                k += 1  # step into next expression
+            else:
+                k += 1  # otherwise step into expression
         elif input_list[i][1] == ",":  # TODO: check push order
             k += 1
         else:
@@ -297,7 +315,7 @@ def main(debug=False):
         # r"..\10\Square\Square.jack",
         # r"..\10\Square\SquareGame.jack",
 
-        r"..\11\Seven\Main.jack",
+        # r"..\11\Seven\Main.jack",
         r"..\11\ConvertToBin\Main.jack",
     ]
 
