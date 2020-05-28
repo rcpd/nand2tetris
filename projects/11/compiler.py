@@ -116,7 +116,6 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
 
 
 def compile_classvardec(pcode, input_list, i, class_dict):
-    # TODO
     return pcode, class_dict
 
 
@@ -214,7 +213,7 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
                 k += 1  # step into next expression
             else:
                 return pcode, proc  # else terminate current level of recursion
-        elif input_list[i][1] == ",":  # TODO: check push order
+        elif input_list[i][1] == ",":
             k += 1
         else:
             raise RuntimeError(input_list[i])
@@ -570,7 +569,6 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    # TODO: process expression on return (also return twice?)
                     # pcode, proc = compile_expression(pcode, input_list, i, class_dict, class_name, func_name)
                     # store_pcode(pcode, "", write=filepath)
 
