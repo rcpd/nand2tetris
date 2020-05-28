@@ -2,6 +2,10 @@
 
 function Main.main 0
 // var int value (local 0)
+push constant 8000
+push constant 1
+push constant 500
+call Main.fillMemory 3
 push constant 8001
 push constant 16
 push constant 1
