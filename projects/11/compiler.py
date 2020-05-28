@@ -156,50 +156,51 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name):
     return pcode, class_dict
 
 
-def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, sub=False):
+def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, sub=False, proc=None):
+    if not sub:
+        proc = []
     j = i  # i = start pos, j = search pos
     # recurse until all brackets unpacked
     while input_list[j][1] not in (";", "{"):
-        # print("DEBUG_OUTER: %s" % input_list[j][1])  # TODO: remove debug
         if input_list[j][1] == "(" and input_list[j+1][1] != ")":
-            pcode = compile_expression(pcode, input_list, j+1, class_dict, class_name, func_name, sub=True)
+            pcode, proc = compile_expression(pcode, input_list, j+1, class_dict, class_name, func_name, sub=True,
+                                             proc=proc)
         j += 1
 
     # process expression
-    # FIXME: expression double tap
-    # FIXME: "= 0" test not run
-
-    if input_list[i][1] in ("(", ")", ";", "{"):
-        # print("DEBUG_INNER_SKIP: %s" % input_list[i][1])  # TODO: remove debug
-        pass
-
     while input_list[i][1] not in (")", ";", "{"):
-        # print("DEBUG_INNER: %s" % input_list[i][1])  # TODO: remove debug
+        if i in proc:
+            return pcode, proc
+
         k = 0
         # parse x <op> y expressions
         if input_list[i][0] == "integerConstant":
             store_pcode(pcode, "push constant %s" % input_list[i][1])
+            proc.append(i)
             k += 1
         elif input_list[i][0] == "identifier":
             var = class_dict[class_name][func_name]["args"][input_list[i][1]]
             store_pcode(pcode, "push %s %s // %s" % (var["type"], var["index"], input_list[i][1]))
+            proc.append(i)
             k += 1
         elif input_list[i][1] in operators:
             if input_list[i+1][0] == "integerConstant":
-                # print("DEBUG_INNER: %s" % input_list[i+1][1])  # TODO: remove debug
                 store_pcode(pcode, "push constant %s" % input_list[i+1][1])
+                proc.append(i+1)
                 k += 1
             elif input_list[i+1][0] == "identifier":
-                # print("DEBUG_INNER: %s" % input_list[i+1][1])  # TODO: remove debug
                 var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
                 store_pcode(pcode, "push %s %s // %s" % (var["type"], var["index"], input_list[i+1][1]))
+                proc.append(i+1)
                 k += 1
 
             if input_list[i][1] == "-":
                 store_pcode(pcode, "neg")  # comes after the value being neg'd
+                proc.append(i)
                 k += 1
 
             store_pcode(pcode, "%s" % op_map[input_list[i][1]])  # parse op
+            proc.append(i)
             k += 1
         elif input_list[i][1] == "(":
             if sub and k == 0:
@@ -208,13 +209,15 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
                     k += 1  # lands on ")"
                 k += 1  # step into next expression
             else:
-                k += 1  # otherwise step into expression
+                return pcode, proc  # else terminate current level of recursion
         elif input_list[i][1] == ",":  # TODO: check push order
             k += 1
         else:
             raise RuntimeError(input_list[i])
+
         i += k
-    return pcode
+
+    return pcode, proc
 
 
 def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
@@ -239,12 +242,12 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
             raise RuntimeError(input_list[i+2])
 
     elif input_list[i][1] == "return":
-        store_pcode(pcode, "return")
+        store_pcode(pcode, "return")  # FIXME: return twice if expr?
     elif input_list[i][1] == "while":
         store_pcode(pcode, "\n// while <expression>")
         while input_list[i][1] != "(":
             i += 1  # increment i to first term in expression
-        pcode, compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
+        pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
         store_pcode(pcode, "if-goto WHILE_START_%s" % func_name)  # TODO: label_dict
         store_pcode(pcode, "goto WHILE_END_%s" % func_name)
         store_pcode(pcode, "label WHILE_START_%s" % func_name)
@@ -252,11 +255,11 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
         store_pcode(pcode, "\n// if <expression>")
         while input_list[i][1] != "(":
             i += 1  # increment i to first term in expression
-        pcode, compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
+        pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
         store_pcode(pcode, "if-goto IF_TRUE_%s" % func_name)  # TODO: label_dict
         store_pcode(pcode, "goto IF_FALSE_%s" % func_name)
         store_pcode(pcode, "label IF_TRUE_%s" % func_name)
-    elif input_list[i][1] == "else":
+    elif input_list[i][1] == "else":  # FIXME: else not invoked
         store_pcode(pcode, "\n// else")
         store_pcode(pcode, "label IF_FALSE_%s" % func_name)
     else:
@@ -275,13 +278,13 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
             if input_list[j+1][1] == "." and input_list[j+2][0] == "identifier" and input_list[j+3][1] == "(":
                 if input_list[j+4][1] != ")":
                     # parse function params
-                    pcode = compile_expression(pcode, input_list, j+4, class_dict, class_name, func_name)
+                    pcode, proc = compile_expression(pcode, input_list, j+4, class_dict, class_name, func_name)
                 # parse call
                 num_args = class_dict[input_list[j][1]][input_list[j+2][1]]["index_dict"]["argument"]
                 store_pcode(pcode, "call %s.%s %s" % (input_list[j][1], input_list[j+2][1], num_args + 1))
                 return pcode, class_dict
             else:
-                pcode = compile_expression(pcode, input_list, j, class_dict, class_name, func_name)
+                pcode, proc = compile_expression(pcode, input_list, j, class_dict, class_name, func_name)
                 return pcode, class_dict
 
         elif input_list[j][0] == "keyword" and input_list[j][1] in ("true", "false"):
@@ -459,6 +462,7 @@ def main(debug=False):
                         if not (input_list[j][0] == "keyword" and input_list[j][1] == "else"):
                             parent = find_parent(output_root, parent)
                             store_pcode(pcode, "\n// end_if")
+                            # FIXME: invoked twice if "else" statement
                             store_pcode(pcode, "label IF_FALSE_%s" % func_name)  # TODO: label_dict
 
                     if parent.tag == "whileStatement":
@@ -526,7 +530,7 @@ def main(debug=False):
                         child = ET.SubElement(parent, input_tuple[0])
                         child.text = " %s " % input_tuple[1]
 
-                        # pcode = compile_expression(pcode, input_list, i, class_dict, class_name, func_name)
+                        # pcode, proc = compile_expression(pcode, input_list, i, class_dict, class_name, func_name)
                         # store_pcode(pcode, "", write=filepath)
 
                         if parent.tag not in ("letStatement", "whileStatement", "ifStatement") \
@@ -563,7 +567,8 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    # pcode = compile_expression(pcode, input_list, i, class_dict, class_name, func_name)
+                    # TODO: process expression on return (also return twice?)
+                    # pcode, proc = compile_expression(pcode, input_list, i, class_dict, class_name, func_name)
                     # store_pcode(pcode, "", write=filepath)
 
                 # open term / nested term
