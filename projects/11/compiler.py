@@ -52,6 +52,16 @@ def store_pcode(pcode, cmd, write=None, debug=True):
     return pcode
 
 
+def label_index(class_dict, class_name, func_name, type):
+    labels = class_dict[class_name][func_name]["label_dict"]
+    if type in labels:
+        labels[type] += 1
+    else:
+        labels[type] = 0
+    class_dict[class_name][func_name]["label_dict"] = labels
+    return class_dict, labels[type]
+
+
 def compile_class(pcode, input_list, i, class_dict, pre=False):
     """
     input_list[i][0] == "keyword" and input_list[i][1] == "class"
@@ -80,7 +90,7 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
     # define function symbol
     if input_list[j-2][1] in ("function", "method"):
         class_dict[class_name][input_list[j][1]] = {"type": input_list[j-2][1], "kind": input_list[j-1][1],
-                                                    "args": {}, "index_dict": {}}
+                                                    "args": {}, "index_dict": {}, "label_dict": {}}
         # define function arguments
         if input_list[j+1][1] == "(":
             while input_list[j+2][1] != ")":
@@ -103,15 +113,16 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
 
     elif input_list[i-2][1] == "constructor":
         pass
-    elif input_list[i-1][1] == ".":
-        if func_name not in class_dict[class_name]:
-            class_dict[class_name][func_name] = {"type": "", "kind": "", "args": {}, "index_dict": {}}
+    # elif input_list[i-1][1] == ".":
+    #     if func_name not in class_dict[class_name]:
+    #         class_dict[class_name][func_name] = {"type": "", "kind": "", "args": {},
+    #         "index_dict": {}, "label_dict": {}}
     else:
         raise RuntimeError
 
     if not pre:
         store_pcode(pcode, "\n%s %s.%s %s" % (input_list[i-2][1], class_name, input_list[i][1],
-                                            len(class_dict[class_name][input_list[i][1]]["args"])))
+                                              len(class_dict[class_name][input_list[i][1]]["args"])))
     return pcode, class_dict, func_name
 
 
@@ -253,17 +264,19 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
         while input_list[i][1] != "(":
             i += 1  # increment i to first term in expression
         pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
-        store_pcode(pcode, "if-goto WHILE_START_%s" % func_name)  # TODO: label_dict
-        store_pcode(pcode, "goto WHILE_END_%s" % func_name)
-        store_pcode(pcode, "label WHILE_START_%s" % func_name)
+        class_dict, while_index = label_index(class_dict, class_name, func_name, "while")
+        store_pcode(pcode, "if-goto WHILE_START_%s_%s" % (func_name, while_index))
+        store_pcode(pcode, "goto WHILE_END_%s_%s" % (func_name, while_index))
+        store_pcode(pcode, "label WHILE_START_%s_%s" % (func_name, while_index))
     elif input_list[i][1] == "if":
         store_pcode(pcode, "\n// if <expression>")
         while input_list[i][1] != "(":
             i += 1  # increment i to first term in expression
         pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
-        store_pcode(pcode, "if-goto IF_TRUE_%s" % func_name)  # TODO: label_dict
-        store_pcode(pcode, "goto IF_FALSE_%s" % func_name)
-        store_pcode(pcode, "label IF_TRUE_%s" % func_name)
+        class_dict, if_index = label_index(class_dict, class_name, func_name, "if")
+        store_pcode(pcode, "if-goto IF_TRUE_%s_%s" % (func_name, if_index))
+        store_pcode(pcode, "goto IF_FALSE_%s_%s" % (func_name, if_index))
+        store_pcode(pcode, "label IF_TRUE_%s_%s" % (func_name, if_index))
     else:
         raise RuntimeError(input_list[i])
     return pcode, class_dict
@@ -349,7 +362,9 @@ def main(debug=False):
             "Output": {"args": {}, "index_dict": {},
                        "printInt": {"type": "function", "kind": "void",
                                     "args": {"i": {"type": "int", "kind": "argument", "index": 0}},
-                                    "index_dict": {"argument": 0}}},
+                                    "index_dict": {"argument": 0},
+                                    }
+                       },
             "Memory": {"args": {}, "index_dict": {},
                        "peek": {"type": "function", "kind": "void",
                                 "args": {"i": {"type": "int", "kind": "argument", "index": 0}},
@@ -357,7 +372,10 @@ def main(debug=False):
                        "poke": {"type": "function", "kind": "void",
                                 "args": {"address": {"type": "int", "kind": "argument", "index": 0},
                                          "value": {"type": "int", "kind": "argument", "index": 1}},
-                                "index_dict": {"argument": 1}}}}
+                                "index_dict": {"argument": 1},
+                                }
+                       }
+        }
 
         # pre-process stream for class/function definitions
         for i, token in enumerate(input_list):
@@ -465,13 +483,17 @@ def main(debug=False):
                             parent = find_parent(output_root, parent)
                         else:
                             store_pcode(pcode, "\n// else")
-                            store_pcode(pcode, "label IF_FALSE_%s" % func_name)  # TODO: label_dict
+                            if_index = class_dict[class_name][func_name]["label_dict"]["if"]
+                            store_pcode(pcode, "label IF_FALSE_%s_%s" % (func_name, if_index))
+                            class_dict[class_name][func_name]["label_dict"]["if"] -= 1
 
                     if parent.tag == "whileStatement":
                         # close parent
                         parent = find_parent(output_root, parent)
                         store_pcode(pcode, "\n// end_while")
-                        store_pcode(pcode, "label WHILE_END_%s" % func_name)  # TODO: label_dict
+                        while_index = class_dict[class_name][func_name]["label_dict"]["while"]
+                        store_pcode(pcode, "label WHILE_END_%s_%s" % (func_name, while_index))
+                        class_dict[class_name][func_name]["label_dict"]["while"] -= 1
 
                     if parent.tag == "subroutineBody":
                         # close parent(s)
