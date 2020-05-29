@@ -26,11 +26,11 @@ push constant 1
 neg
 pop local 2 // loop
 
-// while <expression>
+label WHILE_TEST_convert_0 // while <expression>
 push local 2 // loop
-if-goto WHILE_START_convert_0
-goto WHILE_END_convert_0
-label WHILE_START_convert_0
+if-goto WHILE_TRUE_convert_0
+goto WHILE_FALSE_convert_0
+label WHILE_TRUE_convert_0
 push local 1 // position
 push constant 1
 add
@@ -78,7 +78,8 @@ push constant 0
 pop local 2 // loop
 
 // end_while
-label WHILE_END_convert_0
+goto WHILE_TEST_convert_0
+label WHILE_FALSE_convert_0
 return
 
 function Main.nextMask 0
@@ -102,13 +103,13 @@ return
 
 function Main.fillMemory 0
 
-// while <expression>
+label WHILE_TEST_fillMemory_0 // while <expression>
 push argument 1 // length
 push constant 0
 gt
-if-goto WHILE_START_fillMemory_0
-goto WHILE_END_fillMemory_0
-label WHILE_START_fillMemory_0
+if-goto WHILE_TRUE_fillMemory_0
+goto WHILE_FALSE_fillMemory_0
+label WHILE_TRUE_fillMemory_0
 push argument 0 // startAddress
 push argument 2 // value
 call Memory.poke 2
@@ -123,5 +124,6 @@ add
 pop argument 0 // startAddress
 
 // end_while
-label WHILE_END_fillMemory_0
+goto WHILE_TEST_fillMemory_0
+label WHILE_FALSE_fillMemory_0
 return
