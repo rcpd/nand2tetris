@@ -28,9 +28,10 @@ pop local 2 // loop
 
 label WHILE_TEST_convert_0 // while <expression>
 push local 2 // loop
-if-goto WHILE_TRUE_convert_0
-goto WHILE_FALSE_convert_0
-label WHILE_TRUE_convert_0
+
+if-goto WHILE_TRUE_convert_0 // enter while
+goto WHILE_FALSE_convert_0 // exit while
+label WHILE_TRUE_convert_0 // start while
 push local 1 // position
 push constant 1
 add
@@ -44,9 +45,10 @@ push local 1 // position
 push constant 16
 gt
 not
-if-goto IF_TRUE_convert_0
-goto IF_FALSE_convert_0
-label IF_TRUE_convert_0
+
+if-goto IF_convert_0 // enter if
+goto ELSE_convert_0 // exit if or enter else
+label IF_convert_0 // start if
 
 // if <expression>
 push argument 0 // value
@@ -55,31 +57,36 @@ and
 push constant 0
 eq
 not
-if-goto IF_TRUE_convert_1
-goto IF_FALSE_convert_1
-label IF_TRUE_convert_1
+
+if-goto IF_convert_1 // enter if
+goto ELSE_convert_1 // exit if or enter else
+label IF_convert_1 // start if
 push constant 8000
 push local 1 // position
 add
 push constant 1
 call Memory.poke 2
 
-// else
-label IF_FALSE_convert_1
+goto IF_END_convert_1 // jump over else
+
+label ELSE_convert_1 // else
 push constant 8000
 push local 1 // position
 add
 push constant 0
 call Memory.poke 2
+label IF_END_convert_1 // exit if
 
-// else
-label IF_FALSE_convert_0
+goto IF_END_convert_0 // jump over else
+
+label ELSE_convert_0 // else
 push constant 0
 pop local 2 // loop
+label IF_END_convert_0 // exit if
 
-// end_while
-goto WHILE_TEST_convert_0
-label WHILE_FALSE_convert_0
+goto WHILE_TEST_convert_0 // loop or exit
+label WHILE_FALSE_convert_0 // exit while
+
 return
 
 function Main.nextMask 0
@@ -88,18 +95,21 @@ function Main.nextMask 0
 push argument 0 // mask
 push constant 0
 eq
-if-goto IF_TRUE_nextMask_0
-goto IF_FALSE_nextMask_0
-label IF_TRUE_nextMask_0
+
+if-goto IF_nextMask_0 // enter if
+goto ELSE_nextMask_0 // exit if or enter else
+label IF_nextMask_0 // start if
 push constant 1
 return
 
-// else
-label IF_FALSE_nextMask_0
+goto IF_END_nextMask_0 // jump over else
+
+label ELSE_nextMask_0 // else
 push argument 0 // mask
 push constant 2
 call Math.multiply 2
 return
+label IF_END_nextMask_0 // exit if
 
 function Main.fillMemory 0
 
@@ -107,9 +117,10 @@ label WHILE_TEST_fillMemory_0 // while <expression>
 push argument 1 // length
 push constant 0
 gt
-if-goto WHILE_TRUE_fillMemory_0
-goto WHILE_FALSE_fillMemory_0
-label WHILE_TRUE_fillMemory_0
+
+if-goto WHILE_TRUE_fillMemory_0 // enter while
+goto WHILE_FALSE_fillMemory_0 // exit while
+label WHILE_TRUE_fillMemory_0 // start while
 push argument 0 // startAddress
 push argument 2 // value
 call Memory.poke 2
@@ -123,7 +134,7 @@ push constant 1
 add
 pop argument 0 // startAddress
 
-// end_while
-goto WHILE_TEST_fillMemory_0
-label WHILE_FALSE_fillMemory_0
+goto WHILE_TEST_fillMemory_0 // loop or exit
+label WHILE_FALSE_fillMemory_0 // exit while
+
 return
