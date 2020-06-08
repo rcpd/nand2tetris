@@ -74,7 +74,80 @@ def parse(word, keyword, strings, tokens, debug=False):
     return tokens, keyword
 
 
-def main(debug=False):
+def main(filepath, debug=False):
+    with open(filepath) as jack_file:
+        jack_content = jack_file.readlines()
+
+    block_comment = False
+    strings = {}
+    string_id = 0
+    tokens = ET.Element("tokens")
+
+    for line in jack_content:
+        line = line.strip()
+        if line == "" or line.startswith("//"):
+            continue
+        elif "/*" in line:
+            if "*/" not in line:
+                block_comment = True
+            continue
+        elif "*/" in line:
+            block_comment = False
+            continue
+
+        if block_comment:
+            continue
+
+        if debug:
+            print("// line:", line)
+        line = line.split("//")[0].strip()
+
+        # string_constant parsing
+        if '"' in line:
+            string_line = line.split('"')
+            for i in range(0, len(string_line), 3):
+                substring = string_line[i+1]
+                strings["__string%s__" % string_id] = substring
+                line = line.replace(substring, " __string%s__ " % string_id)
+                string_id += 1
+
+            while '"' in line:
+                line = line.replace('"', '')
+            if debug:
+                print("// line post-replace:", line)
+
+        words = line.split()
+        keyword = False
+        if debug:
+            print("// words:", words)
+
+        for word in words:
+            tokens, keyword = parse(word, keyword, strings, tokens, debug=debug)
+
+    # write/check output
+    output_filepath = filepath.replace(".jack", "T_out.xml")
+    match_filepath = filepath.replace(".jack", "T.xml")
+    tree_string = ET.tostring(tokens)
+    raw_xml = minidom.parseString(tree_string)
+    pretty_xml = raw_xml.toprettyxml(indent="").replace(r'<?xml version="1.0" ?>', '').strip()
+    pretty_xml += "\n"
+
+    print("Writing: %s" % output_filepath)
+    if debug:
+        print(pretty_xml)
+
+    with open(output_filepath, "w") as output_file:
+        output_file.write(pretty_xml)
+
+    if os.path.exists(match_filepath):
+        with open(match_filepath, "r") as match_file:
+            match_contents = match_file.read()
+
+        if match_contents != pretty_xml:
+            raise RuntimeError("%s did not match solution file" % output_file)
+
+
+if __name__ == '__main__':
     jack_filepaths = [
         r"..\09\Average\Main.jack",
         r"..\09\Fraction\Main.jack",
@@ -107,78 +180,5 @@ def main(debug=False):
         r"..\11\Square\SquareGame.jack",
     ]
 
-    for filepath in jack_filepaths:
-        with open(filepath) as jack_file:
-            jack_content = jack_file.readlines()
-
-        block_comment = False
-        strings = {}
-        string_id = 0
-        tokens = ET.Element("tokens")
-
-        for line in jack_content:
-            line = line.strip()
-            if line == "" or line.startswith("//"):
-                continue
-            elif "/*" in line:
-                if "*/" not in line:
-                    block_comment = True
-                continue
-            elif "*/" in line:
-                block_comment = False
-                continue
-
-            if block_comment:
-                continue
-
-            if debug:
-                print("// line:", line)
-            line = line.split("//")[0].strip()
-
-            # string_constant parsing
-            if '"' in line:
-                string_line = line.split('"')
-                for i in range(0, len(string_line), 3):
-                    substring = string_line[i+1]
-                    strings["__string%s__" % string_id] = substring
-                    line = line.replace(substring, " __string%s__ " % string_id)
-                    string_id += 1
-
-                while '"' in line:
-                    line = line.replace('"', '')
-                if debug:
-                    print("// line post-replace:", line)
-
-            words = line.split()
-            keyword = False
-            if debug:
-                print("// words:", words)
-
-            for word in words:
-                tokens, keyword = parse(word, keyword, strings, tokens, debug=debug)
-
-        # write/check output
-        output_filepath = filepath.replace(".jack", "T_out.xml")
-        match_filepath = filepath.replace(".jack", "T.xml")
-        tree_string = ET.tostring(tokens)
-        raw_xml = minidom.parseString(tree_string)
-        pretty_xml = raw_xml.toprettyxml(indent="").replace(r'<?xml version="1.0" ?>', '').strip()
-        pretty_xml += "\n"
-
-        print("Writing: %s" % output_filepath)
-        if debug:
-            print(pretty_xml)
-
-        with open(output_filepath, "w") as output_file:
-            output_file.write(pretty_xml)
-
-        if os.path.exists(match_filepath):
-            with open(match_filepath, "r") as match_file:
-                match_contents = match_file.read()
-
-            if match_contents != pretty_xml:
-                raise RuntimeError("%s did not match solution file" % output_file)
-
-
-if __name__ == '__main__':
-    main(debug=False)
+    for _filepath in jack_filepaths:
+        main(_filepath, debug=False)
