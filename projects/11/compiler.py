@@ -133,6 +133,7 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=
                 continue
 
             if pre:
+                # build the symbol table (no compilation yet)
                 if input_list[i][1] == "var":
                     # update func/local index
                     if "local" not in class_dict[class_name][func_name]["index_dict"]:
@@ -141,9 +142,10 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=
                         class_dict[class_name][func_name]["index_dict"]["local"] += 1
 
                     # add var to func/args
-                    class_dict[class_name][func_name]["args"][input_list[j+2][1]] = \
-                        {"kind": "local", "type": input_list[i+1][1],
-                         "index": class_dict[class_name][func_name]["index_dict"]["local"]}
+                    if input_list[j+2][1] not in class_dict[class_name][func_name]["args"]:
+                        class_dict[class_name][func_name]["args"][input_list[j+2][1]] = \
+                            {"kind": "local", "type": input_list[i+1][1],
+                             "index": class_dict[class_name][func_name]["index_dict"]["local"]}
 
                 elif input_list[i][1] in ("field", "static"):
                     # update class/<field/static> index
@@ -153,21 +155,23 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=
                         class_dict[class_name]["index_dict"][input_list[i][1]] += 1
 
                     # add var to class/args
-                    class_dict[class_name]["args"][input_list[j+2][1]] = \
-                        {"kind": input_list[i][1], "type": input_list[i+1][1],
-                         "index": class_dict[class_name]["index_dict"][input_list[i][1]]}
+                    if input_list[j+2][1] not in class_dict[class_name]["args"]:
+                        class_dict[class_name]["args"][input_list[j+2][1]] = \
+                            {"kind": input_list[i][1], "type": input_list[j+1][1],
+                             "index": class_dict[class_name]["index_dict"][input_list[i][1]]}
                 else:
                     raise RuntimeError("Unexpected kind in var dec")
 
             else:
+                # compile the declaration
                 if input_list[i][1] == "var":
                     store_pcode(pcode, "// var %s %s (local %s)" %
                                 (input_list[i+1][1], input_list[j+2][1],
                                  class_dict[class_name][func_name]["args"][input_list[j+2][1]]["index"]))
                 elif input_list[i][1] in ("field", "static"):
-                    store_pcode(pcode, "// %s %s %s (local %s)" % (input_list[i][1],
-                                input_list[i+1][1], input_list[j+2][1],
-                                class_dict[class_name][func_name]["args"][input_list[j+2][1]]["index"]))
+                    store_pcode(pcode, "// %s %s (%s %s)" %
+                                (input_list[j+2][1], input_list[i+1][1], input_list[j+2][1],
+                                 class_dict[class_name]["args"][input_list[j][1]]["index"]))
                 else:
                     raise RuntimeError("Unexpected kind in var dec")
 
@@ -246,6 +250,9 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
                 return pcode, proc  # else terminate current level of recursion
         elif input_list[i][1] == ",":
             k += 1
+        elif input_list[i][0] == "keyword" and input_list[i][1] == "this":
+            store_pcode(pcode, "push pointer 0")
+            k += 1
         else:
             raise RuntimeError(input_list[i])
 
@@ -321,7 +328,10 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                         pcode, proc = compile_expression(pcode, input_list, j+4, class_dict, class_name, func_name)
 
                 # count params for call
-                k = j+4
+                if class_func:
+                    k = j+4
+                else:
+                    k = j+2
                 num_params = 0
                 if input_list[k][1] != ")":
                     num_params = 1
