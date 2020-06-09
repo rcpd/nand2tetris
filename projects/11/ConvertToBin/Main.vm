@@ -2,18 +2,22 @@
 
 function Main.main 1
 // var int value (local 0)
+// static call Main.fillMemory 
 push constant 8000
 push constant 1
 push constant 500
 call Main.fillMemory 3
+// static call Main.fillMemory 
 push constant 8001
 push constant 16
 push constant 1
 neg
 call Main.fillMemory 3
+// static call Memory.peek 
 push constant 8000
 call Memory.peek 1
-pop local 0 // value
+pop local 0 // value =
+// static call Main.convert 
 push local 0 // value
 call Main.convert 1
 return
@@ -24,7 +28,7 @@ function Main.convert 3
 // var boolean loop (local 2)
 push constant 1
 neg
-pop local 2 // loop
+pop local 2 // loop =
 
 label WHILE_TEST_convert_0 // while <expression>
 push local 2 // loop
@@ -35,10 +39,11 @@ label WHILE_TRUE_convert_0 // start while
 push local 1 // position
 push constant 1
 add
-pop local 1 // position
+pop local 1 // position =
+// static call Main.nextMask 
 push local 0 // mask
 call Main.nextMask 1
-pop local 0 // mask
+pop local 0 // mask =
 
 // if <expression>
 push local 1 // position
@@ -61,6 +66,7 @@ not
 if-goto IF_convert_1 // enter if
 goto ELSE_convert_1 // exit if or enter else
 label IF_convert_1 // start if
+// static call Memory.poke 
 push constant 8000
 push local 1 // position
 add
@@ -70,6 +76,7 @@ call Memory.poke 2
 goto IF_END_convert_1 // jump over else
 
 label ELSE_convert_1 // else
+// static call Memory.poke 
 push constant 8000
 push local 1 // position
 add
@@ -81,7 +88,7 @@ goto IF_END_convert_0 // jump over else
 
 label ELSE_convert_0 // else
 push constant 0
-pop local 2 // loop
+pop local 2 // loop =
 label IF_END_convert_0 // exit if
 
 goto WHILE_TEST_convert_0 // loop or exit
@@ -121,6 +128,7 @@ gt
 if-goto WHILE_TRUE_fillMemory_0 // enter while
 goto WHILE_FALSE_fillMemory_0 // exit while
 label WHILE_TRUE_fillMemory_0 // start while
+// static call Memory.poke 
 push argument 0 // startAddress
 push argument 2 // value
 call Memory.poke 2
@@ -128,11 +136,11 @@ push argument 1 // length
 push constant 1
 neg
 add
-pop argument 1 // length
+pop argument 1 // length =
 push argument 0 // startAddress
 push constant 1
 add
-pop argument 0 // startAddress
+pop argument 0 // startAddress =
 
 goto WHILE_TEST_fillMemory_0 // loop or exit
 label WHILE_FALSE_fillMemory_0 // exit while
