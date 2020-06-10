@@ -273,6 +273,13 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
         elif input_list[i][0] == "keyword" and input_list[i][1] == "this":
             store_pcode(pcode, "push pointer 0 // this")
             k += 1
+        elif input_list[i][0] == "keyword" and input_list[i][1] in ("true", "false"):
+            if input_list[i][1] == "true":
+                store_pcode(pcode, "push constant 1")
+                store_pcode(pcode, "neg // true")
+            else:
+                store_pcode(pcode, "push constant 0 // false")
+            k += 1
         else:
             raise RuntimeError(input_list[i])
 
@@ -398,9 +405,9 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
         elif input_list[j][0] == "keyword" and input_list[j][1] in ("true", "false"):
             if input_list[j][1] == "true":
                 store_pcode(pcode, "push constant 1")
-                store_pcode(pcode, "neg")
+                store_pcode(pcode, "neg // true")
             else:
-                store_pcode(pcode, "push constant 0")
+                store_pcode(pcode, "push constant 0 // false")
         else:
             raise RuntimeError(input_list[j])
         j += 1
