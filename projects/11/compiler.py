@@ -317,8 +317,20 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
 
     elif input_list[i][1] == "return":
         if input_list[i+1][1] != ";":
-            pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
+            if class_dict[class_name][func_name]["type"] != "void":
+                # parse the return value
+                pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
+            else:
+                raise RuntimeError("Unexpected return value on void function/method")
+        else:
+            if class_dict[class_name][func_name]["type"] == "void":
+                if class_dict[class_name][func_name]["kind"] == "method":
+                    # pass the implicit void return for methods
+                    store_pcode(pcode, "push constant 0 // void return")
+            else:
+                raise RuntimeError("Expected return value on non-void function/method")
         store_pcode(pcode, "return")
+
     elif input_list[i][1] == "while":
         class_dict, while_index = label_index(class_dict, class_name, func_name, "while")
         store_pcode(pcode, "\nlabel WHILE_TEST_%s_%s // while <expression>" % (func_name, while_index))
@@ -358,7 +370,6 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                     elif input_list[j][1] in class_dict[class_name]["args"]:  # class attr
                         var = class_dict[class_name]["args"][input_list[j][1]]
                     else:  # non-local call
-                        # TODO: does this still need a this push?
                         call_type = input_list[j][1] + input_list[j+1][1] + input_list[j+2][1]
                         store_pcode(pcode, "// static call %s " % call_type)
 
