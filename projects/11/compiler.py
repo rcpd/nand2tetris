@@ -406,8 +406,8 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                         # external module / not in scope
                         store_pcode(pcode, "call %s.%s %s" % (input_list[j][1], input_list[j+2][1], num_params))
                 else:
-                    # TODO: lookup/convert this to be fully qualified
-                    store_pcode(pcode, "call %s %s" % (input_list[j][1], num_params))
+                    # convert local calls to be fully qualified to current class scope
+                    store_pcode(pcode, "call %s.%s %s" % (class_name, input_list[j][1], num_params))
                 return pcode, class_dict
             else:
                 pcode, proc = compile_expression(pcode, input_list, j, class_dict, class_name, func_name)
