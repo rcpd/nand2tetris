@@ -442,13 +442,15 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
 
                 # compile call
                 if class_func:
+                    # lookup class for object (func table > class table > assume external)
                     try:
-                        # lookup class for object
                         obj_type = class_dict[class_name][func_name]["args"][input_list[j][1]]["type"]
-                        store_pcode(pcode, "call %s.%s %s" % (obj_type, input_list[j+2][1], num_params))
                     except KeyError:
-                        # external module / not in scope
-                        store_pcode(pcode, "call %s.%s %s" % (input_list[j][1], input_list[j+2][1], num_params))
+                        try:
+                            obj_type = class_dict[class_name]["args"][input_list[j][1]]["type"]
+                        except KeyError:
+                            obj_type = input_list[j][1]
+                    store_pcode(pcode, "call %s.%s %s" % (obj_type, input_list[j+2][1], num_params))
                 else:
                     # convert local calls to be fully qualified to current class scope
                     store_pcode(pcode, "call %s.%s %s" % (class_name, input_list[j][1], num_params))
