@@ -602,10 +602,18 @@ def main(filepath, debug=False):
                     # don't close ifStatement if } followed by else
                     if_index = class_dict[class_name][func_name]["label_dict"]["if"]
                     if input_list[j][0] == "keyword" and input_list[j][1] == "else":
+                        class_dict[class_name][func_name]["label_dict"]["else"] = if_index
                         store_pcode(pcode, "\ngoto IF_END_%s_%s // jump over else" % (func_name, if_index))
                         store_pcode(pcode, "\nlabel ELSE_%s_%s // else" % (func_name, if_index))
+                        class_dict[class_name][func_name]["label_dict"]["else"] -= 1
                     else:
                         parent = find_parent(output_root, parent)
+                        if "else" in class_dict[class_name][func_name]["label_dict"]:
+                            if class_dict[class_name][func_name]["label_dict"]["else"] == if_index:
+                                store_pcode(pcode, "\nlabel ELSE_%s_%s // else" % (func_name, if_index))
+                                class_dict[class_name][func_name]["label_dict"]["else"] -= 1
+                        else:
+                            store_pcode(pcode, "\nlabel ELSE_%s_%s // else" % (func_name, if_index))
                         store_pcode(pcode, "label IF_END_%s_%s // exit if" % (func_name, if_index))
                         class_dict[class_name][func_name]["label_dict"]["if"] -= 1
 
