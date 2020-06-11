@@ -3,6 +3,8 @@ Compile a JACK program into a VM program (pcode) from the token stream initially
 by tokenizer/analyzer.
 """
 
+# FIXME: Square.draw() gets passed "0" for "this" which gets caught by emulator after return from Screen.setColor()
+
 import xml.etree.ElementTree as ET
 
 
@@ -133,7 +135,7 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
 
         if input_list[j-2][1] == "constructor":
             # allocate space on heap
-            store_pcode(pcode, "push %s" % num_vars)
+            store_pcode(pcode, "push constant %s" % num_vars)
             store_pcode(pcode, "call Memory.alloc 1 // allocate object + params on heap")
             store_pcode(pcode, "pop pointer 0 // update 'this' to heap address")
 
@@ -447,18 +449,25 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
 
                 # compile call
                 if class_func:
-                    # lookup class for object (func table > class table > assume external)
+                    # lookup class for object (func table > class table > assume external/static)
                     try:
                         obj_type = class_dict[class_name][func_name]["args"][input_list[j][1]]["type"]
+                        # FIXME: potentially unsafe, might be function but not in dict yet
+                        # TODO: need to roll all files into pre-scan
+                        num_params += 1  # inc for implicit this
                     except KeyError:
                         try:
                             obj_type = class_dict[class_name]["args"][input_list[j][1]]["type"]
+                            # FIXME: potentially unsafe, might be function but not in dict yet
+                            # TODO: need to roll all files into pre-scan
+                            num_params += 1  # inc for implicit this
                         except KeyError:
-                            obj_type = input_list[j][1]
+                            obj_type = input_list[j][1]  # external/static must be function
                     store_pcode(pcode, "call %s.%s %s" % (obj_type, input_list[j+2][1], num_params))
                 else:
                     # convert local calls to be fully qualified to current class scope
-                    store_pcode(pcode, "call %s.%s %s" % (class_name, input_list[j][1], num_params))
+                    # FIXME: potentially unsafe, probably should check is method
+                    store_pcode(pcode, "call %s.%s %s" % (class_name, input_list[j][1], num_params+1))
                 return pcode, class_dict
             else:
                 pcode, proc = compile_expression(pcode, input_list, j, class_dict, class_name, func_name)
@@ -812,7 +821,7 @@ def main(filepath, debug=False):
             import pprint
             pprint.pprint(class_dict[class_name]["index_dict"])
             pprint.pprint(class_dict[class_name]["args"])
-            raise RuntimeError(class_name, index_fields, arg_fields)
+            # raise RuntimeError(class_name, index_fields, arg_fields)  # TODO: enable
 
         for func_name in class_dict[class_name]:
             if "kind" not in class_dict[class_name][func_name]:
@@ -842,7 +851,7 @@ def main(filepath, debug=False):
                 import pprint
                 pprint.pprint(class_dict[class_name][func_name]["index_dict"])
                 pprint.pprint(class_dict[class_name][func_name]["args"])
-                raise RuntimeError(class_name, index_fields, arg_fields)
+                # raise RuntimeError(class_name, index_fields, arg_fields)  # TODO: enable
 
     # write output
     output_filepath = filepath.replace(".jack", ".vm")

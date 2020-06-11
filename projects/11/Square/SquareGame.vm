@@ -1,7 +1,8 @@
 // class SquareGame
 
-function SquareGame.new 0
-call Memory.alloc 0 // allocate object + params on heap
+function SquareGame.new 4
+push constant 4
+call Memory.alloc 1 // allocate object + params on heap
 pop pointer 0 // update 'this' to heap address
 // static call Square.new 
 push constant 0
@@ -18,7 +19,7 @@ function SquareGame.dispose 0
 push argument 0
 pop pointer 0 // update 'this' to object for method call
 push this 0 // square (implicit this push)
-call Square.dispose 0
+call Square.dispose 1
 // static call Memory.deAlloc 
 push pointer 0 // this
 call Memory.deAlloc 1
@@ -38,7 +39,7 @@ if-goto IF_moveSquare_0 // enter if
 goto ELSE_moveSquare_0 // exit if or enter else
 label IF_moveSquare_0 // start if
 push this 0 // square (implicit this push)
-call Square.moveUp 0
+call Square.moveUp 1
 
 label ELSE_moveSquare_0 // else
 label IF_END_moveSquare_0 // exit if
@@ -52,7 +53,7 @@ if-goto IF_moveSquare_0 // enter if
 goto ELSE_moveSquare_0 // exit if or enter else
 label IF_moveSquare_0 // start if
 push this 0 // square (implicit this push)
-call Square.moveDown 0
+call Square.moveDown 1
 
 label ELSE_moveSquare_0 // else
 label IF_END_moveSquare_0 // exit if
@@ -66,7 +67,7 @@ if-goto IF_moveSquare_0 // enter if
 goto ELSE_moveSquare_0 // exit if or enter else
 label IF_moveSquare_0 // start if
 push this 0 // square (implicit this push)
-call Square.moveLeft 0
+call Square.moveLeft 1
 
 label ELSE_moveSquare_0 // else
 label IF_END_moveSquare_0 // exit if
@@ -80,7 +81,7 @@ if-goto IF_moveSquare_0 // enter if
 goto ELSE_moveSquare_0 // exit if or enter else
 label IF_moveSquare_0 // start if
 push this 0 // square (implicit this push)
-call Square.moveRight 0
+call Square.moveRight 1
 
 label ELSE_moveSquare_0 // else
 label IF_END_moveSquare_0 // exit if
@@ -117,7 +118,7 @@ label WHILE_TRUE_run_1 // start while
 // static call Keyboard.keyPressed 
 call Keyboard.keyPressed 0
 pop local 0 // key =
-call SquareGame.moveSquare 0
+call SquareGame.moveSquare 1
 
 goto WHILE_TEST_run_1 // loop or exit
 label WHILE_FALSE_run_1 // exit while
@@ -147,7 +148,7 @@ if-goto IF_run_0 // enter if
 goto ELSE_run_0 // exit if or enter else
 label IF_run_0 // start if
 push this 0 // square (implicit this push)
-call Square.decSize 0
+call Square.decSize 1
 
 label ELSE_run_0 // else
 label IF_END_run_0 // exit if
@@ -161,7 +162,7 @@ if-goto IF_run_0 // enter if
 goto ELSE_run_0 // exit if or enter else
 label IF_run_0 // start if
 push this 0 // square (implicit this push)
-call Square.incSize 0
+call Square.incSize 1
 
 label ELSE_run_0 // else
 label IF_END_run_0 // exit if
@@ -234,7 +235,7 @@ label WHILE_TRUE_run_1 // start while
 // static call Keyboard.keyPressed 
 call Keyboard.keyPressed 0
 pop local 0 // key =
-call SquareGame.moveSquare 0
+call SquareGame.moveSquare 1
 
 goto WHILE_TEST_run_1 // loop or exit
 label WHILE_FALSE_run_1 // exit while
