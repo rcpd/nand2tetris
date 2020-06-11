@@ -116,21 +116,25 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
             raise RuntimeError(input_list[j-2][1])
 
     else:
-        if "local" in class_dict[class_name][input_list[i][1]]["index_dict"]:
-            num_params = class_dict[class_name][input_list[i][1]]["index_dict"]["local"]+1
+        if input_list[j-2][1] in ("method", "function"):
+            if "local" in class_dict[class_name][input_list[i][1]]["index_dict"]:
+                num_vars = class_dict[class_name][input_list[i][1]]["index_dict"]["local"]+1
+            else:
+                num_vars = 0
+        elif input_list[j-2][1] == "constructor":
+            if "field" in class_dict[class_name]["index_dict"]:
+                num_vars = class_dict[class_name]["index_dict"]["field"]+1
+            else:
+                num_vars = 0
         else:
-            num_params = 0
+            raise RuntimeError(input_list[j-2][1])
 
-        # declaration
-        store_pcode(pcode, "\nfunction %s.%s %s" % (class_name, input_list[i][1], num_params))
+        store_pcode(pcode, "\nfunction %s.%s %s" % (class_name, input_list[i][1], num_vars))
 
         if input_list[j-2][1] == "constructor":
             # allocate space on heap
-            if num_params >= 1:
-                store_pcode(pcode, "push %s" % num_params)
-                store_pcode(pcode, "call Memory.alloc 1 // allocate object + params on heap")
-            else:
-                store_pcode(pcode, "call Memory.alloc 0 // allocate object + params on heap")
+            store_pcode(pcode, "push %s" % num_vars)
+            store_pcode(pcode, "call Memory.alloc 1 // allocate object + params on heap")
             store_pcode(pcode, "pop pointer 0 // update 'this' to heap address")
 
         elif input_list[j-2][1] == "method":
@@ -804,7 +808,7 @@ def main(filepath, debug=False):
                 raise RuntimeError(class_dict[class_name]["args"][var]["kind"])
 
         if index_fields != arg_fields or index_statics != arg_statics:
-            print()
+            print("\nIndex Count Mismatch Exception Dump")
             import pprint
             pprint.pprint(class_dict[class_name]["index_dict"])
             pprint.pprint(class_dict[class_name]["args"])
@@ -834,7 +838,7 @@ def main(filepath, debug=False):
                 index_argument = class_dict[class_name][func_name]["index_dict"]["argument"]+1
 
             if index_local != arg_local or index_argument != arg_argument:
-                print()
+                print("\nIndex Count Mismatch Exception Dump")
                 import pprint
                 pprint.pprint(class_dict[class_name][func_name]["index_dict"])
                 pprint.pprint(class_dict[class_name][func_name]["args"])
