@@ -1,8 +1,7 @@
 // class Square
 
-constructor Square.new 0
-push 0
-call Memory.alloc 1 // allocate object + params on heap
+function Square.new 0
+call Memory.alloc 0 // allocate object + params on heap
 pop pointer 0 // update 'this' to heap address
 push argument 0 // Ax
 pop this 0 // x =
@@ -14,7 +13,7 @@ call Square.draw 0
 push pointer 0 // this
 return
 
-method Square.dispose 0
+function Square.dispose 0
 push argument 0
 pop pointer 0 // update 'this' to object for method call
 // static call Memory.deAlloc 
@@ -23,7 +22,7 @@ call Memory.deAlloc 1
 push constant 0 // void return
 return
 
-method Square.draw 0
+function Square.draw 0
 push argument 0
 pop pointer 0 // update 'this' to object for method call
 // static call Screen.setColor 
@@ -31,49 +30,49 @@ push constant 1
 neg // true
 call Screen.setColor 1
 // static call Screen.drawRectangle 
-push field 0 // x
-push field 1 // y
-push field 0 // x
-push field 2 // size
+push this 0 // x
+push this 1 // y
+push this 0 // x
+push this 2 // size
 add
-push field 1 // y
-push field 2 // size
+push this 1 // y
+push this 2 // size
 add
 call Screen.drawRectangle 4
 push constant 0 // void return
 return
 
-method Square.erase 0
+function Square.erase 0
 push argument 0
 pop pointer 0 // update 'this' to object for method call
 // static call Screen.setColor 
 push constant 0 // false
 call Screen.setColor 1
 // static call Screen.drawRectangle 
-push field 0 // x
-push field 1 // y
-push field 0 // x
-push field 2 // size
+push this 0 // x
+push this 1 // y
+push this 0 // x
+push this 2 // size
 add
-push field 1 // y
-push field 2 // size
+push this 1 // y
+push this 2 // size
 add
 call Screen.drawRectangle 4
 push constant 0 // void return
 return
 
-method Square.incSize 0
+function Square.incSize 0
 push argument 0
 pop pointer 0 // update 'this' to object for method call
 
 // if <expression>
-push field 1 // y
-push field 2 // size
+push this 1 // y
+push this 2 // size
 add
 push constant 254
 lt
-push field 0 // x
-push field 2 // size
+push this 0 // x
+push this 2 // size
 add
 push constant 510
 lt
@@ -83,7 +82,7 @@ if-goto IF_incSize_0 // enter if
 goto ELSE_incSize_0 // exit if or enter else
 label IF_incSize_0 // start if
 call Square.erase 0
-push field 2 // size
+push this 2 // size
 push constant 2
 add
 pop this 2 // size =
@@ -92,12 +91,12 @@ label IF_END_incSize_0 // exit if
 push constant 0 // void return
 return
 
-method Square.decSize 0
+function Square.decSize 0
 push argument 0
 pop pointer 0 // update 'this' to object for method call
 
 // if <expression>
-push field 2 // size
+push this 2 // size
 push constant 2
 gt
 
@@ -105,7 +104,7 @@ if-goto IF_decSize_0 // enter if
 goto ELSE_decSize_0 // exit if or enter else
 label IF_decSize_0 // start if
 call Square.erase 0
-push field 2 // size
+push this 2 // size
 push constant 2
 neg
 add
@@ -115,12 +114,12 @@ label IF_END_decSize_0 // exit if
 push constant 0 // void return
 return
 
-method Square.moveUp 0
+function Square.moveUp 0
 push argument 0
 pop pointer 0 // update 'this' to object for method call
 
 // if <expression>
-push field 1 // y
+push this 1 // y
 push constant 1
 gt
 
@@ -131,21 +130,21 @@ label IF_moveUp_0 // start if
 push constant 0 // false
 call Screen.setColor 1
 // static call Screen.drawRectangle 
-push field 0 // x
-push field 1 // y
-push field 2 // size
+push this 0 // x
+push this 1 // y
+push this 2 // size
 add
 push constant 1
 neg
 add
-push field 0 // x
-push field 2 // size
+push this 0 // x
+push this 2 // size
 add
-push field 1 // y
-push field 2 // size
+push this 1 // y
+push this 2 // size
 add
 call Screen.drawRectangle 4
-push field 1 // y
+push this 1 // y
 push constant 2
 neg
 add
@@ -155,12 +154,12 @@ push constant 1
 neg // true
 call Screen.setColor 1
 // static call Screen.drawRectangle 
-push field 0 // x
-push field 1 // y
-push field 0 // x
-push field 2 // size
+push this 0 // x
+push this 1 // y
+push this 0 // x
+push this 2 // size
 add
-push field 1 // y
+push this 1 // y
 push constant 1
 add
 call Screen.drawRectangle 4
@@ -168,13 +167,13 @@ label IF_END_moveUp_0 // exit if
 push constant 0 // void return
 return
 
-method Square.moveDown 0
+function Square.moveDown 0
 push argument 0
 pop pointer 0 // update 'this' to object for method call
 
 // if <expression>
-push field 1 // y
-push field 2 // size
+push this 1 // y
+push this 2 // size
 add
 push constant 254
 lt
@@ -186,16 +185,16 @@ label IF_moveDown_0 // start if
 push constant 0 // false
 call Screen.setColor 1
 // static call Screen.drawRectangle 
-push field 0 // x
-push field 1 // y
-push field 0 // x
-push field 2 // size
+push this 0 // x
+push this 1 // y
+push this 0 // x
+push this 2 // size
 add
-push field 1 // y
+push this 1 // y
 push constant 1
 add
 call Screen.drawRectangle 4
-push field 1 // y
+push this 1 // y
 push constant 2
 add
 pop this 1 // y =
@@ -204,30 +203,30 @@ push constant 1
 neg // true
 call Screen.setColor 1
 // static call Screen.drawRectangle 
-push field 0 // x
-push field 1 // y
-push field 2 // size
+push this 0 // x
+push this 1 // y
+push this 2 // size
 add
 push constant 1
 neg
 add
-push field 0 // x
-push field 2 // size
+push this 0 // x
+push this 2 // size
 add
-push field 1 // y
-push field 2 // size
+push this 1 // y
+push this 2 // size
 add
 call Screen.drawRectangle 4
 label IF_END_moveDown_0 // exit if
 push constant 0 // void return
 return
 
-method Square.moveLeft 0
+function Square.moveLeft 0
 push argument 0
 pop pointer 0 // update 'this' to object for method call
 
 // if <expression>
-push field 0 // x
+push this 0 // x
 push constant 1
 gt
 
@@ -238,21 +237,21 @@ label IF_moveLeft_0 // start if
 push constant 0 // false
 call Screen.setColor 1
 // static call Screen.drawRectangle 
-push field 0 // x
-push field 2 // size
+push this 0 // x
+push this 2 // size
 add
 push constant 1
 neg
 add
-push field 1 // y
-push field 0 // x
-push field 2 // size
+push this 1 // y
+push this 0 // x
+push this 2 // size
 add
-push field 1 // y
-push field 2 // size
+push this 1 // y
+push this 2 // size
 add
 call Screen.drawRectangle 4
-push field 0 // x
+push this 0 // x
 push constant 2
 neg
 add
@@ -262,26 +261,26 @@ push constant 1
 neg // true
 call Screen.setColor 1
 // static call Screen.drawRectangle 
-push field 0 // x
-push field 1 // y
-push field 0 // x
+push this 0 // x
+push this 1 // y
+push this 0 // x
 push constant 1
 add
-push field 1 // y
-push field 2 // size
+push this 1 // y
+push this 2 // size
 add
 call Screen.drawRectangle 4
 label IF_END_moveLeft_0 // exit if
 push constant 0 // void return
 return
 
-method Square.moveRight 0
+function Square.moveRight 0
 push argument 0
 pop pointer 0 // update 'this' to object for method call
 
 // if <expression>
-push field 0 // x
-push field 2 // size
+push this 0 // x
+push this 2 // size
 add
 push constant 510
 lt
@@ -293,16 +292,16 @@ label IF_moveRight_0 // start if
 push constant 0 // false
 call Screen.setColor 1
 // static call Screen.drawRectangle 
-push field 0 // x
-push field 1 // y
-push field 0 // x
+push this 0 // x
+push this 1 // y
+push this 0 // x
 push constant 1
 add
-push field 1 // y
-push field 2 // size
+push this 1 // y
+push this 2 // size
 add
 call Screen.drawRectangle 4
-push field 0 // x
+push this 0 // x
 push constant 2
 add
 pop this 0 // x =
@@ -311,18 +310,18 @@ push constant 1
 neg // true
 call Screen.setColor 1
 // static call Screen.drawRectangle 
-push field 0 // x
-push field 2 // size
+push this 0 // x
+push this 2 // size
 add
 push constant 1
 neg
 add
-push field 1 // y
-push field 0 // x
-push field 2 // size
+push this 1 // y
+push this 0 // x
+push this 2 // size
 add
-push field 1 // y
-push field 2 // size
+push this 1 // y
+push this 2 // size
 add
 call Screen.drawRectangle 4
 label IF_END_moveRight_0 // exit if
