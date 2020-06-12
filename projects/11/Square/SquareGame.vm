@@ -118,6 +118,7 @@ label WHILE_TRUE_run_1 // start while
 // external call Keyboard.keyPressed
 call Keyboard.keyPressed 0
 pop local 0 // key =
+push pointer 0 // SquareGame (this)
 call SquareGame.moveSquare 1
 
 goto WHILE_TEST_run_1 // loop or exit
@@ -235,6 +236,7 @@ label WHILE_TRUE_run_1 // start while
 // external call Keyboard.keyPressed
 call Keyboard.keyPressed 0
 pop local 0 // key =
+push pointer 0 // SquareGame (this)
 call SquareGame.moveSquare 1
 
 goto WHILE_TEST_run_1 // loop or exit
