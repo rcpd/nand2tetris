@@ -10,7 +10,7 @@ import xml.etree.ElementTree as ET
 
 operators = ["+", "-", "*", "/", "&", "|", "<", ">", "~", "="]
 op_map = {"+": "add", "-": "sub", "*": "call Math.multiply 2", "/": "call Math.divide 2", "&": "and", "|": "or",
-          "~": "not", "<": "lt", ">": "gt", "=": "eq"}
+          "~": "not", "<": "lt", ">": "gt", "=": "eq"}  # Math.multiply/divide = non-void return (no pop)
 
 
 def find_parent(tree, node):
@@ -30,6 +30,38 @@ def find_ancestor(tree, node, ancestors):
         while parent_map[node].tag not in ancestors:
             node = parent_map[node]
     return node
+
+
+# def check_non_void(call):
+#     """
+#     Check against list of known external API calls with non-void returns
+#     """
+#     non_void = [
+#         "Array.new",
+#         "Keyboard.keyPressed",
+#         "Keyboard.readChar",
+#         "Keyboard.readLine",
+#         "Keyboard.readInt",
+#         "Math.abs",
+#         "Math.multiply",
+#         "Math.divide",
+#         "Math.sqrt",
+#         "Math.max",
+#         "Math.min",
+#         "Memory.peek",
+#         "Memory.alloc",
+#         "Output.getMap",
+#         "String.new",
+#         "String.length",
+#         "String.charAt",
+#         "String.appendChar",
+#         "String.intValue",
+#         "String.newLine",
+#         "String.backSpace",
+#         "String.doubleQuote",
+#     ]
+#     if call in non_void:
+#         return True
 
 
 def store_pcode(pcode, cmd, write=None, debug=True):
@@ -136,7 +168,7 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
         if input_list[j-2][1] == "constructor":
             # allocate space on heap
             store_pcode(pcode, "push constant %s" % num_vars)
-            store_pcode(pcode, "call Memory.alloc 1 // allocate object + params on heap")
+            store_pcode(pcode, "call Memory.alloc 1 // allocate object + params on heap")  # non-void return (no pop)
             store_pcode(pcode, "pop pointer 0 // update 'this' to heap address")
 
         elif input_list[j-2][1] == "method":
@@ -340,12 +372,12 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
     input_list[i][0] == "keyword" and input_list[i][1] in ("let", "do", "while", "if", "return")
     """
     if input_list[i][1] == "do":
-        pcode, class_dict = compile_sub_statement(pcode, input_list, i+1, class_dict, class_name, func_name)
+        pcode, class_dict = compile_sub_statement(pcode, input_list, i+1, class_dict, class_name, func_name, "do")
     elif input_list[i][1] == "let":
         # let <var> = x;
         if input_list[i+2][1] == "=":
             # handle right side of assignment first
-            pcode, class_dict = compile_sub_statement(pcode, input_list, i+3, class_dict, class_name, func_name)
+            pcode, class_dict = compile_sub_statement(pcode, input_list, i+3, class_dict, class_name, func_name, "let")
 
             if input_list[i+1][0] == "identifier":
                 # pop result into destination segment
@@ -371,9 +403,7 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
                 raise RuntimeError(class_dict[class_name][func_name]["type"])
         else:
             if class_dict[class_name][func_name]["type"] == "void":
-                if class_dict[class_name][func_name]["kind"] == "method":
-                    # pass the implicit void return for methods
-                    store_pcode(pcode, "push constant 0 // void return")
+                store_pcode(pcode, "push constant 0 // void return")
             else:
                 raise RuntimeError(class_dict[class_name][func_name]["type"])
         store_pcode(pcode, "return")
@@ -397,7 +427,7 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
     return pcode, class_dict
 
 
-def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_name):
+def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_name, statement):
     """
     Compile common components of statements
     """
@@ -423,13 +453,13 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                         var = class_dict[class_name]["args"][input_list[j][1]]
                     elif input_list[j+2][1] in class_dict[class_name]:  # class func
                         var = class_dict[class_name][input_list[j+2][1]]
-                    else:  # non-local call
+                    else:
                         store_pcode(pcode, "// external call %s" % call_obj)
 
                 if var is not None:
                     # push implicit "this" argument for class methods
                     if var["kind"] == "field":
-                        # FIXME: should check callee is method
+                        # FIXME: should not assume callee is method when pushing this
                         store_pcode(pcode, "push %s %s // %s (this)" % ("this", var["index"], input_list[j][1]))
                     elif var["kind"] == "method":
                         store_pcode(pcode, "push pointer 0 // %s (this)" % class_name)
@@ -460,25 +490,30 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
 
                 # compile call
                 if class_call:
-                    # lookup class for object (func table > class table > assume external/static)
+                    # lookup class for object (func table > class table > assume external)
                     try:
-                        obj_type = class_dict[class_name][func_name]["args"][input_list[j][1]]["type"]
+                        class_obj = class_dict[class_name][func_name]["args"][input_list[j][1]]["type"]
                         # FIXME: might be function but might not be in dict
                         # TODO: need to roll all files into pre-scan
                         num_params += 1  # inc for implicit this
                     except KeyError:
                         try:
-                            obj_type = class_dict[class_name]["args"][input_list[j][1]]["type"]
+                            class_obj = class_dict[class_name]["args"][input_list[j][1]]["type"]
                             # FIXME: might be function but might not be in dict
                             # TODO: need to roll all files into pre-scan
                             num_params += 1  # inc for implicit this
                         except KeyError:
-                            obj_type = input_list[j][1]  # external/static must be function
-                    store_pcode(pcode, "call %s.%s %s" % (obj_type, input_list[j+2][1], num_params))
+                            class_obj = input_list[j][1]  # external must be function
+
+                    store_pcode(pcode, "call %s.%s %s" % (class_obj, input_list[j+2][1], num_params))
+                    if statement == "do":
+                        store_pcode(pcode, "pop temp 0 // discard return on do call")
                 else:
                     # convert local calls to be fully qualified to current class scope
                     # FIXME: should check callee is method before inc params
                     store_pcode(pcode, "call %s.%s %s" % (class_name, input_list[j][1], num_params+1))
+                    if statement == "do":
+                        store_pcode(pcode, "pop temp 0 // discard return on do call")
                 return pcode, class_dict
             else:
                 pcode, proc = compile_expression(pcode, input_list, j, class_dict, class_name, func_name)
@@ -627,6 +662,7 @@ def main(filepath, debug=False):
 
                 if parent.tag == "ifStatement":
                     # don't close ifStatement if } followed by else
+                    # FIXME: label ELSE_x_y is not incrementing and gets reused
                     if_index = class_dict[class_name][func_name]["label_dict"]["if"]
                     if input_list[j][0] == "keyword" and input_list[j][1] == "else":
                         class_dict[class_name][func_name]["label_dict"]["else"] = if_index

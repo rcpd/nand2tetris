@@ -7,12 +7,14 @@ push constant 8000
 push constant 1
 push constant 500
 call Main.fillMemory 3
+pop temp 0 // discard return on do call
 // function call Main.fillMemory
 push constant 8001
 push constant 16
 push constant 1
 neg
 call Main.fillMemory 3
+pop temp 0 // discard return on do call
 // external call Memory.peek
 push constant 8000
 call Memory.peek 1
@@ -20,6 +22,8 @@ pop local 0 // value =
 // function call Main.convert
 push local 0 // value
 call Main.convert 1
+pop temp 0 // discard return on do call
+push constant 0 // void return
 return
 
 function Main.convert 3
@@ -72,6 +76,7 @@ push local 1 // position
 add
 push constant 1
 call Memory.poke 2
+pop temp 0 // discard return on do call
 
 goto IF_END_convert_1 // jump over else
 
@@ -82,6 +87,7 @@ push local 1 // position
 add
 push constant 0
 call Memory.poke 2
+pop temp 0 // discard return on do call
 label IF_END_convert_1 // exit if
 
 goto IF_END_convert_0 // jump over else
@@ -94,6 +100,7 @@ label IF_END_convert_0 // exit if
 goto WHILE_TEST_convert_0 // loop or exit
 label WHILE_FALSE_convert_0 // exit while
 
+push constant 0 // void return
 return
 
 function Main.nextMask 0
@@ -132,6 +139,7 @@ label WHILE_TRUE_fillMemory_0 // start while
 push argument 0 // startAddress
 push argument 2 // value
 call Memory.poke 2
+pop temp 0 // discard return on do call
 push argument 1 // length
 push constant 1
 neg
@@ -145,4 +153,5 @@ pop argument 0 // startAddress =
 goto WHILE_TEST_fillMemory_0 // loop or exit
 label WHILE_FALSE_fillMemory_0 // exit while
 
+push constant 0 // void return
 return

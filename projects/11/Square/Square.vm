@@ -12,6 +12,7 @@ push argument 2 // Asize
 pop this 2 // size =
 push pointer 0 // Square (this)
 call Square.draw 1
+pop temp 0 // discard return on do call
 push pointer 0 // this
 return
 
@@ -21,6 +22,7 @@ pop pointer 0 // update 'this' to object for method call
 // external call Memory.deAlloc
 push pointer 0 // this
 call Memory.deAlloc 1
+pop temp 0 // discard return on do call
 push constant 0 // void return
 return
 
@@ -31,6 +33,7 @@ pop pointer 0 // update 'this' to object for method call
 push constant 1
 neg // true
 call Screen.setColor 1
+pop temp 0 // discard return on do call
 // external call Screen.drawRectangle
 push this 0 // x
 push this 1 // y
@@ -41,6 +44,7 @@ push this 1 // y
 push this 2 // size
 add
 call Screen.drawRectangle 4
+pop temp 0 // discard return on do call
 push constant 0 // void return
 return
 
@@ -50,6 +54,7 @@ pop pointer 0 // update 'this' to object for method call
 // external call Screen.setColor
 push constant 0 // false
 call Screen.setColor 1
+pop temp 0 // discard return on do call
 // external call Screen.drawRectangle
 push this 0 // x
 push this 1 // y
@@ -60,6 +65,7 @@ push this 1 // y
 push this 2 // size
 add
 call Screen.drawRectangle 4
+pop temp 0 // discard return on do call
 push constant 0 // void return
 return
 
@@ -85,12 +91,14 @@ goto ELSE_incSize_0 // exit if or enter else
 label IF_incSize_0 // start if
 push pointer 0 // Square (this)
 call Square.erase 1
+pop temp 0 // discard return on do call
 push this 2 // size
 push constant 2
 add
 pop this 2 // size =
 push pointer 0 // Square (this)
 call Square.draw 1
+pop temp 0 // discard return on do call
 
 label ELSE_incSize_0 // else
 label IF_END_incSize_0 // exit if
@@ -111,6 +119,7 @@ goto ELSE_decSize_0 // exit if or enter else
 label IF_decSize_0 // start if
 push pointer 0 // Square (this)
 call Square.erase 1
+pop temp 0 // discard return on do call
 push this 2 // size
 push constant 2
 neg
@@ -118,6 +127,7 @@ add
 pop this 2 // size =
 push pointer 0 // Square (this)
 call Square.draw 1
+pop temp 0 // discard return on do call
 
 label ELSE_decSize_0 // else
 label IF_END_decSize_0 // exit if
@@ -139,6 +149,7 @@ label IF_moveUp_0 // start if
 // external call Screen.setColor
 push constant 0 // false
 call Screen.setColor 1
+pop temp 0 // discard return on do call
 // external call Screen.drawRectangle
 push this 0 // x
 push this 1 // y
@@ -154,6 +165,7 @@ push this 1 // y
 push this 2 // size
 add
 call Screen.drawRectangle 4
+pop temp 0 // discard return on do call
 push this 1 // y
 push constant 2
 neg
@@ -163,6 +175,7 @@ pop this 1 // y =
 push constant 1
 neg // true
 call Screen.setColor 1
+pop temp 0 // discard return on do call
 // external call Screen.drawRectangle
 push this 0 // x
 push this 1 // y
@@ -173,6 +186,7 @@ push this 1 // y
 push constant 1
 add
 call Screen.drawRectangle 4
+pop temp 0 // discard return on do call
 
 label ELSE_moveUp_0 // else
 label IF_END_moveUp_0 // exit if
@@ -196,6 +210,7 @@ label IF_moveDown_0 // start if
 // external call Screen.setColor
 push constant 0 // false
 call Screen.setColor 1
+pop temp 0 // discard return on do call
 // external call Screen.drawRectangle
 push this 0 // x
 push this 1 // y
@@ -206,6 +221,7 @@ push this 1 // y
 push constant 1
 add
 call Screen.drawRectangle 4
+pop temp 0 // discard return on do call
 push this 1 // y
 push constant 2
 add
@@ -214,6 +230,7 @@ pop this 1 // y =
 push constant 1
 neg // true
 call Screen.setColor 1
+pop temp 0 // discard return on do call
 // external call Screen.drawRectangle
 push this 0 // x
 push this 1 // y
@@ -229,6 +246,7 @@ push this 1 // y
 push this 2 // size
 add
 call Screen.drawRectangle 4
+pop temp 0 // discard return on do call
 
 label ELSE_moveDown_0 // else
 label IF_END_moveDown_0 // exit if
@@ -250,6 +268,7 @@ label IF_moveLeft_0 // start if
 // external call Screen.setColor
 push constant 0 // false
 call Screen.setColor 1
+pop temp 0 // discard return on do call
 // external call Screen.drawRectangle
 push this 0 // x
 push this 2 // size
@@ -265,6 +284,7 @@ push this 1 // y
 push this 2 // size
 add
 call Screen.drawRectangle 4
+pop temp 0 // discard return on do call
 push this 0 // x
 push constant 2
 neg
@@ -274,6 +294,7 @@ pop this 0 // x =
 push constant 1
 neg // true
 call Screen.setColor 1
+pop temp 0 // discard return on do call
 // external call Screen.drawRectangle
 push this 0 // x
 push this 1 // y
@@ -284,6 +305,7 @@ push this 1 // y
 push this 2 // size
 add
 call Screen.drawRectangle 4
+pop temp 0 // discard return on do call
 
 label ELSE_moveLeft_0 // else
 label IF_END_moveLeft_0 // exit if
@@ -307,6 +329,7 @@ label IF_moveRight_0 // start if
 // external call Screen.setColor
 push constant 0 // false
 call Screen.setColor 1
+pop temp 0 // discard return on do call
 // external call Screen.drawRectangle
 push this 0 // x
 push this 1 // y
@@ -317,6 +340,7 @@ push this 1 // y
 push this 2 // size
 add
 call Screen.drawRectangle 4
+pop temp 0 // discard return on do call
 push this 0 // x
 push constant 2
 add
@@ -325,6 +349,7 @@ pop this 0 // x =
 push constant 1
 neg // true
 call Screen.setColor 1
+pop temp 0 // discard return on do call
 // external call Screen.drawRectangle
 push this 0 // x
 push this 2 // size
@@ -340,6 +365,7 @@ push this 1 // y
 push this 2 // size
 add
 call Screen.drawRectangle 4
+pop temp 0 // discard return on do call
 
 label ELSE_moveRight_0 // else
 label IF_END_moveRight_0 // exit if

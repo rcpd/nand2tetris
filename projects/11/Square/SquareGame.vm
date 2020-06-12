@@ -20,9 +20,11 @@ push argument 0
 pop pointer 0 // update 'this' to object for method call
 push this 0 // square (this)
 call Square.dispose 1
+pop temp 0 // discard return on do call
 // external call Memory.deAlloc
 push pointer 0 // this
 call Memory.deAlloc 1
+pop temp 0 // discard return on do call
 push constant 0 // void return
 return
 
@@ -40,6 +42,7 @@ goto ELSE_moveSquare_0 // exit if or enter else
 label IF_moveSquare_0 // start if
 push this 0 // square (this)
 call Square.moveUp 1
+pop temp 0 // discard return on do call
 
 label ELSE_moveSquare_0 // else
 label IF_END_moveSquare_0 // exit if
@@ -54,6 +57,7 @@ goto ELSE_moveSquare_0 // exit if or enter else
 label IF_moveSquare_0 // start if
 push this 0 // square (this)
 call Square.moveDown 1
+pop temp 0 // discard return on do call
 
 label ELSE_moveSquare_0 // else
 label IF_END_moveSquare_0 // exit if
@@ -68,6 +72,7 @@ goto ELSE_moveSquare_0 // exit if or enter else
 label IF_moveSquare_0 // start if
 push this 0 // square (this)
 call Square.moveLeft 1
+pop temp 0 // discard return on do call
 
 label ELSE_moveSquare_0 // else
 label IF_END_moveSquare_0 // exit if
@@ -82,12 +87,14 @@ goto ELSE_moveSquare_0 // exit if or enter else
 label IF_moveSquare_0 // start if
 push this 0 // square (this)
 call Square.moveRight 1
+pop temp 0 // discard return on do call
 
 label ELSE_moveSquare_0 // else
 label IF_END_moveSquare_0 // exit if
 // external call Sys.wait
 push constant 5
 call Sys.wait 1
+pop temp 0 // discard return on do call
 push constant 0 // void return
 return
 
@@ -120,6 +127,7 @@ call Keyboard.keyPressed 0
 pop local 0 // key =
 push pointer 0 // SquareGame (this)
 call SquareGame.moveSquare 1
+pop temp 0 // discard return on do call
 
 goto WHILE_TEST_run_1 // loop or exit
 label WHILE_FALSE_run_1 // exit while
@@ -150,6 +158,7 @@ goto ELSE_run_0 // exit if or enter else
 label IF_run_0 // start if
 push this 0 // square (this)
 call Square.decSize 1
+pop temp 0 // discard return on do call
 
 label ELSE_run_0 // else
 label IF_END_run_0 // exit if
@@ -164,6 +173,7 @@ goto ELSE_run_0 // exit if or enter else
 label IF_run_0 // start if
 push this 0 // square (this)
 call Square.incSize 1
+pop temp 0 // discard return on do call
 
 label ELSE_run_0 // else
 label IF_END_run_0 // exit if
@@ -238,6 +248,7 @@ call Keyboard.keyPressed 0
 pop local 0 // key =
 push pointer 0 // SquareGame (this)
 call SquareGame.moveSquare 1
+pop temp 0 // discard return on do call
 
 goto WHILE_TEST_run_1 // loop or exit
 label WHILE_FALSE_run_1 // exit while

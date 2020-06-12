@@ -8,4 +8,6 @@ push constant 3
 call Math.multiply 2
 add
 call Output.printInt 1
+pop temp 0 // discard return on do call
+push constant 0 // void return
 return
