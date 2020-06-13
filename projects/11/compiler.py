@@ -83,12 +83,13 @@ def label_index(class_dict, class_name, func_name, label_type):
     labels = class_dict[class_name][func_name]["label_dict"]
     if label_type in labels:
         if "count" in labels[label_type]:
-            # update total
+            # inc total for next instance
             labels[label_type]["count"] += 1
             # set instance to most recently opened
-            labels[label_type]["instance"] = labels[label_type]["count"]
+            labels[label_type]["instance"].append(labels[label_type]["count"])
     else:
-        labels[label_type] = {"count": 0, "instance": 0}
+        # initialize count and instance
+        labels[label_type] = {"count": 0, "instance": [0]}
     class_dict[class_name][func_name]["label_dict"] = labels
     return class_dict, labels[label_type]
 
@@ -667,33 +668,31 @@ def main(filepath, debug=False):
 
                 if parent.tag == "ifStatement":
                     # don't close ifStatement if } followed by else
-                    # FIXME: instance should be set to "last open" on close, not -1
-                    # FIXME: will affect while and if, currently seen w/ no while_false_run_0 on SquareGame.run
                     if_index = class_dict[class_name][func_name]["label_dict"]["if"]
                     if input_list[j][0] == "keyword" and input_list[j][1] == "else":
                         # open else statement
                         class_dict[class_name][func_name]["label_dict"]["else"] = if_index
                         store_pcode(pcode, "goto IF_END_%s_%s // jump over else (true)" %
-                                    (func_name, if_index["instance"]))
+                                    (func_name, if_index["instance"][-1]))
                         store_pcode(pcode, "\nlabel ELSE_%s_%s // start else (false)" %
-                                    (func_name, if_index["instance"]))
+                                    (func_name, if_index["instance"][-1]))
                     else:
                         # close else statement (implied)
                         parent = find_parent(output_root, parent)
                         if "else" not in class_dict[class_name][func_name]["label_dict"]:
-                            store_pcode(pcode, "\nlabel ELSE_%s_%s // else" % (func_name, if_index["instance"]))
+                            store_pcode(pcode, "\nlabel ELSE_%s_%s // else" % (func_name, if_index["instance"][-1]))
 
                         # close if statement
-                        store_pcode(pcode, "label IF_END_%s_%s // exit if\n" % (func_name, if_index["instance"]))
-                        class_dict[class_name][func_name]["label_dict"]["if"]["instance"] -= 1
+                        store_pcode(pcode, "label IF_END_%s_%s // exit if\n" % (func_name, if_index["instance"][-1]))
+                        class_dict[class_name][func_name]["label_dict"]["if"]["instance"].pop()
 
                 if parent.tag == "whileStatement":
                     # close parent
                     parent = find_parent(output_root, parent)
-                    while_index = class_dict[class_name][func_name]["label_dict"]["while"]["instance"]
+                    while_index = class_dict[class_name][func_name]["label_dict"]["while"]["instance"][-1]
                     store_pcode(pcode, "goto WHILE_TEST_%s_%s // loop or exit" % (func_name, while_index))
                     store_pcode(pcode, "label WHILE_FALSE_%s_%s // exit while\n" % (func_name, while_index))
-                    class_dict[class_name][func_name]["label_dict"]["while"]["instance"] -= 1
+                    class_dict[class_name][func_name]["label_dict"]["while"]["instance"].pop()
 
                 if parent.tag == "subroutineBody":
                     # close parent(s)

@@ -276,8 +276,8 @@ pop temp 0 // discard return on do call
 goto WHILE_TEST_run_2 // loop or exit
 label WHILE_FALSE_run_2 // exit while
 
-goto WHILE_TEST_run_1 // loop or exit
-label WHILE_FALSE_run_1 // exit while
+goto WHILE_TEST_run_0 // loop or exit
+label WHILE_FALSE_run_0 // exit while
 
 push constant 0 // void return
 return
