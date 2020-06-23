@@ -251,7 +251,6 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=
 def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, sub=False, proc=None):
     """
     Notes:
-    - Previous iteration terminated prematurely if ) in chunk
     - recursing on "," flips the push order (not easily reversed)
     - recursing on ")" processes values outside brackets first
     - passing over ")" means brackets always first which disrupts param order
@@ -283,10 +282,9 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
 def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_name, sub=False, proc=None):
     cmd = []
     # process expression
-    while input_list[i][1] not in ("(", ")", ",", ";", "{"):
+    while input_list[i][1] not in ("(", ")", ",", ";", "{", "[", "]"):
         if i in proc:
-            raise RuntimeError("Passed an already processed node")
-            # return cmd, proc
+            return cmd, proc, i
 
         k = 0
         # parse x <op> y expressions
@@ -302,11 +300,36 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
                 var = class_dict[class_name]["args"][input_list[i][1]]
 
             if var["kind"] == "field":
-                cmd.append("push %s %s // %s" % ("this", var["index"], input_list[i][1]))
+                if input_list[i+1][1] == "[":
+                    cmd.append("push %s %s // %s (array)" % ("this", var["index"], input_list[i][1]))
+                else:
+                    cmd.append("push %s %s // %s" % ("this", var["index"], input_list[i][1]))
             else:
-                cmd.append("push %s %s // %s" % (var["kind"], var["index"], input_list[i][1]))
+                if input_list[i+1][1] == "[":
+                    cmd.append("push %s %s // %s (array)" % (var["kind"], var["index"], input_list[i][1]))
+                else:
+                    cmd.append("push %s %s // %s" % (var["kind"], var["index"], input_list[i][1]))
             proc.append(i)
             k += 1
+
+            if input_list[i+1][1] == "[":
+                # array[x] // where x is expression and array is already pushed
+                j = i+2  # move over bracket
+                sub_cmd = []
+                while input_list[j][1] != "]":
+                    # get expression result for []
+                    _cmd, proc, j = compile_sub_expression(sub_xps, input_list, j, class_dict, class_name,
+                                                           func_name, sub=True, proc=proc)
+                    j += 1
+                    for _c in _cmd:
+                        sub_cmd.append(_c)  # preserve sub-sub commands
+                for c in sub_cmd:
+                    cmd.append(c)  # roll sub-sub back into sub
+
+                # add base + offset
+                cmd.append("add // offset = array + [index]")
+                cmd.append("pop pointer 1 // *that = array[index]")
+                cmd.append("push that 0 // array[index]\n")
 
         elif input_list[i][1] in operators:
             j = None
@@ -406,7 +429,6 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
                 else:
                     store_pcode(pcode, "push %s %s // %s (array)" % (var["kind"], var["index"], input_list[i+1][1]))
 
-                store_pcode(pcode, "// [index]")
                 pcode, proc = compile_expression(pcode, input_list, i+3, class_dict, class_name, func_name)
                 store_pcode(pcode, "add // offset = array + [index]")
 
@@ -496,10 +518,8 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                 else:
                     store_pcode(pcode, "push %s %s // %s (array)" % (var["kind"], var["index"], input_list[j][1]))
 
-                store_pcode(pcode, "// [index]")
                 pcode, proc = compile_expression(pcode, input_list, j+2, class_dict, class_name, func_name)
                 store_pcode(pcode, "add // offset = array + [index]")
-
                 store_pcode(pcode, "pop pointer 1 // *that = array[index]")
                 store_pcode(pcode, "push that 0 // array[index]\n")
                 return pcode, class_dict
