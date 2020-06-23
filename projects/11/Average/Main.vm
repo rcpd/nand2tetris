@@ -59,6 +59,8 @@ push that 0 // array[index]
 add // offset = array + [index]
 pop pointer 1 // *that = array[index]
 push that 0 // array[index]
+push constant 2
+call Math.multiply 2
 pop local 3 // sum =
 // external call Output.printInt
 push local 3 // sum
