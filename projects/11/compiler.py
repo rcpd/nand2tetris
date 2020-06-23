@@ -282,7 +282,7 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
 def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_name, sub=False, proc=None):
     cmd = []
     # process expression
-    while input_list[i][1] not in ("(", ")", ",", ";", "{", "[", "]"):
+    while input_list[i][1] not in ("(", ")", ",", ";", "{", "["):
         if i in proc:
             return cmd, proc, i
 
@@ -326,10 +326,13 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
                 for c in sub_cmd:
                     cmd.append(c)  # roll sub-sub back into sub
 
-                # add base + offset
-                cmd.append("add // offset = array + [index]")
-                cmd.append("pop pointer 1 // *that = array[index]")
-                cmd.append("push that 0 // array[index]\n")
+        elif input_list[i][1] == "]":
+            # add base + offset
+            cmd.append("add // offset = array + [index]")
+            cmd.append("pop pointer 1 // *that = array[index]")
+            cmd.append("push that 0 // array[index]")
+            proc.append(i)
+            return cmd, proc, i
 
         elif input_list[i][1] in operators:
             j = None
@@ -430,10 +433,9 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
                     store_pcode(pcode, "push %s %s // %s (array)" % (var["kind"], var["index"], input_list[i+1][1]))
 
                 pcode, proc = compile_expression(pcode, input_list, i+3, class_dict, class_name, func_name)
-                store_pcode(pcode, "add // offset = array + [index]")
-
-                store_pcode(pcode, "pop pointer 1 // *that = array[index]")
-                store_pcode(pcode, "// result")
+                # TODO: temp should be tracked by compiler
+                store_pcode(pcode, "pop temp 0 // discard expression push")
+                store_pcode(pcode, "\n// result")
                 pcode, proc = compile_expression(pcode, input_list, equals+1, class_dict, class_name, func_name)
                 store_pcode(pcode, "pop that 0 // array[index] = result\n")
                 return pcode, class_dict
@@ -519,9 +521,6 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                     store_pcode(pcode, "push %s %s // %s (array)" % (var["kind"], var["index"], input_list[j][1]))
 
                 pcode, proc = compile_expression(pcode, input_list, j+2, class_dict, class_name, func_name)
-                store_pcode(pcode, "add // offset = array + [index]")
-                store_pcode(pcode, "pop pointer 1 // *that = array[index]")
-                store_pcode(pcode, "push that 0 // array[index]\n")
                 return pcode, class_dict
 
             else:
@@ -599,12 +598,14 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
 
                         store_pcode(pcode, "call %s.%s %s" % (class_obj, input_list[j+2][1], num_params))
                         if statement == "do":
+                            # TODO: temp should be tracked by compiler
                             store_pcode(pcode, "pop temp 0 // discard return on do call")
                     else:
                         # convert local calls to be fully qualified to current class scope
                         # FIXME: should check callee is method before inc params
                         store_pcode(pcode, "call %s.%s %s" % (class_name, input_list[j][1], num_params+1))
                         if statement == "do":
+                            # TODO: temp should be tracked by compiler
                             store_pcode(pcode, "pop temp 0 // discard return on do call")
                     return pcode, class_dict
 

@@ -15,14 +15,20 @@ push local 0 // a (array)
 push constant 0
 add // offset = array + [index]
 pop pointer 1 // *that = array[index]
+push that 0 // array[index]
+pop temp 0 // discard expression push
+
 // result
-push constant 1
+push constant 0
 pop that 0 // array[index] = result
 
 push local 0 // a (array)
 push constant 1
 add // offset = array + [index]
 pop pointer 1 // *that = array[index]
+push that 0 // array[index]
+pop temp 0 // discard expression push
+
 // result
 push constant 2
 pop that 0 // array[index] = result
@@ -31,6 +37,9 @@ push local 0 // a (array)
 push constant 2
 add // offset = array + [index]
 pop pointer 1 // *that = array[index]
+push that 0 // array[index]
+pop temp 0 // discard expression push
+
 // result
 push constant 15
 pop that 0 // array[index] = result
@@ -42,15 +51,14 @@ push constant 0
 add // offset = array + [index]
 pop pointer 1 // *that = array[index]
 push that 0 // array[index]
-
+push constant 1
+add
 add // offset = array + [index]
 pop pointer 1 // *that = array[index]
 push that 0 // array[index]
-
 add // offset = array + [index]
 pop pointer 1 // *that = array[index]
 push that 0 // array[index]
-
 pop local 3 // sum =
 // external call Output.printInt
 push local 3 // sum
