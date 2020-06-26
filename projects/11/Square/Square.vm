@@ -4,11 +4,11 @@ function Square.new 6
 push constant 6
 call Memory.alloc 1 // allocate object + params on heap
 pop pointer 0 // update 'this' to heap address
-push argument 0 // Ax
+push argument 0 // Ax (arg)
 pop this 0 // x =
-push argument 1 // Ay
+push argument 1 // Ay (arg)
 pop this 1 // y =
-push argument 2 // Asize
+push argument 2 // Asize (arg)
 pop this 2 // size =
 push pointer 0 // Square (this)
 call Square.draw 1

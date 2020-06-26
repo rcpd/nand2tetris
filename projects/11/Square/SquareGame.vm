@@ -18,7 +18,7 @@ return
 function SquareGame.dispose 0
 push argument 0
 pop pointer 0 // update 'this' to object for method call
-push this 0 // square (this)
+push this 0 // square
 call Square.dispose 1
 pop temp 0 // discard return on do call
 // external call Memory.deAlloc
@@ -41,7 +41,7 @@ if-goto IF_moveSquare_0 // jump to start if (true)
 goto ELSE_moveSquare_0 // jump to else/end (false)
 
 label IF_moveSquare_0 // start if (true)
-push this 0 // square (this)
+push this 0 // square
 call Square.moveUp 1
 pop temp 0 // discard return on do call
 
@@ -58,7 +58,7 @@ if-goto IF_moveSquare_1 // jump to start if (true)
 goto ELSE_moveSquare_1 // jump to else/end (false)
 
 label IF_moveSquare_1 // start if (true)
-push this 0 // square (this)
+push this 0 // square
 call Square.moveDown 1
 pop temp 0 // discard return on do call
 
@@ -75,7 +75,7 @@ if-goto IF_moveSquare_2 // jump to start if (true)
 goto ELSE_moveSquare_2 // jump to else/end (false)
 
 label IF_moveSquare_2 // start if (true)
-push this 0 // square (this)
+push this 0 // square
 call Square.moveLeft 1
 pop temp 0 // discard return on do call
 
@@ -92,7 +92,7 @@ if-goto IF_moveSquare_3 // jump to start if (true)
 goto ELSE_moveSquare_3 // jump to else/end (false)
 
 label IF_moveSquare_3 // start if (true)
-push this 0 // square (this)
+push this 0 // square
 call Square.moveRight 1
 pop temp 0 // discard return on do call
 
@@ -124,7 +124,7 @@ goto WHILE_FALSE_run_0 // jump to exit while (false)
 label WHILE_TRUE_run_0 // start while
 
 label WHILE_TEST_run_1 // test while <expression>
-push local 0 // key
+push local 0 // key (arg)
 push constant 0
 eq
 
@@ -143,7 +143,7 @@ label WHILE_FALSE_run_1 // exit while
 
 
 // if <expression>
-push local 0 // key
+push local 0 // key (arg)
 push constant 81
 eq
 
@@ -160,7 +160,7 @@ label IF_END_run_0 // exit if
 
 
 // if <expression>
-push local 0 // key
+push local 0 // key (arg)
 push constant 90
 eq
 
@@ -168,7 +168,7 @@ if-goto IF_run_1 // jump to start if (true)
 goto ELSE_run_1 // jump to else/end (false)
 
 label IF_run_1 // start if (true)
-push this 0 // square (this)
+push this 0 // square
 call Square.decSize 1
 pop temp 0 // discard return on do call
 
@@ -177,7 +177,7 @@ label IF_END_run_1 // exit if
 
 
 // if <expression>
-push local 0 // key
+push local 0 // key (arg)
 push constant 88
 eq
 
@@ -185,7 +185,7 @@ if-goto IF_run_2 // jump to start if (true)
 goto ELSE_run_2 // jump to else/end (false)
 
 label IF_run_2 // start if (true)
-push this 0 // square (this)
+push this 0 // square
 call Square.incSize 1
 pop temp 0 // discard return on do call
 
@@ -194,7 +194,7 @@ label IF_END_run_2 // exit if
 
 
 // if <expression>
-push local 0 // key
+push local 0 // key (arg)
 push constant 131
 eq
 
@@ -210,7 +210,7 @@ label IF_END_run_3 // exit if
 
 
 // if <expression>
-push local 0 // key
+push local 0 // key (arg)
 push constant 133
 eq
 
@@ -226,7 +226,7 @@ label IF_END_run_4 // exit if
 
 
 // if <expression>
-push local 0 // key
+push local 0 // key (arg)
 push constant 130
 eq
 
@@ -242,7 +242,7 @@ label IF_END_run_5 // exit if
 
 
 // if <expression>
-push local 0 // key
+push local 0 // key (arg)
 push constant 132
 eq
 
@@ -258,7 +258,7 @@ label IF_END_run_6 // exit if
 
 
 label WHILE_TEST_run_2 // test while <expression>
-push local 0 // key
+push local 0 // key (arg)
 push constant 0
 eq
 not
