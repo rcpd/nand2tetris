@@ -5,7 +5,6 @@ function Main.main 4
 // var int length (local 1)
 // var int i (local 2)
 // var int sum (local 3)
-// external call Keyboard.readInt
 push constant 18 // strlen
 call String.new 1 // "How many numbers?"
 push constant 72 // H (char)
@@ -44,14 +43,17 @@ push constant 63 // ? (char)
 call String.appendChar 2
 push constant 32 //   (char)
 call String.appendChar 2 // padding space
+
 call Keyboard.readInt 1
 pop local 1 // length =
-// external call Array.new
+
 push local 1 // length (arg)
 call Array.new 1
 pop local 0 // a =
+
 push constant 0
 pop local 2 // i =
+
 
 label WHILE_TEST_main_0 // test while <expression>
 push local 2 // i (arg)
@@ -64,15 +66,12 @@ goto WHILE_FALSE_main_0 // jump to exit while (false)
 label WHILE_TRUE_main_0 // start while
 push local 0 // a (array)
 push local 2 // i (arg)
-add // offset = array + [index]
-pop pointer 1 // *that = array[index]
-push that 0 // array[index]
+add // offset = *array + [index]
+pop pointer 1 // that = *array[index]
+push that 0 // array[index] (deref)
 pop temp 0 // discard expression push
-push pointer 1 // retrieve array pointer
-pop temp 0 // store array pointer
 
 // compute result
-// external call Keyboard.readInt
 push constant 16 // strlen
 call String.new 1 // "Enter a number:"
 push constant 69 // E (char)
@@ -107,27 +106,27 @@ push constant 58 // : (char)
 call String.appendChar 2
 push constant 32 //   (char)
 call String.appendChar 2 // padding space
+
 call Keyboard.readInt 1
-push temp 0 // retrieve array[index] pointer
-pop pointer 1 // set array[index] pointer
-pop that 0 // array[index] = result
+pop that 0 // array[index] = result (deref)
 
 push local 3 // sum (arg)
 push local 0 // a
-add
 push local 2 // i (arg)
-add // offset = array + [index]
-pop pointer 1 // *that = array[index]
-push that 0 // array[index]
+add // offset = *array + [index]
+pop pointer 1 // that = *array[index]
+push that 0 // array[index] (deref)
+add
 pop local 3 // sum =
+
 push local 2 // i (arg)
 push constant 1
 add
 pop local 2 // i =
+
 goto WHILE_TEST_main_0 // loop or exit
 label WHILE_FALSE_main_0 // exit while
 
-// external call Output.printString
 push constant 15 // strlen
 call String.new 1 // "The average is"
 push constant 84 // T (char)
@@ -160,9 +159,9 @@ push constant 115 // s (char)
 call String.appendChar 2
 push constant 32 //   (char)
 call String.appendChar 2 // padding space
+
 call Output.printString 1
 pop temp 0 // discard return on do call
-// external call Output.printInt
 push local 3 // sum (arg)
 push local 1 // length
 call Math.divide 2
