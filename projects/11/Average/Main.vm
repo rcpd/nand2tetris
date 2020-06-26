@@ -70,6 +70,7 @@ add // offset = *array + [index]
 pop pointer 1 // that = *array[index]
 push that 0 // array[index] (deref)
 pop temp 0 // discard expression push
+push pointer 1 // push dst array pointer
 
 // compute result
 push constant 16 // strlen
@@ -108,6 +109,9 @@ push constant 32 //   (char)
 call String.appendChar 2 // padding space
 
 call Keyboard.readInt 1
+pop temp 0 // store result 
+pop pointer 1 // retrieve dst array ptr from stack
+push temp 0 // retrieve result
 pop that 0 // array[index] = result (deref)
 
 push local 3 // sum (arg)

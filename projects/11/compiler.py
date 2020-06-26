@@ -216,7 +216,7 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=
 
                 elif input_list[i][1] in ("field", "static"):
                     # update class/<field/static> index
-                    # FIXME: field and possibly other segments were over-counted
+                    # TODO: field and possibly other segments were over-counted
                     if input_list[i][1] not in class_dict[class_name]["index_dict"]:
                         class_dict[class_name]["index_dict"][input_list[i][1]] = 0
                     else:
@@ -274,7 +274,6 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
                                               sub=True, proc=proc, stat=stat)
         sub_xps.append(cmd)
 
-        # FIXME: some functions advance one additional symbol
         if input_list[i][1] not in (";", "{", "="):
             i += 1
         else:
@@ -335,7 +334,7 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
 
             if var is not None:
                 # push implicit "this" argument for class methods
-                # FIXME: should not assume callee is method when pushing this
+                # TODO: should not assume callee is method when pushing this
                 if var["kind"] == "field":
                     if input_list[i+1][1] == "[":
                         cmd.append("push %s %s // %s (array)" % ("this", var["index"], input_list[i][1]))
@@ -402,13 +401,13 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
                 # lookup class for object (func table > class table > assume external)
                 try:
                     class_obj = class_dict[class_name][func_name]["args"][input_list[i][1]]["type"]
-                    # FIXME: might be function but might not be in dict
+                    # TODO: might be function but might not be in dict
                     # TODO: need to roll all files into pre-scan
                     num_params += 1  # inc for implicit this
                 except KeyError:
                     try:
                         class_obj = class_dict[class_name]["args"][input_list[i][1]]["type"]
-                        # FIXME: might be function but might not be in dict
+                        # TODO: might be function but might not be in dict
                         # TODO: need to roll all files into pre-scan
                         num_params += 1  # inc for implicit this
                     except KeyError:
@@ -420,7 +419,7 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
 
             elif local_call:
                 # convert local calls to be fully qualified to current class scope
-                # FIXME: should check callee is method before inc params
+                # TODO: should check callee is method before inc params
                 cmd.append("call %s.%s %s" % (class_name, input_list[i][1], num_params+1))
                 if stat == "do":
                     cmd.append("pop temp 0 // discard return on do call")
@@ -525,7 +524,6 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
                 proc.append(i)
 
             if input_list[i+1][1] == "(":
-                # FIXME: might over-run if k > 0
                 i = j  # return to pos where sub-sub processed
 
         elif input_list[i][0] == "keyword" and input_list[i][1] == "this":
@@ -609,11 +607,19 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
                 store_pcode(pcode, "push %s %s // %s (array)" % (var["kind"], var["index"], input_list[i+1][1]))
 
             pcode, proc = compile_expression(pcode, input_list, i+3, class_dict, class_name, func_name)
-            # FIXME: expression should be lhs/rhs aware to execute this itself / prevent duplication
+            # TODO: expression should be lhs/rhs aware to prevent duplication
             store_pcode(pcode, "pop temp 0 // discard expression push")
+            # TODO: should only do this on array to array assignment
+            store_pcode(pcode, "push pointer 1 // push dst array pointer")
 
             store_pcode(pcode, "\n// compute result")
             pcode, proc = compile_expression(pcode, input_list, equals+1, class_dict, class_name, func_name)
+
+            # TODO: should only do this on array to array assignment
+            store_pcode(pcode, "pop temp 0 // store result ")
+            store_pcode(pcode, "pop pointer 1 // retrieve dst array ptr from stack")
+            store_pcode(pcode, "push temp 0 // retrieve result")
+
             store_pcode(pcode, "pop that 0 // array[index] = result (deref)\n")
             return pcode, class_dict
             # else: fall through to var=x case
@@ -1122,10 +1128,10 @@ if __name__ == '__main__':
         r"..\11\Square\SquareGame.jack",  # compiled / tested
         r"..\11\Average\Main.jack",  # compiled / tested
 
-        r"..\11\Pong\Ball.jack",
-        r"..\11\Pong\Bat.jack",
-        r"..\11\Pong\Main.jack",
-        r"..\11\Pong\PongGame.jack",
+        # r"..\11\Pong\Ball.jack",
+        # r"..\11\Pong\Bat.jack",
+        # r"..\11\Pong\Main.jack",
+        # r"..\11\Pong\PongGame.jack",
     ]
 
     for _filepath in jack_filepaths:
