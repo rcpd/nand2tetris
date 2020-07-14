@@ -3,6 +3,11 @@ Compile a JACK program into a VM program (pcode) from the token stream initially
 by tokenizer/analyzer.
 """
 
+# FIXME: x = -1 should include "add" (pong)
+# FIXME: if without else generates a goto with no corresponding label (pong)
+# FIXME: expressions broken if includes call (complexarrays)
+# FIXME: nested arrays consume the stack and overflow into locals (complexarrays)
+
 import xml.etree.ElementTree as ET
 
 

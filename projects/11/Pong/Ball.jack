@@ -135,33 +135,18 @@ class Ball {
 	        let wall = 1;    
 	        let x = leftWall;
 	    }
-	    else {
-	        let wall = wall;
-	    }
-
         if (~(x < rightWall)) {
 	        let wall = 2;    
 	        let x = rightWall;
 	    }
-	    else {
-	        let wall = wall;
-	    }
-
         if (~(y > topWall)) {
             let wall = 3;    
 	        let y = topWall;
         }
-	    else {
-	        let wall = wall;
-	    }
-
         if (~(y < bottomWall)) {
             let wall = 4;    
 	        let y = bottomWall;
         }
-        else {
-	        let wall = wall;
-	    }
 
 	    do show();
 
