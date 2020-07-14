@@ -93,6 +93,7 @@ class Bat {
         else {
             let x = x + 4;
             if ((x + width) > 511) { let x = 511 - width; }
+            else { let x = x; }
             do Screen.setColor(false);
             do Screen.drawRectangle(x - 4, y, x - 1, y + height);
             do Screen.setColor(true);
