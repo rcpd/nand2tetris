@@ -1200,6 +1200,22 @@
                         </letStatement>
                       </statements>
                       <symbol> } </symbol>
+                      <keyword> else </keyword>
+                      <symbol> { </symbol>
+                      <statements>
+                        <letStatement>
+                          <keyword> let </keyword>
+                          <identifier> exit </identifier>
+                          <symbol> = </symbol>
+                          <expression>
+                            <term>
+                              <identifier> exit </identifier>
+                            </term>
+                          </expression>
+                          <symbol> ; </symbol>
+                        </letStatement>
+                      </statements>
+                      <symbol> } </symbol>
                     </ifStatement>
                   </statements>
                   <symbol> } </symbol>

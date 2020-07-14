@@ -1,0 +1,652 @@
+// class Ball
+
+function Ball.new 30
+push constant 30
+call Memory.alloc 1 // allocate object + params on heap
+pop pointer 0 // update 'this' to heap address
+push argument 0 // Ax (arg)
+pop this 0 // x =
+
+push argument 1 // Ay (arg)
+pop this 1 // y =
+
+push argument 2 // AleftWall (arg)
+pop this 10 // leftWall =
+
+push argument 3 // ArightWall (arg)
+push constant 6
+neg
+add
+pop this 11 // rightWall =
+
+push argument 4 // AtopWall (arg)
+pop this 12 // topWall =
+
+push argument 5 // AbottomWall (arg)
+push constant 6
+neg
+add
+pop this 13 // bottomWall =
+
+push constant 0
+pop this 14 // wall =
+
+push pointer 0 // Ball (this)
+call Ball.show 1
+pop temp 0 // discard return on do call
+push pointer 0 // this
+return
+
+function Ball.dispose 0
+push argument 0
+pop pointer 0 // update 'this' to object for method call
+push pointer 0 // this
+call Memory.deAlloc 1
+pop temp 0 // discard return on do call
+push constant 0 // void return
+return
+
+function Ball.show 0
+push argument 0
+pop pointer 0 // update 'this' to object for method call
+push constant 1
+neg // true
+call Screen.setColor 1
+pop temp 0 // discard return on do call
+push pointer 0 // Ball (this)
+call Ball.draw 1
+pop temp 0 // discard return on do call
+push constant 0 // void return
+return
+
+function Ball.hide 0
+push argument 0
+pop pointer 0 // update 'this' to object for method call
+push constant 0 // false
+call Screen.setColor 1
+pop temp 0 // discard return on do call
+push pointer 0 // Ball (this)
+call Ball.draw 1
+pop temp 0 // discard return on do call
+push constant 0 // void return
+return
+
+function Ball.draw 0
+push argument 0
+pop pointer 0 // update 'this' to object for method call
+push this 0 // x
+push this 1 // y
+push this 0 // x
+push constant 5
+add
+push this 1 // y
+push constant 5
+add
+call Screen.drawRectangle 4
+pop temp 0 // discard return on do call
+push constant 0 // void return
+return
+
+function Ball.getLeft 0
+push argument 0
+pop pointer 0 // update 'this' to object for method call
+push this 0 // x
+return
+
+function Ball.getRight 0
+push argument 0
+pop pointer 0 // update 'this' to object for method call
+push this 0 // x
+push constant 5
+add
+return
+
+function Ball.setDestination 3
+push argument 0
+pop pointer 0 // update 'this' to object for method call
+// var int dx (local 0)
+// var int dy (local 1)
+// var int temp (local 2)
+push argument 1 // destx (arg)
+push this 0 // x
+neg
+add
+pop this 2 // lengthx =
+
+push argument 2 // desty (arg)
+push this 1 // y
+neg
+add
+pop this 3 // lengthy =
+
+push this 2 // lengthx
+call Math.abs 1
+pop local 0 // dx =
+
+push this 3 // lengthy
+call Math.abs 1
+pop local 1 // dy =
+
+push local 0 // dx (arg)
+push local 1 // dy
+lt
+pop this 7 // invert =
+
+
+// if <expression>
+push this 7 // invert
+
+if-goto IF_setDestination_0 // jump to start if (true)
+goto ELSE_setDestination_0 // jump to else/end (false)
+
+label IF_setDestination_0 // start if (true)
+push local 0 // dx (arg)
+pop local 2 // temp =
+
+push local 1 // dy (arg)
+pop local 0 // dx =
+
+push local 2 // temp (arg)
+pop local 1 // dy =
+
+push this 1 // y
+push argument 2 // desty
+lt
+pop this 8 // positivex =
+
+push this 0 // x
+push argument 1 // destx
+lt
+pop this 9 // positivey =
+
+goto IF_END_setDestination_0 // jump over else (true)
+
+label ELSE_setDestination_0 // start else (false)
+push this 0 // x
+push argument 1 // destx
+lt
+pop this 8 // positivex =
+
+push this 1 // y
+push argument 2 // desty
+lt
+pop this 9 // positivey =
+
+label IF_END_setDestination_0 // exit if
+
+push constant 2
+push local 1 // dy
+call Math.multiply 2
+push local 0 // dx
+neg
+add
+pop this 4 // d =
+
+push constant 2
+push local 1 // dy
+call Math.multiply 2
+pop this 5 // straightD =
+
+push constant 2
+push local 1 // dy (arg)
+push local 0 // dx
+neg
+add
+call Math.multiply 2
+pop this 6 // diagonalD =
+
+push constant 0 // void return
+return
+
+function Ball.move 0
+push argument 0
+pop pointer 0 // update 'this' to object for method call
+push pointer 0 // Ball (this)
+call Ball.hide 1
+pop temp 0 // discard return on do call
+
+// if <expression>
+push this 4 // d
+push constant 0
+lt
+
+if-goto IF_move_0 // jump to start if (true)
+goto ELSE_move_0 // jump to else/end (false)
+
+label IF_move_0 // start if (true)
+push this 4 // d
+push this 5 // straightD
+add
+pop this 4 // d =
+
+goto IF_END_move_0 // jump over else (true)
+
+label ELSE_move_0 // start else (false)
+push this 4 // d
+push this 6 // diagonalD
+add
+pop this 4 // d =
+
+
+// if <expression>
+push this 9 // positivey
+
+if-goto IF_move_1 // jump to start if (true)
+goto ELSE_move_1 // jump to else/end (false)
+
+label IF_move_1 // start if (true)
+
+// if <expression>
+push this 7 // invert
+
+if-goto IF_move_2 // jump to start if (true)
+goto ELSE_move_2 // jump to else/end (false)
+
+label IF_move_2 // start if (true)
+push this 0 // x
+push constant 4
+add
+pop this 0 // x =
+
+goto IF_END_move_2 // jump over else (true)
+
+label ELSE_move_2 // start else (false)
+push this 1 // y
+push constant 4
+add
+pop this 1 // y =
+
+label IF_END_move_2 // exit if
+
+goto IF_END_move_1 // jump over else (true)
+
+label ELSE_move_1 // start else (false)
+
+// if <expression>
+push this 7 // invert
+
+if-goto IF_move_3 // jump to start if (true)
+goto ELSE_move_3 // jump to else/end (false)
+
+label IF_move_3 // start if (true)
+push this 0 // x
+push constant 4
+neg
+add
+pop this 0 // x =
+
+goto IF_END_move_3 // jump over else (true)
+
+label ELSE_move_3 // start else (false)
+push this 1 // y
+push constant 4
+neg
+add
+pop this 1 // y =
+
+label IF_END_move_3 // exit if
+
+label IF_END_move_1 // exit if
+
+label IF_END_move_0 // exit if
+
+
+// if <expression>
+push this 8 // positivex
+
+if-goto IF_move_4 // jump to start if (true)
+goto ELSE_move_4 // jump to else/end (false)
+
+label IF_move_4 // start if (true)
+
+// if <expression>
+push this 7 // invert
+
+if-goto IF_move_5 // jump to start if (true)
+goto ELSE_move_5 // jump to else/end (false)
+
+label IF_move_5 // start if (true)
+push this 1 // y
+push constant 4
+add
+pop this 1 // y =
+
+goto IF_END_move_5 // jump over else (true)
+
+label ELSE_move_5 // start else (false)
+push this 0 // x
+push constant 4
+add
+pop this 0 // x =
+
+label IF_END_move_5 // exit if
+
+goto IF_END_move_4 // jump over else (true)
+
+label ELSE_move_4 // start else (false)
+
+// if <expression>
+push this 7 // invert
+
+if-goto IF_move_6 // jump to start if (true)
+goto ELSE_move_6 // jump to else/end (false)
+
+label IF_move_6 // start if (true)
+push this 1 // y
+push constant 4
+neg
+add
+pop this 1 // y =
+
+goto IF_END_move_6 // jump over else (true)
+
+label ELSE_move_6 // start else (false)
+push this 0 // x
+push constant 4
+neg
+add
+pop this 0 // x =
+
+label IF_END_move_6 // exit if
+
+label IF_END_move_4 // exit if
+
+
+// if <expression>
+push this 0 // x
+push this 10 // leftWall
+gt
+not
+
+if-goto IF_move_7 // jump to start if (true)
+goto ELSE_move_7 // jump to else/end (false)
+
+label IF_move_7 // start if (true)
+push constant 1
+pop this 14 // wall =
+
+push this 10 // leftWall
+pop this 0 // x =
+
+goto IF_END_move_7 // jump over else (true)
+
+label ELSE_move_7 // start else (false)
+push this 14 // wall
+pop this 14 // wall =
+
+label IF_END_move_7 // exit if
+
+
+// if <expression>
+push this 0 // x
+push this 11 // rightWall
+lt
+not
+
+if-goto IF_move_8 // jump to start if (true)
+goto ELSE_move_8 // jump to else/end (false)
+
+label IF_move_8 // start if (true)
+push constant 2
+pop this 14 // wall =
+
+push this 11 // rightWall
+pop this 0 // x =
+
+goto IF_END_move_8 // jump over else (true)
+
+label ELSE_move_8 // start else (false)
+push this 14 // wall
+pop this 14 // wall =
+
+label IF_END_move_8 // exit if
+
+
+// if <expression>
+push this 1 // y
+push this 12 // topWall
+gt
+not
+
+if-goto IF_move_9 // jump to start if (true)
+goto ELSE_move_9 // jump to else/end (false)
+
+label IF_move_9 // start if (true)
+push constant 3
+pop this 14 // wall =
+
+push this 12 // topWall
+pop this 1 // y =
+
+goto IF_END_move_9 // jump over else (true)
+
+label ELSE_move_9 // start else (false)
+push this 14 // wall
+pop this 14 // wall =
+
+label IF_END_move_9 // exit if
+
+
+// if <expression>
+push this 1 // y
+push this 13 // bottomWall
+lt
+not
+
+if-goto IF_move_10 // jump to start if (true)
+goto ELSE_move_10 // jump to else/end (false)
+
+label IF_move_10 // start if (true)
+push constant 4
+pop this 14 // wall =
+
+push this 13 // bottomWall
+pop this 1 // y =
+
+goto IF_END_move_10 // jump over else (true)
+
+label ELSE_move_10 // start else (false)
+push this 14 // wall
+pop this 14 // wall =
+
+label IF_END_move_10 // exit if
+
+push pointer 0 // Ball (this)
+call Ball.show 1
+pop temp 0 // discard return on do call
+push this 14 // wall
+return
+
+function Ball.bounce 5
+push argument 0
+pop pointer 0 // update 'this' to object for method call
+// var int newx (local 0)
+// var int newy (local 1)
+// var int divLengthx (local 2)
+// var int divLengthy (local 3)
+// var int factor (local 4)
+push this 2 // lengthx
+push constant 10
+call Math.divide 2
+pop local 2 // divLengthx =
+
+push this 3 // lengthy
+push constant 10
+call Math.divide 2
+pop local 3 // divLengthy =
+
+
+// if <expression>
+push argument 1 // bouncingDirection (arg)
+push constant 0
+eq
+
+if-goto IF_bounce_0 // jump to start if (true)
+goto ELSE_bounce_0 // jump to else/end (false)
+
+label IF_bounce_0 // start if (true)
+push constant 10
+pop local 4 // factor =
+
+goto IF_END_bounce_0 // jump over else (true)
+
+label ELSE_bounce_0 // start else (false)
+
+// if <expression>
+push this 2 // lengthx
+push constant 0
+lt
+push argument 1 // bouncingDirection (arg)
+push constant 1
+eq
+push this 2 // lengthx
+push constant 0
+lt
+push argument 1 // bouncingDirection (arg)
+push constant 1
+neg
+eq
+and
+or
+and
+not
+
+if-goto IF_bounce_1 // jump to start if (true)
+goto ELSE_bounce_1 // jump to else/end (false)
+
+label IF_bounce_1 // start if (true)
+push constant 20
+pop local 4 // factor =
+
+goto IF_END_bounce_1 // jump over else (true)
+
+label ELSE_bounce_1 // start else (false)
+push constant 5
+pop local 4 // factor =
+
+label IF_END_bounce_1 // exit if
+
+label IF_END_bounce_0 // exit if
+
+
+// if <expression>
+push this 14 // wall
+push constant 1
+eq
+
+if-goto IF_bounce_2 // jump to start if (true)
+goto ELSE_bounce_2 // jump to else/end (false)
+
+label IF_bounce_2 // start if (true)
+push constant 506
+pop local 0 // newx =
+
+push local 3 // divLengthy (arg)
+push constant 50
+neg
+push local 2 // divLengthx
+call Math.divide 2
+call Math.multiply 2
+pop local 1 // newy =
+
+push this 1 // y
+push local 1 // newy (arg)
+push local 4 // factor
+call Math.multiply 2
+add
+pop local 1 // newy =
+
+goto IF_END_bounce_2 // jump over else (true)
+
+label ELSE_bounce_2 // start else (false)
+
+// if <expression>
+push this 14 // wall
+push constant 2
+eq
+
+if-goto IF_bounce_3 // jump to start if (true)
+goto ELSE_bounce_3 // jump to else/end (false)
+
+label IF_bounce_3 // start if (true)
+push constant 0
+pop local 0 // newx =
+
+push local 3 // divLengthy (arg)
+push constant 50
+call Math.multiply 2
+push local 2 // divLengthx
+call Math.divide 2
+pop local 1 // newy =
+
+push this 1 // y
+push local 1 // newy (arg)
+push local 4 // factor
+call Math.multiply 2
+add
+pop local 1 // newy =
+
+goto IF_END_bounce_3 // jump over else (true)
+
+label ELSE_bounce_3 // start else (false)
+
+// if <expression>
+push this 14 // wall
+push constant 3
+eq
+
+if-goto IF_bounce_4 // jump to start if (true)
+goto ELSE_bounce_4 // jump to else/end (false)
+
+label IF_bounce_4 // start if (true)
+push constant 250
+pop local 1 // newy =
+
+push local 2 // divLengthx (arg)
+push constant 25
+neg
+push local 3 // divLengthy
+call Math.divide 2
+call Math.multiply 2
+pop local 0 // newx =
+
+push this 0 // x
+push local 0 // newx (arg)
+push local 4 // factor
+call Math.multiply 2
+add
+pop local 0 // newx =
+
+goto IF_END_bounce_4 // jump over else (true)
+
+label ELSE_bounce_4 // start else (false)
+push constant 0
+pop local 1 // newy =
+
+push local 2 // divLengthx (arg)
+push constant 25
+call Math.multiply 2
+push local 3 // divLengthy
+call Math.divide 2
+pop local 0 // newx =
+
+push this 0 // x
+push local 0 // newx (arg)
+push local 4 // factor
+call Math.multiply 2
+add
+pop local 0 // newx =
+
+label IF_END_bounce_4 // exit if
+
+label IF_END_bounce_3 // exit if
+
+label IF_END_bounce_2 // exit if
+
+push pointer 0 // Ball (this)
+push local 0 // newx (arg)
+push local 1 // newy (arg)
+call Ball.setDestination 3
+pop temp 0 // discard return on do call
+push constant 0 // void return
+return

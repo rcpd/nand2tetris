@@ -1,0 +1,17 @@
+// class Main
+
+function Main.main 1
+// var PongGame game (local 0)
+call PongGame.newInstance 0
+pop temp 0 // discard return on do call
+call PongGame.getInstance 0
+pop local 0 // game =
+
+push local 0 // game (arg)
+call PongGame.run 1
+pop temp 0 // discard return on do call
+push local 0 // game (arg)
+call PongGame.dispose 1
+pop temp 0 // discard return on do call
+push constant 0 // void return
+return
