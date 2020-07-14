@@ -729,21 +729,37 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                                                  stat=statement)
                 return pcode, class_dict
 
+        elif input_list[j][1] == "(":
+            # pass to expression handler
+            pcode, proc = compile_expression(pcode, input_list, j, class_dict, class_name, func_name,
+                                             stat=statement)
+            return pcode, class_dict
+
         # handle constants (true/false/integer)
         elif input_list[j][0] == "keyword" and input_list[j][1] in ("true", "false"):
-            if input_list[j][1] == "true":
-                store_pcode(pcode, "push constant 1")
-                store_pcode(pcode, "neg // true")
-            else:
-                store_pcode(pcode, "push constant 0 // false")
+            # pass to expression handler
+            pcode, proc = compile_expression(pcode, input_list, j, class_dict, class_name, func_name,
+                                             stat=statement)
+            return pcode, class_dict
+
         elif input_list[j][0] == "integerConstant":
-            store_pcode(pcode, "push constant %s" % input_list[j][1])
+            pcode, proc = compile_expression(pcode, input_list, j, class_dict, class_name, func_name,
+                                             stat=statement)
+            return pcode, class_dict
+
         elif input_list[j][0] == "keyword" and input_list[j][1] == "null":
-            store_pcode(pcode, "push constant 0 // null")
+            pcode, proc = compile_expression(pcode, input_list, j, class_dict, class_name, func_name,
+                                             stat=statement)
+            return pcode, class_dict
+
+        elif input_list[j][1] in operators:
+            pcode, proc = compile_expression(pcode, input_list, j, class_dict, class_name, func_name,
+                                             stat=statement)
+            return pcode, class_dict
 
         else:
             raise RuntimeError(input_list[j])
-        j += 1
+        # j += 1
     return pcode, class_dict
 
 
@@ -790,6 +806,9 @@ def main(filepath, debug=False):
         if debug:
             store_pcode(pcode, "// line: %s %s" % (input_tuple[0], input_tuple[1]))
 
+        if input_list[i][0] == "keyword" and input_list[i][1] in ("method", "function", "constructor"):
+            func_name = input_list[i+2][1]
+
         # process tokens
         try:
             # close decs/expressions/statements ;
@@ -834,14 +853,15 @@ def main(filepath, debug=False):
                 parent = ET.SubElement(parent, "subroutineDec")
                 child = ET.SubElement(parent, input_tuple[0])
                 child.text = " %s " % input_tuple[1]
-
                 if input_list[j][0] in ("keyword", "identifier") and input_list[j+1][0] == "identifier":
                     pcode, class_dict, func_name = compile_function(pcode, input_list, j+1, class_dict, class_name)
                     store_pcode(pcode, "", write=filepath)
 
             # open classVarDec
+            # TODO: should be whitelist not blacklist
             elif parent.tag == "class" and input_list[i][0] == "keyword" \
-                    and input_list[i][1] not in ("function", "method", "constructor"):
+                    and input_list[i][1] not in ("function", "method", "constructor") \
+                    and input_list[i][1] not in ("if", "else", "let", "return"):
                 # only process if there are elements to add
                 if not (input_list[j][0] == "keyword" and input_list[j][1] in
                         ("function", "method", "constructor")):
@@ -1149,12 +1169,12 @@ if __name__ == '__main__':
         r"..\11\Square\SquareGame.jack",  # compiled / tested
         r"..\11\Average\Main.jack",  # compiled / tested
 
-        r"..\11\ComplexArrays\Main.jack",
+        r"..\11\ComplexArrays\Main.jack",  # compiled
 
-        # r"..\11\Pong\Ball.jack",
-        # r"..\11\Pong\Bat.jack",
-        # r"..\11\Pong\Main.jack",
-        # r"..\11\Pong\PongGame.jack",
+        r"..\11\Pong\Ball.jack",  # compiled
+        r"..\11\Pong\Bat.jack",  # compiled
+        r"..\11\Pong\Main.jack",  # compiled
+        r"..\11\Pong\PongGame.jack",  # compiled
     ]
 
     for _filepath in jack_filepaths:
