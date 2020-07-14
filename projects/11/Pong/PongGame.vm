@@ -1,0 +1,332 @@
+function PongGame.new 14
+push constant 14
+call Memory.alloc 1 // allocate object + params on heap
+pop pointer 0 // update 'this' to heap address
+call Screen.clearScreen 0
+pop temp 0 // discard return on do call
+push constant 50
+pop this 6 // batWidth =
+push constant 230
+push constant 229
+push this 6 // batWidth
+push constant 7
+call Bat.new 4
+pop this 0 // bat =
+push constant 253
+push constant 222
+push constant 0
+push constant 511
+push constant 0
+push constant 229
+call Ball.new 6
+pop this 1 // ball =
+push this 1 // ball
+push constant 400
+push constant 0
+call Ball.setDestination 3
+pop temp 0 // discard return on do call
+push constant 0
+push constant 238
+push constant 511
+push constant 240
+call Screen.drawRectangle 4
+pop temp 0 // discard return on do call
+push constant 22
+push constant 0
+call Output.moveCursor 2
+pop temp 0 // discard return on do call
+push constant 9 // strlen
+call String.new 1 // "Score: 0"
+push constant 83 // S (char)
+call String.appendChar 2
+push constant 99 // c (char)
+call String.appendChar 2
+push constant 111 // o (char)
+call String.appendChar 2
+push constant 114 // r (char)
+call String.appendChar 2
+push constant 101 // e (char)
+call String.appendChar 2
+push constant 58 // : (char)
+call String.appendChar 2
+push constant 32 //   (char)
+call String.appendChar 2
+push constant 48 // 0 (char)
+call String.appendChar 2
+call Output.printString 1
+pop temp 0 // discard return on do call
+push constant 0 // false
+pop this 3 // exit =
+push constant 0
+pop this 4 // score =
+push constant 0
+pop this 2 // wall =
+push constant 0
+pop this 5 // lastWall =
+push pointer 0 // this
+return
+function PongGame.dispose 0
+push argument 0
+pop pointer 0 // update 'this' to object for method call
+push this 0 // bat
+call Bat.dispose 1
+pop temp 0 // discard return on do call
+push this 1 // ball
+call Ball.dispose 1
+pop temp 0 // discard return on do call
+push pointer 0 // this
+call Memory.deAlloc 1
+pop temp 0 // discard return on do call
+push constant 0 // void return
+return
+function PongGame.newInstance 0
+call PongGame.new 0
+pop static 0 // instance =
+push constant 0 // void return
+return
+function PongGame.getInstance 0
+push static 0 // instance (arg)
+return
+function PongGame.run 1
+push argument 0
+pop pointer 0 // update 'this' to object for method call
+label WHILE_TEST_run_0 // test while <expression>
+push this 3 // exit
+not
+if-goto WHILE_TRUE_run_0 // jump to start while (true)
+goto WHILE_FALSE_run_0 // jump to exit while (false)
+label WHILE_TRUE_run_0 // start while
+label WHILE_TEST_run_1 // test while <expression>
+push local 0 // key (arg)
+push constant 0
+eq
+push this 3 // exit
+not
+and
+if-goto WHILE_TRUE_run_1 // jump to start while (true)
+goto WHILE_FALSE_run_1 // jump to exit while (false)
+label WHILE_TRUE_run_1 // start while
+call Keyboard.keyPressed 0
+pop local 0 // key =
+push this 0 // bat
+call Bat.move 1
+pop temp 0 // discard return on do call
+push pointer 0 // PongGame (this)
+call PongGame.moveBall 1
+pop temp 0 // discard return on do call
+push constant 50
+call Sys.wait 1
+pop temp 0 // discard return on do call
+goto WHILE_TEST_run_1 // loop or exit
+label WHILE_FALSE_run_1 // exit while
+push local 0 // key (arg)
+push constant 130
+eq
+if-goto IF_run_0 // jump to start if (true)
+goto ELSE_run_0 // jump to else/end (false)
+label IF_run_0 // start if (true)
+push this 0 // bat
+push constant 1
+call Bat.setDirection 2
+pop temp 0 // discard return on do call
+goto IF_END_run_0 // jump over else (true)
+label ELSE_run_0 // start else (false)
+push local 0 // key (arg)
+push constant 132
+eq
+if-goto IF_run_1 // jump to start if (true)
+goto ELSE_run_1 // jump to else/end (false)
+label IF_run_1 // start if (true)
+push this 0 // bat
+push constant 2
+call Bat.setDirection 2
+pop temp 0 // discard return on do call
+goto IF_END_run_1 // jump over else (true)
+label ELSE_run_1 // start else (false)
+push local 0 // key (arg)
+push constant 140
+eq
+if-goto IF_run_2 // jump to start if (true)
+goto ELSE_run_2 // jump to else/end (false)
+label IF_run_2 // start if (true)
+push constant 1
+neg // true
+pop this 3 // exit =
+goto IF_END_run_2 // jump over else (true)
+label ELSE_run_2 // start else (false)
+push this 3 // exit
+pop this 3 // exit =
+label IF_END_run_2 // exit if
+label IF_END_run_1 // exit if
+label IF_END_run_0 // exit if
+label WHILE_TEST_run_2 // test while <expression>
+push local 0 // key (arg)
+push constant 0
+eq
+not // -- added
+push this 3 // exit
+not
+and
+not
+if-goto WHILE_TRUE_run_2 // jump to start while (true)
+goto WHILE_FALSE_run_2 // jump to exit while (false)
+label WHILE_TRUE_run_2 // start while
+call Keyboard.keyPressed 0
+pop local 0 // key =
+push this 0 // bat
+call Bat.move 1
+pop temp 0 // discard return on do call
+push pointer 0 // PongGame (this)
+call PongGame.moveBall 1
+pop temp 0 // discard return on do call
+push constant 50
+call Sys.wait 1
+pop temp 0 // discard return on do call
+goto WHILE_TEST_run_2 // loop or exit
+label WHILE_FALSE_run_2 // exit while
+goto WHILE_TEST_run_0 // loop or exit
+label WHILE_FALSE_run_0 // exit while
+push this 3 // exit
+if-goto IF_run_3 // jump to start if (true)
+goto ELSE_run_3 // jump to else/end (false)
+label IF_run_3 // start if (true)
+push constant 10
+push constant 27
+call Output.moveCursor 2
+pop temp 0 // discard return on do call
+push constant 10 // strlen
+call String.new 1 // "Game Over"
+push constant 71 // G (char)
+call String.appendChar 2
+push constant 97 // a (char)
+call String.appendChar 2
+push constant 109 // m (char)
+call String.appendChar 2
+push constant 101 // e (char)
+call String.appendChar 2
+push constant 32 //   (char)
+call String.appendChar 2
+push constant 79 // O (char)
+call String.appendChar 2
+push constant 118 // v (char)
+call String.appendChar 2
+push constant 101 // e (char)
+call String.appendChar 2
+push constant 114 // r (char)
+call String.appendChar 2
+call Output.printString 1
+pop temp 0 // discard return on do call
+goto IF_END_run_3 // jump over else (true)
+label ELSE_run_3 // start else (false)
+push this 3 // exit
+pop this 3 // exit =
+label IF_END_run_3 // exit if
+push constant 0 // void return
+return
+function PongGame.moveBall 5
+push argument 0
+pop pointer 0 // update 'this' to object for method call
+push this 1 // ball
+call Ball.move 1
+pop this 2 // wall =
+push this 2 // wall
+push constant 0
+gt
+push this 2 // wall
+push this 5 // lastWall
+eq
+not
+and
+if-goto IF_moveBall_0 // jump to start if (true)
+goto ELSE_moveBall_0 // jump to else/end (false)
+label IF_moveBall_0 // start if (true)
+push this 2 // wall
+pop this 5 // lastWall =
+push constant 0
+pop local 0 // bouncingDirection =
+push this 0 // bat
+call Bat.getLeft 1
+pop local 1 // batLeft =
+push this 0 // bat
+call Bat.getRight 1
+pop local 2 // batRight =
+push this 1 // ball
+call Ball.getLeft 1
+pop local 3 // ballLeft =
+push this 1 // ball
+call Ball.getRight 1
+pop local 4 // ballRight =
+push this 2 // wall
+push constant 4
+eq
+if-goto IF_moveBall_1 // jump to start if (true)
+goto ELSE_moveBall_1 // jump to else/end (false)
+label IF_moveBall_1 // start if (true)
+push local 1 // batLeft (arg)
+push local 4 // ballRight
+gt
+push local 2 // batRight (arg)
+push local 3 // ballLeft
+lt
+or
+pop this 3 // exit =
+push this 3 // exit
+not
+if-goto IF_moveBall_2 // jump to start if (true)
+goto ELSE_moveBall_2 // jump to else/end (false)
+label IF_moveBall_2 // start if (true)
+push local 4 // ballRight (arg)
+push local 1 // batLeft (arg)
+push constant 10
+add
+lt
+if-goto IF_moveBall_3 // jump to start if (true)
+goto ELSE_moveBall_3 // jump to else/end (false)
+label IF_moveBall_3 // start if (true)
+push constant 1
+neg // add -- removed
+pop local 0 // bouncingDirection =
+goto IF_END_moveBall_3 // jump over else (true)
+label ELSE_moveBall_3 // start else (false)
+push this 3 // exit
+pop this 3 // exit =
+label IF_END_moveBall_3 // exit if
+label IF_END_moveBall_2 // exit if
+push this 6 // batWidth
+push constant 2
+neg
+add
+pop this 6 // batWidth =
+push this 0 // bat
+push this 6 // batWidth
+call Bat.setWidth 2
+pop temp 0 // discard return on do call
+push this 4 // score
+push constant 1
+add
+pop this 4 // score =
+push constant 22
+push constant 7
+call Output.moveCursor 2
+pop temp 0 // discard return on do call
+push this 4 // score
+call Output.printInt 1
+pop temp 0 // discard return on do call
+goto IF_END_moveBall_1 // jump over else (true)
+label ELSE_moveBall_1 // start else (false)
+push this 3 // exit
+pop this 3 // exit =
+label IF_END_moveBall_1 // exit if
+goto IF_END_moveBall_0 // jump over else (true)
+label ELSE_moveBall_0 // start else (false)
+push this 3 // exit
+pop this 3 // exit =
+label IF_END_moveBall_0 // exit if
+push this 1 // ball
+push local 0 // bouncingDirection (arg)
+call Ball.bounce 2
+pop temp 0 // discard return on do call
+push this 3 // exit
+pop this 3 // exit =
+push constant 0 // void return
+return
