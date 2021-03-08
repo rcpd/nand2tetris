@@ -208,12 +208,6 @@ neg
 add
 pop this 0 // x =
 
-goto IF_END_move_2 // jump over else (true)
-
-label ELSE_move_2 // start else (false)
-push this 0 // x
-pop this 0 // x =
-
 label IF_END_move_2 // exit if
 
 push constant 0 // false

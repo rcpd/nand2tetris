@@ -315,6 +315,7 @@ if __name__ == '__main__':
         r"..\09\Square\Main.jack",
         r"..\09\Square\Square.jack",
         r"..\09\Square\SquareGame.jack",
+
         r"..\10\ArrayTest\Main.jack",
         r"..\10\ExpressionLessSquare\Main.jack",
         r"..\10\ExpressionLessSquare\Square.jack",

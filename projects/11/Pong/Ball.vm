@@ -368,12 +368,6 @@ pop this 14 // wall =
 push this 10 // leftWall
 pop this 0 // x =
 
-goto IF_END_move_7 // jump over else (true)
-
-label ELSE_move_7 // start else (false)
-push this 14 // wall
-pop this 14 // wall =
-
 label IF_END_move_7 // exit if
 
 
@@ -392,12 +386,6 @@ pop this 14 // wall =
 
 push this 11 // rightWall
 pop this 0 // x =
-
-goto IF_END_move_8 // jump over else (true)
-
-label ELSE_move_8 // start else (false)
-push this 14 // wall
-pop this 14 // wall =
 
 label IF_END_move_8 // exit if
 
@@ -418,12 +406,6 @@ pop this 14 // wall =
 push this 12 // topWall
 pop this 1 // y =
 
-goto IF_END_move_9 // jump over else (true)
-
-label ELSE_move_9 // start else (false)
-push this 14 // wall
-pop this 14 // wall =
-
 label IF_END_move_9 // exit if
 
 
@@ -442,12 +424,6 @@ pop this 14 // wall =
 
 push this 13 // bottomWall
 pop this 1 // y =
-
-goto IF_END_move_10 // jump over else (true)
-
-label ELSE_move_10 // start else (false)
-push this 14 // wall
-pop this 14 // wall =
 
 label IF_END_move_10 // exit if
 

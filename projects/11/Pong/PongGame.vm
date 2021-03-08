@@ -196,12 +196,6 @@ push constant 1
 neg // true
 pop this 3 // exit =
 
-goto IF_END_run_2 // jump over else (true)
-
-label ELSE_run_2 // start else (false)
-push this 3 // exit
-pop this 3 // exit =
-
 label IF_END_run_2 // exit if
 
 label IF_END_run_1 // exit if
@@ -277,12 +271,6 @@ call String.appendChar 2 // padding space
 
 call Output.printString 1
 pop temp 0 // discard return on do call
-goto IF_END_run_3 // jump over else (true)
-
-label ELSE_run_3 // start else (false)
-push this 3 // exit
-pop this 3 // exit =
-
 label IF_END_run_3 // exit if
 
 push constant 0 // void return
@@ -382,14 +370,12 @@ neg
 add
 pop local 0 // bouncingDirection =
 
-goto IF_END_moveBall_3 // jump over else (true)
 
-label ELSE_moveBall_3 // start else (false)
-push this 3 // exit
-pop this 3 // exit =
-
+label ELSE_moveBall_3 // else
 label IF_END_moveBall_3 // exit if
 
+
+label ELSE_moveBall_2 // else
 label IF_END_moveBall_2 // exit if
 
 push this 6 // batWidth
@@ -414,28 +400,17 @@ pop temp 0 // discard return on do call
 push this 4 // score
 call Output.printInt 1
 pop temp 0 // discard return on do call
-goto IF_END_moveBall_1 // jump over else (true)
 
-label ELSE_moveBall_1 // start else (false)
-push this 3 // exit
-pop this 3 // exit =
-
+label ELSE_moveBall_1 // else
 label IF_END_moveBall_1 // exit if
 
-goto IF_END_moveBall_0 // jump over else (true)
 
-label ELSE_moveBall_0 // start else (false)
-push this 3 // exit
-pop this 3 // exit =
-
+label ELSE_moveBall_0 // else
 label IF_END_moveBall_0 // exit if
 
 push this 1 // ball
 push local 0 // bouncingDirection (arg)
 call Ball.bounce 2
 pop temp 0 // discard return on do call
-push this 3 // exit
-pop this 3 // exit =
-
 push constant 0 // void return
 return
