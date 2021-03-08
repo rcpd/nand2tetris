@@ -809,6 +809,17 @@ def translate(vm_dir, vm_bootstrap_paths=(), debug=False):
         os.path.join(vm_dir, vm_dir.split('\\')[-1]+'.vm'),
         os.path.join(vm_dir, 'Class1.vm'),
         os.path.join(vm_dir, 'Class2.vm'),
+        os.path.join(vm_dir, 'Array.vm'),
+        os.path.join(vm_dir, 'Ball.vm'),
+        os.path.join(vm_dir, 'Bat.vm'),
+        os.path.join(vm_dir, 'Keyboard.vm'),
+        os.path.join(vm_dir, 'Math.vm'),
+        os.path.join(vm_dir, 'Memory.vm'),
+        os.path.join(vm_dir, 'Output.vm'),
+        os.path.join(vm_dir, 'PongGame.vm'),
+        os.path.join(vm_dir, 'Screen.vm'),
+        os.path.join(vm_dir, 'SquareGame.vm'),
+        os.path.join(vm_dir, 'String.vm'),
     ]
 
     for vm_filepath in vm_filelist:
@@ -867,7 +878,6 @@ if __name__ == "__main__":
         r'..\projects\07\MemoryAccess\StaticTest',
         r'..\projects\07\StackArithmetic\SimpleAdd',
         r'..\projects\07\StackArithmetic\StackTest',
-
         r'..\projects\08\ProgramFlow\BasicLoop',
         r'..\projects\08\ProgramFlow\FibonacciSeries',
         r'..\projects\08\FunctionCalls\SimpleFunction',
