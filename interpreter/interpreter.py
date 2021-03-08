@@ -16,7 +16,7 @@ def dump_call_tree(call_tree, debug_msg):
 
 
 def run(asm_filepath, static_dict=None, tst_params=None, debug=False):
-    # TODO: (week 6-8) all asm/tst/cmp/out/vms parsed/compiled/executed/passed
+    # TODO: (week 6-8) all asm/tst/cmp/out/vms parsed/assembled/executed/passed
     # TODO: translator finish stack mapping: other stack manip(stacksize), functions(stackframes)
     # TODO: maybe stacksize should be <start-sp>-esp function instead?
     # TODO: maybe stack metadata could use address labels dict?
@@ -282,7 +282,7 @@ def run(asm_filepath, static_dict=None, tst_params=None, debug=False):
                     call_tree.pop()
                 except IndexError:
                     # SimpleFunction does not contain a call so will always break the index on return
-                    if asm_filepath != '../08/FunctionCalls/SimpleFunction/SimpleFunction.asm':
+                    if asm_filepath != '../projects/08/FunctionCalls/SimpleFunction/SimpleFunction.asm':
                         raise
 
                 debug_msg = dump_call_tree(call_tree, debug_msg)
@@ -355,66 +355,66 @@ if __name__ == '__main__':
     # regular VM programs
     # TODO: standardise paths
     _vm_dirpaths = [
-        # r'..\07\MemoryAccess\BasicTest',
-        # r'..\07\MemoryAccess\PointerTest',
-        # r'..\07\MemoryAccess\StaticTest',
-        # r'..\07\StackArithmetic\SimpleAdd',
-        # r'..\07\StackArithmetic\StackTest',
-        #
-        # r'..\08\ProgramFlow\BasicLoop',
-        # r'..\08\ProgramFlow\FibonacciSeries',
-        # r'..\08\FunctionCalls\SimpleFunction',
+        r'..\projects\07\MemoryAccess\BasicTest',
+        r'..\projects\07\MemoryAccess\PointerTest',
+        r'..\projects\07\MemoryAccess\StaticTest',
+        r'..\projects\07\StackArithmetic\SimpleAdd',
+        r'..\projects\07\StackArithmetic\StackTest',
 
-        r"..\11\Seven",
+        r'..\projects\08\ProgramFlow\BasicLoop',
+        r'..\projects\08\ProgramFlow\FibonacciSeries',
+        r'..\projects\08\FunctionCalls\SimpleFunction',
+
+        # r"..\projects\11\Seven",  # TODO: is injecting changes?
     ]
 
     # VM programs that require non-spec bootstrap to pass tests
     _vm_bootstrap_paths = [
-        # r'..\08\FunctionCalls\FibonacciElement',
-        # r'..\08\FunctionCalls\NestedCall',
-        # r'..\08\FunctionCalls\StaticsTest'
+        r'..\projects\08\FunctionCalls\FibonacciElement',
+        r'..\projects\08\FunctionCalls\NestedCall',
+        r'..\projects\08\FunctionCalls\StaticsTest'
     ]
 
     _vm_dirpaths = _vm_dirpaths + _vm_bootstrap_paths
 
     vm_asm_filepaths = [  # test scripts
-        # "../07/MemoryAccess/BasicTest/BasicTest.asm",
-        # "../07/MemoryAccess/PointerTest/PointerTest.asm",
-        # "../07/MemoryAccess/StaticTest/StaticTest.asm",
-        # "../07/StackArithmetic/SimpleAdd/SimpleAdd.asm",
-        # "../07/StackArithmetic/StackTest/StackTest.asm",
-        #
-        # "../08/FunctionCalls/FibonacciElement/FibonacciElement.asm",
-        # "../08/FunctionCalls/NestedCall/NestedCall.asm",
-        # "../08/FunctionCalls/SimpleFunction/SimpleFunction.asm",
-        # "../08/FunctionCalls/StaticsTest/StaticsTest.asm",
-        # "../08/ProgramFlow/BasicLoop/BasicLoop.asm",
-        # "../08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
+        "../projects/07/MemoryAccess/BasicTest/BasicTest.asm",
+        "../projects/07/MemoryAccess/PointerTest/PointerTest.asm",
+        "../projects/07/MemoryAccess/StaticTest/StaticTest.asm",
+        "../projects/07/StackArithmetic/SimpleAdd/SimpleAdd.asm",
+        "../projects/07/StackArithmetic/StackTest/StackTest.asm",
+
+        "../projects/08/FunctionCalls/FibonacciElement/FibonacciElement.asm",
+        "../projects/08/FunctionCalls/NestedCall/NestedCall.asm",
+        "../projects/08/FunctionCalls/SimpleFunction/SimpleFunction.asm",
+        "../projects/08/FunctionCalls/StaticsTest/StaticsTest.asm",
+        "../projects/08/ProgramFlow/BasicLoop/BasicLoop.asm",
+        "../projects/08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
     ]
 
     binary_asm_filepaths = [  # compilation only
-        # "../04/fill/fill.asm",
-        # "../04/mult/mult.asm",
-        # "../06/add/add.asm",
-        # "../06/max/max.asm",
-        # "../06/max/maxL.asm",
-        # "../06/pong/pong.asm",
-        # "../06/pong/pongL.asm",
-        # "../06/rect/rect.asm",
-        # "../06/rect/rectL.asm",
-        r"../11/Seven/Seven.asm",
+        "../projects/04/fill/fill.asm",
+        "../projects/04/mult/mult.asm",
+        "../projects/06/add/add.asm",
+        "../projects/06/max/max.asm",
+        "../projects/06/max/maxL.asm",
+        "../projects/06/pong/pong.asm",
+        "../projects/06/pong/pongL.asm",
+        "../projects/06/rect/rect.asm",
+        "../projects/06/rect/rectL.asm",
+
+        # r"../projects/11/Seven/Seven.asm",  # TODO: is injecting changes?
     ]
 
-    # debug_runs = [True, False]
     debug_runs = [True]
-    # debug_runs = [False]
+
     vm_static_dicts = {}
     for _debug in debug_runs:
-        # transpile VM to ASM
+        # translate VM to ASM
         for _vm_dir in _vm_dirpaths:
             vm_static_dicts[_vm_dir] = translator.translate(_vm_dir, _vm_bootstrap_paths, debug=False)
 
-        # compile all ASM to HACK and binary match if available
+        # assemble all ASM to HACK and binary match if available
         _asm_filepaths = vm_asm_filepaths + binary_asm_filepaths
         for _asm_filepath in _asm_filepaths:
             assembler.assemble(_asm_filepath, debug=False)
@@ -439,5 +439,3 @@ if __name__ == '__main__':
 
             # execute
             run(_asm_filepath, static_dict=_static_dict, tst_params=_tst_params, debug=_debug)
-
-

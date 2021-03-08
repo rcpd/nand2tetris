@@ -688,7 +688,7 @@
   STATICS: 0 0 0 0 
 350 @16 
   // pop static 0 
-  // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm) 
+  // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class1.vm) 
   EVAL: A=16 
   A=16 D=6 M=0 R13=0 R14=0 R15=0 
   SP: 269 LCL=268 ARG=261 THIS=0 THAT=0 
@@ -908,7 +908,7 @@
   STATICS: 6 0 0 0 
 378 @16 
   // pop static 1 
-  // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm) 
+  // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class1.vm) 
   EVAL: A=16 
   A=16 D=8 M=6 R13=0 R14=0 R15=0 
   SP: 269 LCL=268 ARG=261 THIS=0 THAT=0 
@@ -2394,7 +2394,7 @@
   STATICS: 6 8 0 0 
 559 @18 
   // pop static 0 
-  // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm) 
+  // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class2.vm) 
   EVAL: A=18 
   A=18 D=23 M=0 R13=268 R14=0 R15=0 
   SP: 269 LCL=268 ARG=261 THIS=0 THAT=0 
@@ -2614,7 +2614,7 @@
   STATICS: 6 8 23 0 
 587 @18 
   // pop static 1 
-  // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm) 
+  // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class2.vm) 
   EVAL: A=18 
   A=18 D=15 M=23 R13=268 R14=0 R15=0 
   SP: 269 LCL=268 ARG=261 THIS=0 THAT=0 
@@ -3977,7 +3977,7 @@
 461 @16 
   // push static 0 
   // function Class1.get 0 
-  // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm) 
+  // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class1.vm) 
   // (Class1.get) 
   EVAL: A=16 
   A=16 D=267 M=6 R13=268 R14=0 R15=0 
@@ -4051,7 +4051,7 @@
   STATICS: 6 8 23 15 
 471 @16 
   // push static 1 
-  // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm) 
+  // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class1.vm) 
   EVAL: A=16 
   A=16 D=6 M=6 R13=268 R14=0 R15=0 
   SP: 268 LCL=267 ARG=261 THIS=0 THAT=0 
@@ -5211,7 +5211,7 @@
 670 @18 
   // push static 0 
   // function Class2.get 0 
-  // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm) 
+  // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class2.vm) 
   // (Class2.get) 
   EVAL: A=18 
   A=18 D=268 M=23 R13=267 R14=0 R15=0 
@@ -5285,7 +5285,7 @@
   STATICS: 6 8 23 15 
 680 @18 
   // push static 1 
-  // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm) 
+  // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class2.vm) 
   EVAL: A=18 
   A=18 D=23 M=23 R13=267 R14=0 R15=0 
   SP: 269 LCL=268 ARG=262 THIS=0 THAT=0 
