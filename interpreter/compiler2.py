@@ -2,8 +2,8 @@
 Compile a JACK program into a VM program (pcode) from the token stream initially generated
 by tokenizer/analyzer.
 """
-
-import xml.etree.ElementTree as ET  # FIXME: pep
+import xml.etree.ElementTree as Et
+import traceback
 
 op_map = {"+": "add", "-": "sub", "*": "call Math.multiply 2", "/": "call Math.divide 2", "&": "and", "|": "or",
           "~": "not", "<": "lt", ">": "gt", "=": "eq"}  # Math.multiply/divide = non-void return (no pop)
@@ -23,7 +23,7 @@ char_map = {
     }
 
 
-def store_pcode(pcode, cmd, write=None, strip=False, debug=True):
+def store_pcode(pcode, cmd, debug=True):
     """
     TODO: docstring
     """
@@ -31,17 +31,9 @@ def store_pcode(pcode, cmd, write=None, strip=False, debug=True):
         if cmd.strip() != "":
             print("PCODE: %s" % cmd.strip())
 
-    if write:
-        # debug/wip write
-        with open(write.replace(".jack", ".vm"), "w") as pcode_file:
-            pcode_file.writelines(pcode)
-    else:
-        # overwrite at end if successful
-        # don't append empty debug "write" calls
-        if strip:
-            pcode.append(cmd.strip())
-        else:
-            pcode.append(cmd+"\n")
+    # overwrite at end if successful
+    # don't append empty debug "write" calls
+    pcode.append(cmd.strip()+"\n")
 
     return pcode
 
@@ -173,7 +165,7 @@ def compile_constant(pcode, constant):
     """
     TODO: docstring
     """
-    store_pcode(pcode, "\npush %s" % constant)
+    store_pcode(pcode, "\npush constant %s" % constant)
     return pcode
 
 
@@ -211,89 +203,90 @@ def main(filepath, debug=False):
     """
     TODO: docstring
     """
-    print("Parsing: %s" % filepath)
-    tree = ET.parse(filepath.replace(".jack", "_out.xml"))
-
-    # persist through loop scope
-    parent = 'class'
     pcode = []
-    exp_buffer = []
-    class_dict = {}
-    num_args = 0
-    class_name = func_kind = call_class = call_func = statement = func_name = keyword = _type = identifier = ''
-    func_type = symbol = lhs_var_name = rhs_parent = rhs_child = ''
+    try:
+        print("Parsing: %s" % filepath)
+        tree = Et.parse(filepath.replace(".jack", "_out.xml"))
 
-    # dump tree
-    for elem in tree.iter():
-        elem.tag = (elem.tag or '').strip()
-        elem.text = (elem.text or '').strip()
-        # skip rootnode
-        if elem.tag == 'class':
-            continue
+        # persist through loop scope
+        parent = 'class'
+        exp_buffer = []
+        class_dict = {}
+        num_args = 0
+        class_name = func_kind = call_class = call_func = statement = func_name = keyword = _type = identifier = ''
+        func_type = symbol = lhs_var_name = rhs_parent = rhs_child = ''
 
-        # debug
-        # if elem.tag == 'subroutineBody':
-        #     print("break")
-        # print("TOKEN:", elem.tag, elem.text, parent)
+        # dump tree
+        for elem in tree.iter():
+            elem.tag = (elem.tag or '').strip()
+            elem.text = (elem.text or '').strip()
+            # skip rootnode
+            if elem.tag == 'class':
+                continue
 
-        if elem:  # has children
-            parent = elem.tag
-            # reset tag context on depth change (possibly this can be controlled by function scoping?)
-            # exlcusion: class_name, func_kind, call_class, call_func, statement, func_name, lhs_var_name
-            keyword = _type = identifier = func_type = symbol = ''
+            # debug
+            # if elem.tag == 'subroutineBody':
+            #     print("break")
+            # print("TOKEN:", elem.tag, elem.text, parent)
 
-        if elem.tag == 'keyword':
-            if not keyword:
-                keyword = elem.text
-            elif not _type:
-                _type = elem.text
-            else:
-                raise RuntimeError("unexpected keywords %s %s %s" % (keyword, _type, elem.text))
-            
-        elif elem.tag == 'identifier':
-            if keyword:
-                identifier = elem.text
-                if keyword == 'class':
-                    class_name = identifier  # preserved for later
-                    func_kind = 'method'
-                    pcode, class_dict = compile_class(pcode, class_name, class_dict)
+            if elem:  # has children
+                parent = elem.tag
+                # reset tag context on depth change (possibly this can be controlled by function scoping?)
+                # exlcusion: class_name, func_kind, call_class, call_func, statement, func_name, lhs_var_name
+                keyword = _type = identifier = func_type = symbol = ''
 
-                elif keyword == 'function':
-                    func_name = identifier  # preserved for later
-                    if not func_kind:
-                        raise RuntimeError("undefined function kind for %s.%s" % (class_name, func_name))
-                    pcode, class_dict = compile_function(pcode, func_name, _type, func_kind, class_dict, class_name)
+            if elem.tag == 'keyword':
+                if not keyword:
+                    keyword = elem.text
+                elif not _type:
+                    _type = elem.text
+                else:
+                    raise RuntimeError("unexpected keywords %s %s %s" % (keyword, _type, elem.text))
 
-                elif keyword == 'var':
-                    pcode, class_dict, num_args, exp_buffer = \
-                        compile_statement(pcode, statement, class_dict, class_name, func_name,
-                                          None, None, _type, identifier, num_args, exp_buffer)
+            elif elem.tag == 'identifier':
+                if keyword:
+                    identifier = elem.text
+                    if keyword == 'class':
+                        class_name = identifier  # preserved for later
+                        func_kind = 'method'
+                        pcode, class_dict = compile_class(pcode, class_name, class_dict)
 
-                elif keyword == 'do':
-                    # "do" compilation is deferred until ";"
-                    if not call_class:
-                        call_class = identifier  # preserved for later
-                    else:
-                        call_func = identifier  # preserved for later
+                    elif keyword == 'function':
+                        func_name = identifier  # preserved for later
+                        if not func_kind:
+                            raise RuntimeError("undefined function kind for %s.%s" % (class_name, func_name))
+                        pcode, class_dict = compile_function(pcode, func_name, _type, func_kind, class_dict, class_name)
 
-                elif keyword == 'let':
-                    if not lhs_var_name:
-                        lhs_var_name = identifier
-                    elif not rhs_parent:
-                        rhs_parent = identifier  # preserved for later
-                    else:
-                        rhs_child = identifier  # preserved for later
-
-                    if lhs_var_name:
+                    elif keyword == 'var':
                         pcode, class_dict, num_args, exp_buffer = \
                             compile_statement(pcode, statement, class_dict, class_name, func_name,
-                                              call_class, call_func, _type, identifier, num_args, exp_buffer)
+                                              None, None, _type, identifier, num_args, exp_buffer)
 
-                else:
-                    raise RuntimeError("unexpected keyword %s for identifier %s" % (keyword, elem.text))
+                    elif keyword == 'do':
+                        # "do" compilation is deferred until ";"
+                        if not call_class:
+                            call_class = identifier  # preserved for later
+                        else:
+                            call_func = identifier  # preserved for later
 
-            elif statement != "let":
-                raise RuntimeError("no keyword defined for %s" % elem.text)
+                    elif keyword == 'let':
+                        if not lhs_var_name:
+                            lhs_var_name = identifier
+                        elif not rhs_parent:
+                            rhs_parent = identifier  # preserved for later
+                        else:
+                            rhs_child = identifier  # preserved for later
+
+                        if lhs_var_name:
+                            pcode, class_dict, num_args, exp_buffer = \
+                                compile_statement(pcode, statement, class_dict, class_name, func_name,
+                                                  call_class, call_func, _type, identifier, num_args, exp_buffer)
+
+                    else:
+                        raise RuntimeError("unexpected keyword %s for identifier %s" % (keyword, elem.text))
+
+                elif statement != "let":
+                    raise RuntimeError("no keyword defined for %s" % elem.text)
 
         elif elem.tag == 'symbol':
             symbol = elem.text
@@ -325,39 +318,71 @@ def main(filepath, debug=False):
             else:
                 raise RuntimeError("unexpected symbol %s" % elem.text)
 
-        elif elem.tag == 'integerConstant':
-            pcode = compile_constant(pcode, elem.text)
+            elif elem.tag == 'integerConstant':
+                pcode = compile_constant(pcode, elem.text)
 
-        elif elem.tag == 'varDec':
-            statement = 'var'
-        elif elem.tag == 'doStatement':
-            statement = 'do'
-        elif elem.tag == 'letStatement':
-            statement = 'let'
-        elif elem.tag == 'returnStatement':
-            statement = 'return'
-        elif elem.tag == 'expressionList':
-            if statement == 'do':
-                children = list(elem)
-                for c_elem in children:
-                    if c_elem.tag == 'expression':
-                        num_args += 1
+            elif elem.tag == 'varDec':
+                statement = 'var'
+            elif elem.tag == 'doStatement':
+                statement = 'do'
+            elif elem.tag == 'letStatement':
+                statement = 'let'
+            elif elem.tag == 'returnStatement':
+                statement = 'return'
+            elif elem.tag == 'expressionList':
+                if statement == 'do':
+                    children = list(elem)
+                    for c_elem in children:
+                        if c_elem.tag == 'expression':
+                            num_args += 1
 
-        # ignore the tags only used for grouping
-        elif elem.tag in ('subroutineDec', 'subroutineBody', 'parameterList', 'statements', 'expression', 'term'):
-            pass
+            # ignore the tags only used for grouping
+            elif elem.tag in ('subroutineDec', 'subroutineBody', 'parameterList', 'statements', 'expression', 'term'):
+                pass
 
-        else:
-            raise RuntimeError("unparsed tag %s" % elem.tag)
+            else:
+                raise RuntimeError("unparsed tag %s" % elem.tag)
+
+    except Exception:
+        # capture whatever pcode was processed so far
+        print("\n", traceback.format_exc())
+        return pcode
+
+    return pcode
 
 
 if __name__ == '__main__':
     jack_filepaths = [
-        r"..\11\Seven\Main.jack",  # matched to course compiler
-        r"..\11\ConvertToBin\Main.jack",  # matches up to let (nyi) + num_vars for main
+        r"..\11\Seven\Main.jack",
+        r"..\11\ConvertToBin\Main.jack",
+    ]
+
+    # matched to course compiler
+    strict_matches = [
+        r"..\11\Seven\Main.vm",
+        # r"..\11\ConvertToBin\Main.jack"  # matches up to let (nyi) + num_vars for main
     ]
 
     for _filepath in jack_filepaths:
-        main(_filepath, debug=False)
+        pcode = main(_filepath, debug=False)
+
+        # strip debug for result comparison
+        with open(_filepath.replace(".jack", "_.vm"), "w") as f:
+            print("Writing: %s" % _filepath)
+            for line in pcode:
+                comment = line.find("//")
+                if line.startswith("//"):
+                    continue
+                elif comment:
+                    f.write(line[:comment].strip() + "\n")
+                else:
+                    f.write(line + "\n")
+
+    # enforce matching for known samples
+    for match in strict_matches:
+        with open(match) as org_file:
+            with open(match.replace(".vm", "_.vm")) as cur_file:
+                if org_file.read() != cur_file.read():
+                    raise RuntimeError("Strict file did not match: %s" % match)
 
     # TODO: implement rhs expression handler (queue the call in 'let value = Memory.peek(8000);')
