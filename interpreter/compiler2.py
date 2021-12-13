@@ -27,6 +27,8 @@ sys_func = {
     "Memory": {"peek": 1, "poke": 2, "alloc": 1, "dealloc": 1}
 }
 
+types = ['int']  # TODO: and the rest (param typing)
+
 
 def store_pcode(pcode, cmd, debug=True):
     """
@@ -102,6 +104,7 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
     # don't emit pcode on pre-scan
     if not prescan:
         store_pcode(pcode, "\nfunction %s.%s %s" % (class_name, func_name, num_vars))
+        store_pcode(pcode, "\n// param this argument 0")
 
         if func_kind == "constructor":
             # allocate space on heap
@@ -120,7 +123,7 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
 
 
 def compile_statement(pcode, statement, class_dict, class_name, func_name, call_class, call_func,
-                      var_type, var_name, num_args, exp_buffer):
+                      var_type, var_name, num_args, exp_buffer, prescan=False):
     """
     TODO: docstring
     """
@@ -129,7 +132,7 @@ def compile_statement(pcode, statement, class_dict, class_name, func_name, call_
         num_args = 0
 
     elif statement == "let":
-        exp_buffer.append(compile_lhs_statement(class_dict, class_name, func_name, var_name))
+        exp_buffer = compile_lhs_statement(class_dict, class_name, func_name, var_name, exp_buffer)
 
     elif statement == "return":
         # looks up func type (affects return behaviour)
@@ -143,11 +146,13 @@ def compile_statement(pcode, statement, class_dict, class_name, func_name, call_
 
     elif statement == "var":
         # update class/func dict
-        pcode, class_dict = compile_vardec(pcode, class_dict, class_name, func_name, 'local', var_type, var_name)
+        pcode, class_dict = compile_vardec(pcode, class_dict, class_name, func_name, 'local', var_type, var_name,
+                                           prescan=prescan)
 
     elif statement == "param":
         # update class/func dict
-        pcode, class_dict = compile_vardec(pcode, class_dict, class_name, func_name, 'argument', var_type, var_name)
+        pcode, class_dict = compile_vardec(pcode, class_dict, class_name, func_name, 'argument', var_type, var_name,
+                                           prescan=prescan)
 
     else:
         raise RuntimeError("Unexpected statement type '%s'" % statement)
@@ -155,13 +160,14 @@ def compile_statement(pcode, statement, class_dict, class_name, func_name, call_
     return pcode, class_dict, num_args, exp_buffer
 
 
-def compile_lhs_statement(class_dict, class_name, func_name, var_name):
-    lhs_kind = class_dict[class_name][func_name]['args'][var_name]['kind']
-    lhs_index = class_dict[class_name][func_name]['args'][var_name]['index']
-    return "pop %s %s // %s" % (lhs_kind, lhs_index, var_name)
+def compile_lhs_statement(class_dict, class_name, func_name, var_name, exp_buffer):
+    exp_buffer.append("pop %s %s // %s" % (class_dict[class_name][func_name]['args'][var_name]['kind'],
+                                           class_dict[class_name][func_name]['args'][var_name]['index'],
+                                           var_name))
+    return exp_buffer
 
 
-def compile_vardec(pcode, class_dict, class_name, func_name, var_kind, var_type, var_name):
+def compile_vardec(pcode, class_dict, class_name, func_name, var_kind, var_type, var_name, prescan=False):
     """
     add var to the class dict, print a comment in pcode
     """
@@ -174,7 +180,8 @@ def compile_vardec(pcode, class_dict, class_name, func_name, var_kind, var_type,
 
         class_dict[class_name][func_name]['args'][var_name] = {'kind': var_kind, 'type': var_type, 'index': index}
         class_dict[class_name][func_name]['index_dict'][var_kind] = index
-    else:
+
+    elif not prescan:
         if var_kind == 'local':
             store_pcode(pcode, "// var %s %s (%s %s)" %
                         (var_type, var_name,  var_kind, class_dict[class_name][func_name]['args'][var_name]['index']))
@@ -225,6 +232,19 @@ def compile_literal(pcode, code):
     return pcode
 
 
+def compile_boolean(value, exp_buffer):
+    if value == "true":
+        # this is in reverse due to how exp_buffer is unpacked
+        exp_buffer.append("not // true (2/2)")
+        exp_buffer.append("push constant 0 // true (1/2)")
+    elif value == "false":
+        exp_buffer.append("push constant 0 // false")
+    else:
+        raise RuntimeError("unexpected boolean value '%s'" % value)
+
+    return exp_buffer
+
+
 def main(filepath, debug=False):
     """
     TODO: docstring
@@ -262,6 +282,11 @@ def main(filepath, debug=False):
 
             elif elem.tag == 'identifier':
                 identifier = elem.text
+
+                # # debug
+                # if identifier == 'loop':
+                #     print('bp')
+
                 if keyword == 'class':
                     class_name = identifier  # preserved for later
                     func_kind = 'method'  # preserved for later
@@ -275,8 +300,8 @@ def main(filepath, debug=False):
 
                 elif statement in ('var', 'param'):
                     pcode, class_dict, num_args, exp_buffer = \
-                        compile_statement(pcode, statement, class_dict, class_name, func_name,
-                                          None, None, _type, identifier, num_args, exp_buffer)
+                        compile_statement(pcode, statement, class_dict, class_name, func_name, None, None, _type,
+                                          identifier, num_args, exp_buffer, prescan=True)
 
             elif elem.tag == 'varDec':
                 statement = 'var'
@@ -304,11 +329,6 @@ def main(filepath, debug=False):
             if elem.tag == 'class':
                 continue
 
-            # debug
-            # if elem.tag == 'subroutineBody':
-            #     print("break")
-            # print("TOKEN:", elem.tag, elem.text, parent)
-
             if elem:  # has children
                 parent = elem.tag
                 # reset tag context on depth change
@@ -316,7 +336,9 @@ def main(filepath, debug=False):
                 keyword = _type = identifier = func_type = symbol = ''
 
             if elem.tag == 'keyword':
-                if not keyword:
+                if elem.text in ('true', 'false'):
+                    exp_buffer = compile_boolean(elem.text, exp_buffer)
+                elif not keyword:
                     keyword = elem.text  # preserved for later
                 elif not _type:
                     _type = elem.text  # preserved for later
@@ -324,6 +346,10 @@ def main(filepath, debug=False):
                     raise RuntimeError("unexpected keywords '%s' '%s' '%s'" % (keyword, _type, elem.text))
 
             elif elem.tag == 'identifier':
+                # debug
+                # if elem.text == 'loop':
+                #     print('bp')
+
                 if keyword or statement:
                     identifier = elem.text
                     if keyword == 'class':
@@ -338,6 +364,9 @@ def main(filepath, debug=False):
                         pcode, class_dict = compile_function(pcode, func_name, _type, func_kind, class_dict, class_name)
 
                     elif statement in ('var', 'param'):
+                        # catch param case where type is only keyword
+                        if not _type and keyword in types:
+                            _type = keyword
                         pcode, class_dict, num_args, exp_buffer = \
                             compile_statement(pcode, statement, class_dict, class_name, func_name,
                                               None, None, _type, identifier, num_args, exp_buffer)
@@ -368,7 +397,7 @@ def main(filepath, debug=False):
                         raise RuntimeError("unexpected keyword '%s' for identifier '%s'" % (keyword, elem.text))
 
                 else:
-                    raise RuntimeError("no keyword defined for '%s'" % elem.text)
+                    raise RuntimeError("no keyword or statement defined for '%s'" % elem.text)
 
             elif elem.tag == 'symbol':
                 symbol = elem.text
@@ -407,6 +436,8 @@ def main(filepath, debug=False):
 
                     while exp_buffer:
                         pcode = store_pcode(pcode, exp_buffer.pop())
+
+                    lhs_var_name = rhs_parent = rhs_child = ''
 
                 else:
                     raise RuntimeError("unexpected symbol '%s'" % elem.text)
@@ -480,4 +511,4 @@ if __name__ == '__main__':
                 if org_file.read() != cur_file.read():
                     raise RuntimeError("Strict file did not match: %s" % match)
 
-    # TODO: let loop = true;
+    # TODO: while
