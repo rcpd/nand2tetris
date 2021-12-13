@@ -321,13 +321,17 @@ def main(filepath, debug=False):
                             compile_statement(pcode, statement, class_dict, class_name, func_name,
                                               None, None, _type, identifier, num_args, exp_buffer)
 
-                    elif keyword == 'do':
+                    elif keyword == 'do' or statement == 'do':
                         # "do" compilation is deferred until ";"
                         if not call_class:
                             call_class = identifier  # preserved for later
-                        else:
+                        elif not call_func:
                             call_func = identifier  # preserved for later
-
+                        elif identifier in class_dict[class_name][func_name]['args']:
+                            exp_buffer.append("push %s %s // %s" %
+                                              (class_dict[class_name][func_name]['args'][identifier]['kind'],
+                                               class_dict[class_name][func_name]['args'][identifier]['index'],
+                                               identifier))
                     elif statement == 'let':
                         if not lhs_var_name:
                             lhs_var_name = identifier  # preserved for later
@@ -453,5 +457,4 @@ if __name__ == '__main__':
                 if org_file.read() != cur_file.read():
                     raise RuntimeError("Strict file did not match: %s" % match)
 
-    # TODO: not compiling call in do Main.convert(value);
-    # TODO: do keyword lost during depth change (not sure how this is different)
+    # TODO: arg(s) [psuedo vardec] in function declaration (parameterList)
