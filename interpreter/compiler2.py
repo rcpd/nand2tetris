@@ -185,9 +185,8 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
     return pcode, class_dict
 
 
-# TODO: update compile_statement calls
 def compile_statement(pcode=None, statement=None, class_dict=None, class_name=None, func_name=None, call_class=None,
-                      call_func=None, var_type=None, var_name=None, num_args=None, exp_buffer=None, while_count=0,
+                      call_func=None, var_type=None, var_name=None, num_args=0, exp_buffer=[], while_count=0,
                       prescan=False):
     """
     provides a common interface to the statement compilers
@@ -334,9 +333,20 @@ def compile_while(pcode, while_count):
     emit pcode when while encountered
     """
 
-    store_pcode(pcode, "\nWHILE_EXP%s" % while_count)
+    store_pcode(pcode, "\nlabel WHILE_EXP%s" % while_count)
     while_count += 1
     return pcode, while_count
+
+
+def compile_var(pcode, class_dict, class_name, func_name, var_name):
+    """
+    emit pcode when while encountered
+    """
+
+    store_pcode(pcode, "\npush %s %s" %
+                (class_dict[class_name][func_name]['args'][var_name]['kind'],
+                 class_dict[class_name][func_name]['args'][var_name]['index']))
+    return pcode
 
 
 def main(filepath, debug=False):
@@ -382,10 +392,6 @@ def main(filepath, debug=False):
             elif elem.tag == 'identifier':
                 identifier = elem.text
 
-                # # debug
-                # if identifier == 'loop':
-                #     print('bp')
-
                 if keyword == 'class':
                     class_name = identifier  # preserved for later
                     pcode, class_dict = compile_class(pcode, class_name, class_dict)
@@ -399,8 +405,9 @@ def main(filepath, debug=False):
 
                 elif statement in ('var', 'param'):
                     pcode, class_dict, num_args, while_count, exp_buffer = \
-                        compile_statement(pcode, statement, class_dict, class_name, func_name, None, None, _type,
-                                          identifier, num_args, exp_buffer, prescan=True)
+                        compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
+                                          class_name=class_name, func_name=func_name, var_type=_type,
+                                          var_name=identifier)
 
             elif elem.tag == 'varDec':
                 statement = 'var'
@@ -438,7 +445,7 @@ def main(filepath, debug=False):
                 if elem.text in ('true', 'false'):
                     exp_buffer = compile_boolean(elem.text, exp_buffer)
                 elif elem.text == 'while':
-                    compile_statement(pcode=pcode, while_count=while_count)
+                    compile_statement(pcode=pcode, statement=statement, while_count=while_count)
                 elif not keyword:
                     keyword = elem.text  # preserved for later
                 elif not _type:
@@ -447,10 +454,6 @@ def main(filepath, debug=False):
                     raise RuntimeError("unexpected keywords '%s' '%s' '%s'" % (keyword, _type, elem.text))
 
             elif elem.tag == 'identifier':
-                # debug
-                # if elem.text == 'loop':
-                #     print('bp')
-
                 if keyword or statement:
                     identifier = elem.text
                     if keyword == 'class':
@@ -469,8 +472,9 @@ def main(filepath, debug=False):
                         if not _type and keyword in types:
                             _type = keyword
                         pcode, class_dict, num_args, while_count, exp_buffer = \
-                            compile_statement(pcode, statement, class_dict, class_name, func_name,
-                                              None, None, _type, identifier, num_args, exp_buffer)
+                            compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
+                                              class_name=class_name, func_name=func_name, var_type=_type,
+                                              var_name=identifier)
 
                     elif statement == 'do':
                         # "do" compilation is deferred until ";"
@@ -483,20 +487,25 @@ def main(filepath, debug=False):
                                               (class_dict[class_name][func_name]['args'][identifier]['kind'],
                                                class_dict[class_name][func_name]['args'][identifier]['index'],
                                                identifier))
+
                     elif statement == 'let':
                         if not lhs_var_name:
                             lhs_var_name = identifier  # preserved for later
                             pcode, class_dict, num_args, while_count, exp_buffer = \
-                                compile_statement(pcode, statement, class_dict, class_name, func_name,
-                                                  call_class, call_func, _type, identifier, num_args, exp_buffer)
+                                compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
+                                                  class_name=class_name, func_name=func_name, var_name=identifier,
+                                                  exp_buffer=exp_buffer)
+
                         elif not rhs_parent:
                             rhs_parent = identifier  # preserved for later
                         else:
                             rhs_child = identifier  # preserved for later
 
+                    elif statement == 'while':
+                        compile_var(pcode, class_dict, class_name, func_name, identifier)
                     else:
-                        raise RuntimeError("unexpected keyword '%s' for identifier '%s'" % (keyword, elem.text))
-
+                        raise RuntimeError("unexpected keyword/statement '%s' for identifier '%s'" %
+                                           (keyword, elem.text))
                 else:
                     raise RuntimeError("no keyword or statement defined for '%s'" % elem.text)
 
@@ -511,6 +520,11 @@ def main(filepath, debug=False):
                         if rhs_parent in sys_func:
                             if rhs_child in sys_func[rhs_parent]:
                                 num_params = sys_func[rhs_parent][rhs_child]['len']
+                        else:
+                            num_params = 0
+                            for arg in class_dict[class_name][func_name]['args']:
+                                if class_dict[class_name][func_name]['args'][arg]['kind'] == 'argument':
+                                    num_params += 1
                         if not num_params:
                             raise NotImplementedError
 
@@ -527,13 +541,14 @@ def main(filepath, debug=False):
                 elif symbol == ';':
                     if statement == 'do':
                         pcode, class_dict, num_args, while_count, exp_buffer = \
-                            compile_statement(pcode, statement, class_dict, None, None,
-                                              call_class, call_func, None, None, num_args, exp_buffer)
+                            compile_statement(pcode=pcode, class_dict=class_dict, call_class=call_class,
+                                              call_func=call_func, num_args=num_args, statement=statement)
                         call_class = call_func = ''
+
                     elif statement == 'return':
                         pcode, class_dict, num_args, while_count, exp_buffer = \
-                            compile_statement(pcode, statement, class_dict, class_name, func_name,
-                                              None, None, None, None, num_args, exp_buffer)
+                            compile_statement(pcode=pcode, class_dict=class_dict, class_name=class_name,
+                                              func_name=func_name, statement=statement)
 
                     while exp_buffer:
                         pcode = store_pcode(pcode, exp_buffer.pop())
@@ -546,6 +561,8 @@ def main(filepath, debug=False):
             elif elem.tag == 'integerConstant':
                 pcode = compile_constant(pcode, elem.text)
 
+            elif elem.tag == 'whileStatement':
+                statement = 'while'
             elif elem.tag == 'varDec':
                 statement = 'var'
             elif elem.tag == 'parameterList':
@@ -619,4 +636,4 @@ if __name__ == '__main__':
                 if org_file.read() != cur_file.read():
                     raise RuntimeError("Strict file did not match: %s" % match)
 
-    # TODO: while
+    # TODO: while goto, missing next let, if statement
