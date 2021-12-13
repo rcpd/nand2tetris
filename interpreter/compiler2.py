@@ -2,6 +2,7 @@
 Compile a JACK program into a VM program (pcode) from the token stream initially generated
 by tokenizer/analyzer.
 """
+
 import xml.etree.ElementTree as Et
 import traceback
 
@@ -22,18 +23,81 @@ char_map = {
         "f3": 143, "f4": 144, "f5": 145, "f6": 146, "f7": 147, "f8": 148, "f9": 149, "f10": 150, "f11": 151, "f12": 152
     }
 
-# compiled library functions
+# compiled library functions header (kind, type, params)
 sys_func = {
-    "Memory": {"peek": 1, "poke": 2, "alloc": 1, "dealloc": 1}
-}
+    "Math": {"init:": {"kind": "func", "type": "void", "args": (), "len": 0},
+             "abs": {"kind": "func", "type": "int", "args": ("int",), "len": 1},
+             "multiply": {"kind": "func", "type": "int", "args": ("int", "int"), "len": 2},
+             "divide": {"kind": "func", "type": "int", "args": ("int", "int"), "len": 2},
+             "min": {"kind": "func", "type": "int", "args": ("int", "int"), "len": 2},
+             "max": {"kind": "func", "type": "int", "args": ("int", "int"), "len": 2},
+             "sqrt": {"kind": "func", "type": "int", "args": ("int",), "len": 1}},
+    "Memory": {"init:": {"kind": "func", "type": "void", "args": (), "len": 0},
+               "peek:": {"kind": "func", "type": "int", "args": ("int", ), "len": 1},
+               "poke:": {"kind": "func", "type": "void", "args": ("int", "int"), "len": 2},
+               "alloc:": {"kind": "func", "type": "Array", "args": ("int",), "len": 1},
+               "deAlloc:": {"kind": "func", "type": "void", "args": ("Array",), "len": 1}},
+    "String": {"new": {"kind": "const", "type": "String", "args": ("int",), "len": 1},
+               "dispose": {"kind": "method", "type": "void", "args": (), "len": 0},
+               "length": {"kind": "method", "type": "int", "args": (), "len": 0},
+               "charAt": {"kind": "method", "type": "int", "args": ("int",), "len": 1},
+               "setCharAt": {"kind": "method", "type": "void", "args": ("int", "char"), "len": 2},
+               "appendChar": {"kind": "method", "type": "String", "args": ("char",), "len": 1},
+               "eraselastChar": {"kind": "method", "type": "void", "args": (), "len": 0},
+               "intValue": {"kind": "method", "type": "int", "args": ("int",), "len": 1},
+               "setInt": {"kind": "method", "type": "void", "args": ("int",), "len": 1},
+               "backSpace": {"kind": "func", "type": "char", "args": (), "len": 0},
+               "doubleQuote": {"kind": "func", "type": "char", "args": (), "len": 0},
+               "newLine": {"kind": "func", "type": "char", "args": (), "len": 0}},
+    "Array": {"new:": {"kind": "const", "type": "Array", "args": ("int",), "len": 1},
+              "dispose:": {"kind": "method", "type": "void", "args": (), "len": 0}},
+    "Output": {"init:": {"kind": "func", "type": "void", "args": (), "len": 0},
+               "moveCursor:": {"kind": "func", "type": "void", "args": ("int", "int"), "len": 2},
+               "printChar:": {"kind": "func", "type": "void", "args": ("char",), "len": 1},
+               "printString:": {"kind": "func", "type": "void", "args": ("String",), "len": 1},
+               "printInt:": {"kind": "func", "type": "void", "args": ("int",), "len": 1},
+               "println:": {"kind": "func", "type": "void", "args": (), "len": 0},
+               "backSpace:": {"kind": "func", "type": "void", "args": (), "len": 0}},
+    "Screen": {"init:": {"kind": "func", "type": "void", "args": (), "len": 0},
+               "clearScreen:": {"kind": "func", "type": "void", "args": (), "len": 0},
+               "setColor:": {"kind": "func", "type": "void", "args": ("boolean", ), "len": 1},
+               "drawPixel:": {"kind": "func", "type": "void", "args": ("int", "int"), "len": 2},
+               "drawLine:": {"kind": "func", "type": "void", "args": ("int", "int", "int", "int"), "len": 4},
+               "drawRectangle:": {"kind": "func", "type": "void", "args": ("int", "int", "int", "int"), "len": 4},
+               "drawCirlce:": {"kind": "func", "type": "void", "args": ("int", "int", "int"), "len": 3}},
+    "Keyboard": {"init:": {"kind": "func", "type": "void", "args": (), "len": 0},
+                 "keyPressed:": {"kind": "func", "type": "char", "args": (), "len": 0},
+                 "readChar:": {"kind": "func", "type": "char", "args": (), "len": 0},
+                 "readLine:": {"kind": "func", "type": "String", "args": ("String",), "len": 1},
+                 "readInt:": {"kind": "func", "type": "int", "args": ("String",), "len": 1},
+                 },
+    "Sys": {"init:": {"kind": "func", "type": "void", "args": (), "len": 0},
+            "halt:": {"kind": "func", "type": "void", "args": (), "len": 0},
+            "error:": {"kind": "func", "type": "void", "args": ("int",), "len": 1},
+            "wait:": {"kind": "func", "type": "void", "args": ("int",), "len": 1}},
+    }
 
-types = ['int']  # TODO: and the rest (param typing)
+# primitives & keywords
+# class, constructor, method, function
+# int, boolean, char, void
+# var, static, field
+# let, do, if, else, while, return
+# true, false, null, this
+
+# var: defined as an argument or locally, scoped to the function/method
+# static: single global reference shared amongst all instances of a class
+# field: unique to a specific instantiation of a class object
+# method: operates on a specific instantiation of a class object
+# function: global to all instantiations of the class (a constructor is a function)
+
+types = ['int', 'boolean', 'char', 'void']
 
 
 def store_pcode(pcode, cmd, debug=True):
     """
-    TODO: docstring
+    optionally dynamically print the pcode with additional debug information, store for later file output
     """
+
     if debug:
         if cmd.strip() != "":
             print("PCODE: %s" % cmd.strip())
@@ -47,8 +111,9 @@ def store_pcode(pcode, cmd, debug=True):
 
 def compile_class(pcode, class_name, class_dict):
     """
-    TODO: docstring
+    update the class_dict during pre-scan, emit pcode when declaration encountered
     """
+
     # define class_name and initialize symbol table
     if class_name not in class_dict:
         class_dict[class_name] = {"args": {}, "index_dict": {}}
@@ -61,9 +126,9 @@ def compile_class(pcode, class_name, class_dict):
 
 def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_name):
     """
-    TODO: docstring
+    update the class_dict during pre-scan, emit pcode when declaration encountered
     """
-    # FIXME: num_vars is wrong
+
     # define function symbol
     prescan = False
     if func_kind in ("function", "method", "constructor"):
@@ -114,10 +179,8 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
 
         elif func_kind == "method":
             # move pointer to current object (implicit "this" argument)
-            # TODO: doesn't seem to be used?
-            # store_pcode(pcode, "push argument 0")
-            # store_pcode(pcode, "pop pointer 0 // update 'this' to object for method call")
-            pass
+            store_pcode(pcode, "push argument 0")
+            store_pcode(pcode, "pop pointer 0 // update 'this' to object for method call")
 
     return pcode, class_dict
 
@@ -125,8 +188,9 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
 def compile_statement(pcode, statement, class_dict, class_name, func_name, call_class, call_func,
                       var_type, var_name, num_args, exp_buffer, prescan=False):
     """
-    TODO: docstring
+    provides a common interface to the statement compilers
     """
+
     if statement == "do":
         pcode = compile_call(pcode, call_class, call_func, num_args, statement)
         num_args = 0
@@ -161,6 +225,11 @@ def compile_statement(pcode, statement, class_dict, class_name, func_name, call_
 
 
 def compile_lhs_statement(class_dict, class_name, func_name, var_name, exp_buffer):
+    """
+    compile the assignment component of a statement
+    store pcode in exp_buffer so its emitted when expression is closed
+    """
+
     exp_buffer.append("pop %s %s // %s" % (class_dict[class_name][func_name]['args'][var_name]['kind'],
                                            class_dict[class_name][func_name]['args'][var_name]['index'],
                                            var_name))
@@ -171,6 +240,7 @@ def compile_vardec(pcode, class_dict, class_name, func_name, var_kind, var_type,
     """
     add var to the class dict, print a comment in pcode
     """
+
     # don't emit pcode during pre-scan
     if var_name not in class_dict[class_name][func_name]['args']:
         if var_kind not in class_dict[class_name][func_name]['index_dict']:
@@ -196,16 +266,18 @@ def compile_vardec(pcode, class_dict, class_name, func_name, var_kind, var_type,
 
 def compile_constant(pcode, constant):
     """
-    TODO: docstring
+    emit pcode when constant encountered
     """
+
     store_pcode(pcode, "\npush constant %s" % constant)
     return pcode
 
 
 def compile_call(pcode, call_class, call_func, num_args, statement):
     """
-    TODO: docstring
+    emit pcode when call encountered, discard return on do call
     """
+
     store_pcode(pcode, "\ncall %s.%s %s" % (call_class, call_func, num_args))
     if statement == 'do':
         store_pcode(pcode, "\npop temp 0 // discard return on do call")
@@ -214,8 +286,9 @@ def compile_call(pcode, call_class, call_func, num_args, statement):
 
 def compile_return(pcode, class_dict, class_name, func_name):
     """
-    TODO: docstring
+    emit pcode when return encountered, push null for void functions
     """
+
     if class_dict[class_name][func_name]["type"] == "void":
         store_pcode(pcode, "push constant 0 // void return")
     else:
@@ -226,13 +299,18 @@ def compile_return(pcode, class_dict, class_name, func_name):
 
 def compile_literal(pcode, code):
     """
-    TODO: docstring
+    emit pcode when literal encountered
     """
+
     store_pcode(pcode, "\n%s" % code)
     return pcode
 
 
 def compile_boolean(value, exp_buffer):
+    """
+    store pcode in exp_buffer so its emitted when expression is closed
+    """
+
     if value == "true":
         # this is in reverse due to how exp_buffer is unpacked
         exp_buffer.append("not // true (2/2)")
@@ -247,8 +325,13 @@ def compile_boolean(value, exp_buffer):
 
 def main(filepath, debug=False):
     """
-    TODO: docstring
+    main engine:
+        - parse the AST
+        - prescan the AST for class/function declarations
+        - tag metadata as tokens are parsed
+        - compile once enough information is parsed
     """
+
     pcode = []
     try:
         print("\nParsing: %s" % filepath)
@@ -478,6 +561,13 @@ def main(filepath, debug=False):
 
 
 if __name__ == '__main__':
+    """
+    loop across multiple files:
+        - call the main engine
+        - write pcode to output file (however much was processed)
+        - where possible, enforce match to course compiled programs
+    """
+
     jack_filepaths = [
         r"..\11\Seven\Main.jack",
         r"..\11\ConvertToBin\Main.jack",
