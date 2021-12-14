@@ -198,8 +198,8 @@ def compile_statement(pcode=None, statement=None, class_dict=None, class_name=No
         num_args = 0
 
     elif statement == "let":
-        exp_buffer = compile_lhs_statement(class_dict=class_dict, class_name=class_name, func_name=func_name,
-                                           var_name=var_name, exp_buffer=exp_buffer)
+        exp_buffer = compile_assignment(class_dict=class_dict, class_name=class_name, func_name=func_name,
+                                        var_name=var_name, exp_buffer=exp_buffer)
 
     elif statement == "return":
         # looks up func type (affects return behaviour)
@@ -229,15 +229,15 @@ def compile_statement(pcode=None, statement=None, class_dict=None, class_name=No
     return pcode, class_dict, num_args, while_count, exp_buffer
 
 
-def compile_lhs_statement(class_dict, class_name, func_name, var_name, exp_buffer):
+def compile_assignment(class_dict, class_name, func_name, var_name, exp_buffer):
     """
     compile the assignment component of a statement
     store pcode in exp_buffer so its emitted when expression is closed
     """
 
-    exp_buffer.append("pop %s %s // %s" % (class_dict[class_name][func_name]['args'][var_name]['kind'],
-                                           class_dict[class_name][func_name]['args'][var_name]['index'],
-                                           var_name))
+    exp_buffer.append("pop %s %s // = %s" % (class_dict[class_name][func_name]['args'][var_name]['kind'],
+                                             class_dict[class_name][func_name]['args'][var_name]['index'],
+                                             var_name))
     return exp_buffer
 
 
@@ -333,8 +333,7 @@ def compile_while(pcode, while_count):
     emit pcode when while encountered
     """
 
-    store_pcode(pcode, "\nlabel WHILE_EXP%s" % while_count)
-    while_count += 1
+    store_pcode(pcode, "\nlabel WHILE_EXP%s // begin while expression" % while_count)
     return pcode, while_count
 
 
@@ -343,9 +342,10 @@ def compile_var(pcode, class_dict, class_name, func_name, var_name):
     emit pcode when while encountered
     """
 
-    store_pcode(pcode, "\npush %s %s" %
+    store_pcode(pcode, "\npush %s %s // %s" %
                 (class_dict[class_name][func_name]['args'][var_name]['kind'],
-                 class_dict[class_name][func_name]['args'][var_name]['index']))
+                 class_dict[class_name][func_name]['args'][var_name]['index'],
+                 var_name))
     return pcode
 
 
@@ -355,7 +355,8 @@ def main(filepath, debug=False):
         - parse the AST
         - prescan the AST for class/function declarations
         - tag metadata as tokens are parsed
-        - compile once enough information is parsed
+        -- tag scope is defined by tree depth, some need to be carried forward, others cleared on depth change
+        - call compile functions once enough information is parsed
     """
 
     pcode = []
@@ -380,7 +381,7 @@ def main(filepath, debug=False):
                 continue
 
             if elem:  # has children
-                parent = elem.tag
+                parent = elem.tag  # preserved for later
                 keyword = _type = ''  # reset tag context on depth change
 
             if elem.tag == 'keyword':
@@ -483,6 +484,7 @@ def main(filepath, debug=False):
                         elif not call_func:
                             call_func = identifier  # preserved for later
                         elif identifier in class_dict[class_name][func_name]['args']:
+                            # TODO: compile_do_statement
                             exp_buffer.append("push %s %s // %s" %
                                               (class_dict[class_name][func_name]['args'][identifier]['kind'],
                                                class_dict[class_name][func_name]['args'][identifier]['index'],
@@ -497,7 +499,10 @@ def main(filepath, debug=False):
                                                   exp_buffer=exp_buffer)
 
                         elif not rhs_parent:
-                            rhs_parent = identifier  # preserved for later
+                            if identifier in class_dict or identifier in sys_func:
+                                rhs_parent = identifier  # preserved for later
+                            else:
+                                compile_var(pcode, class_dict, class_name, func_name, identifier)
                         else:
                             rhs_child = identifier  # preserved for later
 
@@ -510,9 +515,21 @@ def main(filepath, debug=False):
                     raise RuntimeError("no keyword or statement defined for '%s'" % elem.text)
 
             elif elem.tag == 'symbol':
+                # TODO: compile_symbol
                 symbol = elem.text
-                if symbol in "{}.=,":
+                if symbol in "}.=,":
                     pass
+                elif symbol == "{":
+                    if statement == 'while':
+                        # TODO: compile_while_goto
+                        store_pcode(pcode, "\nnot // end while expression / while_jump (1/2)")
+                        store_pcode(pcode, "\nif-goto WHILE_END%s // while_jump (2/2) [break loop if not]" % while_count)
+                        while_count += 1
+                    elif statement == 'param':
+                        pass
+                    elif keyword not in ('class', 'function'):
+                        raise RuntimeError("unexpected '{' (statement '%s', keyword '%s')" % (statement, keyword))
+
                 elif symbol == "(":
                     # compile call
                     if statement == "let" and rhs_parent and rhs_child:
@@ -611,7 +628,7 @@ if __name__ == '__main__':
     # matched to course compiler
     strict_matches = [
         r"..\11\Seven\Main.vm",
-        # r"..\11\ConvertToBin\Main.jack"  # matches up to let (nyi) + num_vars for main
+        # r"..\11\ConvertToBin\Main.jack"  # partial match / wip
     ]
 
     for _filepath in jack_filepaths:
@@ -636,4 +653,4 @@ if __name__ == '__main__':
                 if org_file.read() != cur_file.read():
                     raise RuntimeError("Strict file did not match: %s" % match)
 
-    # TODO: while goto, missing next let, if statement
+    # TODO: if statement
