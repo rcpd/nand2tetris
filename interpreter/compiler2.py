@@ -141,17 +141,6 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
             class_dict[class_name][func_name]["index_dict"]["argument"] = 0
             class_dict[class_name][func_name]["args"]["this"] = \
                 {"kind": "argument", "type": "this", "index": 0}
-        '''
-        # update func/arg index
-        if "argument" not in class_dict[class_name][func_name]["index_dict"]:
-            class_dict[class_name][func_name]["index_dict"]["argument"] = 0
-        else:
-            class_dict[class_name][func_name]["index_dict"]["argument"] += 1
-
-        class_dict[class_name][func_name]["args"][input_list[j+3][1]] = \
-            {"kind": "argument", "type": input_list[j+2][1],
-             "index": class_dict[class_name][func_name]["index_dict"]["argument"]}
-        '''
 
     if func_kind in ("method", "function"):
         if "local" in class_dict[class_name][func_name]["index_dict"]:
@@ -390,15 +379,15 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
 
     if symbol:
         if symbol == "(":
-            exp_buffer.append("// (")  # mark new expression opening
+            exp_buffer.append("// (")  # inject expression marker into buffer
 
         elif symbol == ")":
-            exp_buffer.append("// )")  # mark new expression opening
+            # process everything up to & including the last expression opening from buffer
             pcode = pop_buffer(pcode, exp_buffer, stop_at="// (", pop_incl=True)
 
         elif symbol == ",":
-            if exp_buffer:
-                pcode = pop_buffer(pcode, exp_buffer, stop_at="// (")
+            # process everything up to but not including the last expression opening from buffer
+            pcode = pop_buffer(pcode, exp_buffer, stop_at="// (")  # i.e. expression was not bracketed
 
     elif identifier:
         # attempt to lookup class/func attributes (2 passes)
@@ -420,14 +409,14 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
                             if class_dict[parent_obj][child_func]['args'][arg]['kind'] == 'argument':
                                 num_params += 1
 
-        # if parent/child pair found assume call & compile
+        # if parent/child pair found assume call & compile directly
         if parent_obj and child_func:
             exp_buffer = compile_call(pcode, parent_obj, child_func, num_params, statement, exp_buffer=exp_buffer)
             parent_obj = child_func = ''
 
-        # if var found compile
+        # if var found compile directly (not buffer)
         elif identifier in class_dict[class_name][func_name]['args']:
-            exp_buffer = compile_var(pcode, class_dict, class_name, func_name, identifier, exp_buffer=exp_buffer)
+            pcode = compile_var(pcode, class_dict, class_name, func_name, identifier)
 
     return pcode, exp_buffer, parent_obj, child_func
 
@@ -436,7 +425,7 @@ def pop_buffer(pcode, exp_buffer, stop_at=None, pop_incl=False):
     """
     selectively or entirely process the expression buffer
     """
-    if stop_at:
+    if stop_at and exp_buffer:
         while exp_buffer[-1] != stop_at:
             store_pcode(pcode, exp_buffer.pop())
         if pop_incl:
@@ -459,7 +448,7 @@ def main(filepath, debug=False):
 
     pcode = []
     try:
-        print("\nParsing: %s" % filepath)
+        print("Parsing: %s" % filepath)
         tree = Et.parse(filepath.replace(".jack", "_out.xml"))
 
         # persist through loop scope
@@ -599,7 +588,8 @@ def main(filepath, debug=False):
                         else:
                             pcode, exp_buffer, parent_obj, child_func = \
                                 expression_handler(pcode, statement, exp_buffer, class_dict=class_dict,
-                                                   identifier=identifier, class_name=class_name, func_name=func_name)
+                                                   identifier=identifier, class_name=class_name, func_name=func_name,
+                                                   parent_obj=parent_obj, child_func=child_func)
 
                     # buffer while/if expressions
                     elif statement in ('while', 'if'):
@@ -615,8 +605,10 @@ def main(filepath, debug=False):
             elif elem.tag == 'symbol':
                 # TODO: compile_symbol
                 symbol = elem.text.strip()
-                if symbol in (r"(){},") or symbol in op_map:
-                    print("PCODE: // '%s'" % symbol)
+
+                # debug
+                # if symbol in (r"(){},") or symbol in op_map:
+                #     print("PCODE: // '%s'" % symbol)
 
                 if symbol in "}.":
                     pass
@@ -647,24 +639,6 @@ def main(filepath, debug=False):
                     pcode, exp_buffer, parent_obj, child_func = \
                         expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
                                            class_name=class_name, func_name=func_name, symbol=symbol)
-
-                    ####
-                    # # compile call
-                    # if statement == "let" and rhs_parent and rhs_child:
-                    #     num_params = 0
-                    #     if rhs_parent in sys_func:
-                    #         if rhs_child in sys_func[rhs_parent]:
-                    #             num_params = sys_func[rhs_parent][rhs_child]['len']
-                    #     else:
-                    #         for arg in class_dict[class_name][func_name]['args']:
-                    #             if class_dict[class_name][func_name]['args'][arg]['kind'] == 'argument':
-                    #                 num_params += 1
-                    #     if not num_params:
-                    #         raise NotImplementedError
-                    #
-                    #     exp_buffer.append("call %s.%s %s" % (rhs_parent, rhs_child, num_params))
-                    #     rhs_parent = rhs_child = ''
-                    ####
 
                 elif symbol == ")":
                     # pop the last buffered expression (including the brackets)
@@ -758,17 +732,17 @@ if __name__ == '__main__':
     ]
 
     # matched to course compiler
-    strict_matches = [
-        r"..\11\Seven\Main.vm",
-        # r"..\11\ConvertToBin\Main.jack"  # partial match / wip
-    ]
+    strict_matches = {
+        r"..\11\Seven\Main.vm": 10,  # all
+        r"..\11\ConvertToBin\Main.vm": 57,  # wip
+    }
 
     for _filepath in jack_filepaths:
         pcode = main(_filepath, debug=False)
 
         # strip debug for result comparison
         with open(_filepath.replace(".jack", "_out.vm"), "w") as f:
-            print("Writing: %s" % _filepath)
+            print("Writing: %s\n" % _filepath)
             for line in pcode:
                 comment = line.find("//")
                 if line.startswith("//"):
@@ -780,9 +754,16 @@ if __name__ == '__main__':
 
     # enforce matching for known samples
     for match in strict_matches:
+        wip = match.replace(".vm", "_out.vm")
         with open(match) as org_file:
-            with open(match.replace(".vm", "_out.vm")) as cur_file:
-                if org_file.read() != cur_file.read():
-                    raise RuntimeError("Strict file did not match: %s" % match)
-
-    # TODO: expression parsing fails: let value = Memory.peek(8000); [call isn't popped]
+            with open(wip) as cur_file:
+                # index = 0
+                for index, (solution, current) in enumerate(zip(org_file, cur_file)):
+                    if solution != current:
+                        break
+                index += 1
+                if strict_matches[match] and index < strict_matches[match]:
+                    print("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
+                else:
+                    print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
+    # TODO: else
