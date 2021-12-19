@@ -69,6 +69,8 @@ label IF_FALSE0
 push constant 0
 pop local 2
 label IF_END0
+goto WHILE_EXP0
+label WHILE_END0
 push constant 0
 return
 function Main.nextMask 0
