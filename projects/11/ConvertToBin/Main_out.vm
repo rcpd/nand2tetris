@@ -81,3 +81,12 @@ if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
 push constant 1
+return
+goto IF_END0
+label IF_FALSE0
+push argument 0
+push constant 2
+call Math.multiply 2
+return
+label IF_END0
+function Main.fillMemory 0
