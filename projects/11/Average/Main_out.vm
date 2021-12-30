@@ -93,10 +93,11 @@ pop pointer 1
 push temp 0
 pop that 0
 push local 3
-push local 0
 push local 2
-push local 3
+push local 0
 add
+pop pointer 1
+push that 0
 add
 pop local 3
 push local 2
