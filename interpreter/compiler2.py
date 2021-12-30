@@ -90,7 +90,7 @@ sys_func = {
 # method: operates on a specific instantiation of a class object
 # function: global to all instantiations of the class (a constructor is a function)
 
-types = ['int', 'boolean', 'char', 'void', 'Array']
+types = ['int', 'boolean', 'char', 'void', 'Array', 'Fraction']  # FIXME: Fraction is not a built-in
 
 
 def find_parent(tree, node):
@@ -178,6 +178,12 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
             store_pcode(pcode, "\npush argument 0 // &this")
             store_pcode(pcode, "pop pointer 0 // *this =")
 
+        elif func_kind == 'function':
+            pass
+
+        else:
+            raise RuntimeError("Unexpected function kind '%s'")
+
     return pcode, class_dict
 
 
@@ -213,6 +219,11 @@ def compile_statement(pcode=None, statement=None, class_dict=None, class_name=No
     elif statement == "var":
         # update class/func dict
         compile_vardec(pcode=pcode, class_dict=class_dict, class_name=class_name, func_name=func_name, var_kind='local',
+                       var_type=var_type, var_name=var_name, prescan=prescan)
+
+    elif statement == "class_var":
+        # update class/func dict
+        compile_vardec(pcode=pcode, class_dict=class_dict, class_name=class_name, func_name=func_name, var_kind='field',
                        var_type=var_type, var_name=var_name, prescan=prescan)
 
     elif statement == "param":
@@ -259,9 +270,22 @@ def compile_vardec(pcode, class_dict, class_name, func_name, var_kind, var_type,
     """
     add var to the class dict, print a comment in pcode
     """
-
     # don't emit pcode during pre-scan
-    if var_name not in class_dict[class_name][func_name]['args']:
+    # class fields / statics
+    if var_kind == 'field':
+        if var_name not in class_dict[class_name]['args']:
+            if var_kind not in class_dict[class_name]['index_dict']:
+                index = 0
+            else:
+                index = class_dict[class_name]['index_dict'][var_kind] + 1
+        else:
+            raise RuntimeError("unexpected field '%s.%s" % (class_name, var_name))
+
+    # function locals
+    elif func_name == '':
+        raise RuntimeError  # FIXME: constructor name not being added during pre-scan
+
+    elif var_name not in class_dict[class_name][func_name]['args']:
         if var_kind not in class_dict[class_name][func_name]['index_dict']:
             index = 0
         else:
@@ -271,6 +295,7 @@ def compile_vardec(pcode, class_dict, class_name, func_name, var_kind, var_type,
                                                                'initialized': False}
         class_dict[class_name][func_name]['index_dict'][var_kind] = index
 
+    # debug info only
     elif not prescan:
         if not var_type:
             raise RuntimeError("unexpected var_type '%s' (%s.%s.%s)" % (var_type, class_name, func_name, var_name))
@@ -283,6 +308,9 @@ def compile_vardec(pcode, class_dict, class_name, func_name, var_kind, var_type,
         elif var_kind == 'argument':
             store_pcode(pcode, "// param %s %s (%s %s)" %
                         (var_type, var_name, var_kind, class_dict[class_name][func_name]['args'][var_name]['index']))
+        elif var_kind == 'field':
+            store_pcode(pcode, "// field %s %s (%s %s)" %
+                        (var_type, var_name, var_kind, class_dict[class_name]['args'][var_name]['index']))
         else:
             raise RuntimeError("unexpected var_kind '%s'" % var_kind)
 
@@ -493,7 +521,7 @@ def pop_buffer(pcode, exp_buffer, stop_at=None, pop_incl=False):
     return pcode
 
 
-def main(filepath):
+def main(filepath, file_list):
     """
     main engine:
         - parse the AST
@@ -502,80 +530,83 @@ def main(filepath):
         -- tag scope is defined by tree depth, some need to be carried forward, others cleared on depth change
         - call compile functions once enough information is parsed
     """
-
-    pcode = []
     try:
-        print("Parsing: %s" % filepath)
-        tree = Et.parse(filepath.replace(".jack", "_out.xml"))
-
         # persist through loop scope
         class_dict = {}
-        class_name = statement = func_name = keyword = var_type = ''
+        pcode = []
 
-        # pre-process tree for class/function/var decs
-        for elem in tree.iter():
-            elem.tag = (elem.tag or '').strip()
-            elem.text = (elem.text or '').strip()
-            # skip rootnode
-            if elem.tag == 'class':
-                continue
+        # pre-process tree for class/function/var decs (all related files)
+        for filepath in file_list:
+            class_name = statement = func_name = keyword = var_type = ''
 
-            if elem:  # has children
-                keyword = var_type = ''  # reset tag context on depth change
+            print("Pre-scan: %s" % filepath)
+            tree = Et.parse(filepath.replace(".jack", "_out.xml"))
 
-            if elem.tag == 'keyword':
-                if not keyword:
-                    keyword = elem.text  # preserved for later
-                elif not var_type:
-                    var_type = elem.text  # preserved for later
+            for elem in tree.iter():
+                elem.tag = (elem.tag or '').strip()
+                elem.text = (elem.text or '').strip()
+                # skip rootnode
+                if elem.tag == 'class':
+                    continue
 
-            elif elem.tag == 'identifier':
-                identifier = elem.text
+                if elem:  # has children
+                    keyword = var_type = ''  # reset tag context on depth change
 
-                if keyword == 'class':
-                    class_name = identifier  # preserved for later
-                    pcode, class_dict = compile_class(pcode, class_name, class_dict)
+                if elem.tag == 'keyword':
+                    if not keyword:
+                        keyword = elem.text  # preserved for later
+                    elif not var_type:
+                        var_type = elem.text  # preserved for later
 
-                elif keyword == 'function':
-                    func_name = identifier  # preserved for later
-                    func_kind = keyword  # preserved for later
-                    if not func_kind:
-                        raise RuntimeError("undefined function kind for '%s.%s'" % (class_name, func_name))
-                    pcode, class_dict = compile_function(pcode, func_name, var_type, func_kind, class_dict, class_name)
+                elif elem.tag == 'identifier':
+                    identifier = elem.text
 
-                elif statement in ('var', 'param'):
-                    if not var_type:
-                        # param in function declaration
-                        if keyword in types:
-                            var_type = keyword
+                    if keyword == 'class':
+                        class_name = identifier  # preserved for later
+                        pcode, class_dict = compile_class(pcode, class_name, class_dict)
 
-                        # local var passed as param
-                        elif identifier in class_dict[class_name][func_name]['args']:
-                            continue  # already processed
+                    elif keyword == 'function':
+                        func_name = identifier  # preserved for later
+                        func_kind = keyword  # preserved for later
+                        if not func_kind:
+                            raise RuntimeError("undefined function kind for '%s.%s'" % (class_name, func_name))
+                        pcode, class_dict = compile_function(pcode, func_name, var_type, func_kind, class_dict,
+                                                             class_name)
 
-                        # built-in types like 'Array'
-                        elif identifier in types:
-                            var_type = identifier
-                            continue  # process on next loop
-
+                    elif statement in ('var', 'param', 'class_var'):
                         if not var_type:
-                            raise RuntimeError()
+                            # param in function declaration
+                            if keyword in types:
+                                var_type = keyword
 
-                    pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
-                        compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
-                                          class_name=class_name, func_name=func_name, var_type=var_type,
-                                          var_name=identifier, prescan=True)
+                            # local var passed as param
+                            elif identifier in class_dict[class_name][func_name]['args'] or identifier in \
+                                    class_dict[class_name]['args']:
+                                continue  # already processed
 
-            elif elem.tag == 'varDec':
-                statement = 'var'
-            elif elem.tag == 'parameterList':
-                statement = 'param'
-            elif elem.tag == 'doStatement':
-                statement = 'do'
-            elif elem.tag == 'letStatement':
-                statement = 'let'
-            elif elem.tag == 'returnStatement':
-                statement = 'return'
+                            # built-in types like 'Array'
+                            elif identifier in types:
+                                var_type = identifier
+                                continue  # process on next loop
+
+                            if not var_type:
+                                raise RuntimeError()
+
+                        pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
+                            compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
+                                              class_name=class_name, func_name=func_name, var_type=var_type,
+                                              var_name=identifier, prescan=True)
+
+                elif elem.tag == 'varDec':
+                    statement = 'var'
+                elif elem.tag == 'parameterList':
+                    statement = 'param'
+                elif elem.tag == 'doStatement':
+                    statement = 'do'
+                elif elem.tag == 'letStatement':
+                    statement = 'let'
+                elif elem.tag == 'returnStatement':
+                    statement = 'return'
 
         # persist through loop scope
         exp_buffer = []
@@ -585,6 +616,8 @@ def main(filepath):
         lhs_var_name = lhs_array = parent_obj = child_func = ''
 
         # walk AST
+        print("Parsing: %s" % filepath)
+        tree = Et.parse(filepath.replace(".jack", "_out.xml"))
         for elem in tree.iter():
             elem.tag = (elem.tag or '').strip()
             elem.text = (elem.text or '').strip()
@@ -609,9 +642,6 @@ def main(filepath):
                     raise RuntimeError("unexpected keywords '%s' '%s' '%s'" % (keyword, var_type, elem.text))
 
             elif elem.tag == 'identifier':
-                # if elem.text == 'a':
-                #     print()  # debug
-
                 if keyword or statement:
                     identifier = elem.text
 
@@ -630,7 +660,7 @@ def main(filepath):
                                                              class_name)
 
                     # var declaration (local or function parameter)
-                    elif statement in ('var', 'param'):
+                    elif statement in ('var', 'param', 'class_var'):
                         # catch param case where type is only keyword (not a vardec so not in pre-scan)
                         if not var_type:
                             try:
@@ -842,6 +872,8 @@ def main(filepath):
                                       while_count=while_count, if_count=if_count, exp_buffer=exp_buffer)
             elif elem.tag == 'varDec':
                 statement = 'var'
+            elif elem.tag == 'classVarDec':
+                statement = 'class_var'
             elif elem.tag == 'parameterList':
                 statement = 'param'
             elif elem.tag == 'doStatement':
@@ -882,14 +914,15 @@ if __name__ == '__main__':
 
     jack_filepaths = [
         # compiled / tested
-        r"..\09\Average\Main.jack",
-        r"..\11\Seven\Main.jack",
-        r"..\11\ConvertToBin\Main.jack",
-        r"..\11\Average\Main.jack",
+        [r"..\09\Average\Main.jack"],
+        [r"..\11\Seven\Main.jack"],
+        [r"..\11\ConvertToBin\Main.jack"],
+        [r"..\11\Average\Main.jack"],
 
         # wip
-        # r"..\09\Fraction\Main.jack",
-        # r"..\09\Fraction\Fraction.jack",
+        [r"..\09\Fraction\Main.jack",
+         r"..\09\Fraction\Fraction.jack"],
+
         # r"..\09\HelloWorld\Main.jack",
         # r"..\09\List\Main.jack",
         # r"..\09\List\List.jack",
@@ -924,20 +957,21 @@ if __name__ == '__main__':
         r"..\11\Average\Main.vm": 149,  # all
     }
 
-    for _filepath in jack_filepaths:
-        pcode = main(_filepath)
+    for file_list in jack_filepaths:
+        for _filepath in file_list:
+            pcode = main(_filepath, file_list)
 
-        # strip debug for result comparison
-        with open(_filepath.replace(".jack", "_out.vm"), "w") as f:
-            print("Writing: %s\n" % _filepath)
-            for line in pcode:
-                comment = line.find("//")
-                if line.startswith("//"):
-                    continue
-                elif comment:
-                    f.write(line[:comment].strip() + "\n")
-                else:
-                    f.write(line + "\n")
+            # strip debug for result comparison
+            with open(_filepath.replace(".jack", "_out.vm"), "w") as f:
+                print("Writing: %s\n" % _filepath)
+                for line in pcode:
+                    comment = line.find("//")
+                    if line.startswith("//"):
+                        continue
+                    elif comment:
+                        f.write(line[:comment].strip() + "\n")
+                    else:
+                        f.write(line + "\n")
 
     # enforce matching for known samples
     for match in strict_matches:
@@ -953,4 +987,4 @@ if __name__ == '__main__':
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
 
-    # TODO: add new test programs
+    # TODO: constructor func_name, check fields (fraction)
