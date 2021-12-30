@@ -194,8 +194,7 @@ def compile_statement(pcode=None, statement=None, class_dict=None, class_name=No
     """
 
     if statement == "do":
-        pcode = compile_call(pcode=pcode, call_class=call_class, call_func=call_func, num_args=num_args,
-                             statement=statement)
+        compile_call(pcode=pcode, call_class=call_class, call_func=call_func, num_args=num_args, statement=statement)
         num_args = 0
 
     elif statement == "let":
@@ -204,25 +203,24 @@ def compile_statement(pcode=None, statement=None, class_dict=None, class_name=No
 
     elif statement == "return":
         # looks up func type (affects return behaviour)
-        pcode = compile_return(pcode=pcode, class_dict=class_dict, class_name=class_name, func_name=func_name)
+        compile_return(pcode=pcode, class_dict=class_dict, class_name=class_name, func_name=func_name)
 
     elif statement == "while":
-        pcode, while_count = compile_while(pcode=pcode, while_count=while_count)
+        compile_while(pcode=pcode, while_count=while_count)
 
     elif statement == "if":
         pass
 
     elif statement == "var":
         # update class/func dict
-        pcode, class_dict = compile_vardec(pcode=pcode, class_dict=class_dict, class_name=class_name,
-                                           func_name=func_name, var_kind='local', var_type=var_type, var_name=var_name,
-                                           prescan=prescan)
+        compile_vardec(pcode=pcode, class_dict=class_dict, class_name=class_name, func_name=func_name, var_kind='local',
+                       var_type=var_type, var_name=var_name, prescan=prescan)
 
     elif statement == "param":
         # update class/func dict
-        pcode, class_dict = compile_vardec(pcode=pcode, class_dict=class_dict, class_name=class_name,
-                                           func_name=func_name, var_kind='argument', var_type=var_type,
-                                           var_name=var_name, prescan=prescan)
+        compile_vardec(pcode=pcode, class_dict=class_dict, class_name=class_name,
+                       func_name=func_name, var_kind='argument', var_type=var_type,
+                       var_name=var_name, prescan=prescan)
 
     else:
         raise RuntimeError("Unexpected statement type '%s'" % statement)
@@ -388,7 +386,7 @@ def compile_string(pcode, string):
     store_pcode(pcode, "push constant %s // strlen" % (len(string) + 1))
     store_pcode(pcode, "call String.new 1 // \"%s\"" % string)
     for c, char in enumerate(string):
-        pcode = compile_char(pcode, char)
+        compile_char(pcode, char)
         store_pcode(pcode, "call String.appendChar 2")
     compile_char(pcode, " ")  # pad with space
     store_pcode(pcode, "call String.appendChar 2 // padding space\n")
@@ -415,11 +413,11 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
 
         elif symbol == ")":
             # process everything up to & including the last expression opening from buffer
-            pcode = pop_buffer(pcode, exp_buffer, stop_at="// (", pop_incl=True)
+            pop_buffer(pcode, exp_buffer, stop_at="// (", pop_incl=True)
 
         elif symbol == ",":
             # process everything up to but not including the last expression opening from buffer
-            pcode = pop_buffer(pcode, exp_buffer, stop_at="// (")  # i.e. expression was not bracketed
+            pop_buffer(pcode, exp_buffer, stop_at="// (")  # i.e. expression was not bracketed
 
     elif identifier:
         # attempt to lookup class/func attributes (2 passes)
@@ -448,7 +446,7 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
 
         # if var found compile directly (not buffer)
         elif identifier in class_dict[class_name][func_name]['args']:
-            pcode = compile_var(pcode, class_dict, class_name, func_name, identifier)
+            compile_var(pcode, class_dict, class_name, func_name, identifier)
 
     return pcode, exp_buffer, parent_obj, child_func
 
@@ -861,4 +859,4 @@ if __name__ == '__main__':
                     print("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
-    # TODO: stringConstant (Average)
+    # TODO: arrays (Average)
