@@ -185,7 +185,6 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
     if not prescan:
         pcode = store_pcode(pcode, "\nfunction %s.%s %s // %s" % (class_name, func_name, num_vars, func_kind))
 
-        # FIXME: why isn't this hitting for Fraction.new()
         if func_kind == "constructor":
             # allocate space on heap
             pcode = store_pcode(pcode, "push constant %s" % num_vars)
@@ -223,9 +222,9 @@ def compile_statement(pcode=None, statement=None, class_dict=None, class_name=No
         num_args = 0
 
     elif statement == "let":
-        exp_buffer = compile_assignment(class_dict=class_dict, class_name=class_name, func_name=func_name,
-                                        var_name=var_name, exp_buffer=exp_buffer, lhs_array=lhs_array,
-                                        var_scope=var_scope)
+        exp_buffer, class_dict = \
+            compile_assignment(class_dict=class_dict, class_name=class_name, func_name=func_name, var_name=var_name,
+                               exp_buffer=exp_buffer, lhs_array=lhs_array, var_scope=var_scope)
 
     elif statement == "return":
         # looks up func type (affects return behaviour)
@@ -276,9 +275,7 @@ def compile_assignment(class_dict, class_name, func_name, var_name, exp_buffer, 
                                                      class_dict[class_name][func_name]['args'][var_name]['index'],
                                                      var_name))
         elif var_scope == 'member':
-            exp_buffer.append("pop %s %s // %s =" % (class_dict[class_name]['args'][var_name]['kind'],
-                                                     class_dict[class_name]['args'][var_name]['index'],
-                                                     var_name))
+            exp_buffer.append("pop this %s // %s =" % (class_dict[class_name]['args'][var_name]['index'], var_name))
 
     elif not class_dict[class_name][func_name]['args'][var_name]['initialized']:
         # array constructor
@@ -297,7 +294,7 @@ def compile_assignment(class_dict, class_name, func_name, var_name, exp_buffer, 
     elif var_scope == 'member':
         class_dict[class_name]['args'][var_name]['initialized'] = True
 
-    return exp_buffer
+    return exp_buffer, class_dict
 
 
 def compile_vardec(pcode, class_dict, class_name, func_name, var_kind, var_type, var_name, prescan=False):
@@ -504,9 +501,8 @@ def compile_var(pcode, class_dict, class_name, func_name, var_name, var_scope, e
             return exp_buffer
 
         elif var_scope == 'member':
-            exp_buffer.append("push %s %s // %s" %
-                              (class_dict[class_name]['args'][var_name]['kind'],
-                               class_dict[class_name]['args'][var_name]['index'], var_name))
+            exp_buffer.append("push this %s // %s" %
+                              (class_dict[class_name]['args'][var_name]['index'], var_name))
             return exp_buffer
 
     else:
@@ -517,9 +513,8 @@ def compile_var(pcode, class_dict, class_name, func_name, var_name, var_scope, e
             return pcode
 
         elif var_scope == 'member':
-            pcode = store_pcode(pcode, "\npush %s %s // %s" %
-                                (class_dict[class_name]['args'][var_name]['kind'],
-                                 class_dict[class_name]['args'][var_name]['index'], var_name))
+            pcode = store_pcode(pcode, "\npush this %s // %s" %
+                                (class_dict[class_name]['args'][var_name]['index'], var_name))
             return pcode
 
 
@@ -796,8 +791,10 @@ def main(filepath, file_list):
 
                 # function declaration
                 elif keyword in ('function', 'constructor', 'method'):
-                    func_kind = 'function'  # preserved for later
-
+                    # func_kind = 'function'  # preserved for later
+                    # FIXME: all functions treated as constructors
+                    if not func_kind:
+                        func_kind = keyword
                     if identifier in objects or identifier in types:
                         continue  # identifier was object type not function name
                     else:
@@ -1157,4 +1154,7 @@ if __name__ == '__main__':
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
 
-    # FIXME: constructor & field compilation (Fraction.Fraction)
+    # FIXME: num_args should not increase for members
+    # FIXME: push this (pointer 0) for methods
+    # FIXME: all functions treated as constructors (see above)
+    # FIXME: if without else (see above)
