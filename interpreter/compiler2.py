@@ -137,7 +137,6 @@ def compile_class(pcode, class_name, class_dict):
     return pcode, class_dict
 
 
-# FIXME: all Fraction functions are constructor as kind
 def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_name):
     """
     update the class_dict during pre-scan, emit pcode when declaration encountered
@@ -186,6 +185,7 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
     if not prescan:
         pcode = store_pcode(pcode, "\nfunction %s.%s %s // %s" % (class_name, func_name, num_vars, func_kind))
 
+        # FIXME: why isn't this hitting for Fraction.new()
         if func_kind == "constructor":
             # allocate space on heap
             pcode = store_pcode(pcode, "push constant %s" % num_vars)
@@ -389,9 +389,6 @@ def compile_call(pcode, call_class, call_func, num_args, statement, exp_buffer=N
         raise RuntimeError("illegal class: '%s'" % call_class)
     if not call_func:
         raise RuntimeError("illegal callee: '%s'" % call_func)
-
-    if call_class == 'Fraction' and call_func == 'plus':
-        print("debug")
 
     # count arguments
     num_args = 0
@@ -680,12 +677,9 @@ def main(filepath, file_list):
                     var_type = elem.text  # preserved for later
 
                 if keyword in ('function', 'method', 'constructor'):
-                    if not func_kind:
-                        func_kind = keyword
-                        if not func_kind:
-                            raise RuntimeError("undefined function kind for '%s.%s'" % (class_name, func_name))
+                    func_kind = keyword
 
-                    elif not func_type:
+                    if not func_type:
                         # type could be keyword or identifier
                         if var_type and (var_type in types or var_type in objects):
                             func_type = var_type
@@ -1123,10 +1117,13 @@ if __name__ == '__main__':
 
     # matched to course compiler
     strict_matches = {
-        r"..\09\Average\Main.vm": 149,  # all
-        r"..\11\Seven\Main.vm": 10,  # all
-        r"..\11\ConvertToBin\Main.vm": 114,  # all
-        r"..\11\Average\Main.vm": 149,  # all
+        # all
+        r"..\09\Average\Main.vm": 149,
+        r"..\11\Seven\Main.vm": 10,
+        r"..\11\ConvertToBin\Main.vm": 114,
+        r"..\11\Average\Main.vm": 149,
+        r"..\09\Fraction\Main.vm": 18,
+        # wip
     }
 
     for file_list in jack_filepaths:
@@ -1160,4 +1157,4 @@ if __name__ == '__main__':
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
 
-    # FIXME: fix num args (Fraction.main), constructor & field compilation (Fraction.Fraction)
+    # FIXME: constructor & field compilation (Fraction.Fraction)
