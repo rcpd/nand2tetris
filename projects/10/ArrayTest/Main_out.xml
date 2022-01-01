@@ -45,7 +45,7 @@
               <expressionList>
                 <expression>
                   <term>
-                    <stringConstant> HOW MANY NUMBERS? </stringConstant>
+                    <stringConstant> HOW MANY NUMBERS?  </stringConstant>
                   </term>
                 </expression>
               </expressionList>
@@ -122,7 +122,7 @@
                   <expressionList>
                     <expression>
                       <term>
-                        <stringConstant> ENTER THE NEXT NUMBER: </stringConstant>
+                        <stringConstant> ENTER THE NEXT NUMBER:  </stringConstant>
                       </term>
                     </expression>
                   </expressionList>
@@ -235,7 +235,7 @@
           <expressionList>
             <expression>
               <term>
-                <stringConstant> THE AVERAGE IS: </stringConstant>
+                <stringConstant> THE AVERAGE IS:  </stringConstant>
               </term>
             </expression>
           </expressionList>
