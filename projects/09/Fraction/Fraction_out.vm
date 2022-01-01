@@ -1,4 +1,4 @@
-function Fraction.new 2
+function Fraction.new 0
 push constant 2
 call Memory.alloc 1
 pop pointer 0

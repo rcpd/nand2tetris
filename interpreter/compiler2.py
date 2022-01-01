@@ -149,45 +149,38 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
         raise RuntimeError("illegal function type: '%s'" % func_type)
     if not func_kind:
         raise RuntimeError("illegal function kind: '%s'" % func_kind)
+    if func_kind not in ("function", "method", "constructor"):
+        raise RuntimeError("illegal function kind: '%s'" % func_kind)
 
     # define function symbol
     prescan = False
-    if func_kind in ("function", "method", "constructor"):
-        if func_kind == 'constructor':
-            func_type = class_name
-        if func_name not in class_dict[class_name]:
-            class_dict[class_name][func_name] = {"kind": func_kind, "type": func_type,
-                                                 "args": {}, "index_dict": {}, "label_dict": {}}
-            prescan = True
+    if func_kind == 'constructor':
+        func_type = class_name
+    if func_name not in class_dict[class_name]:
+        class_dict[class_name][func_name] = {"kind": func_kind, "type": func_type,
+                                             "args": {}, "index_dict": {}, "label_dict": {}}
+        prescan = True
 
-        if func_kind == "method":
-            # assign space for the implicit "this" argument for class methods
-            class_dict[class_name][func_name]["index_dict"]["argument"] = 0
-            class_dict[class_name][func_name]["args"]["this"] = \
-                {"kind": "argument", "type": "this", "index": 0}
-
-    if func_kind in ("method", "function"):
-        if "local" in class_dict[class_name][func_name]["index_dict"]:
-            num_vars = class_dict[class_name][func_name]["index_dict"]["local"]+1
-        else:
-            num_vars = 0
-
-    elif func_kind == "constructor":
-        if "field" in class_dict[class_name]["index_dict"]:
-            num_vars = class_dict[class_name]["index_dict"]["field"]+1
-        else:
-            num_vars = 0
-
-    else:
-        raise RuntimeError(func_kind)
+    if func_kind == "method":
+        # assign space for the implicit "this" argument for class methods
+        class_dict[class_name][func_name]["index_dict"]["argument"] = 0
+        class_dict[class_name][func_name]["args"]["this"] = \
+            {"kind": "argument", "type": "this", "index": 0}
 
     # don't emit pcode on pre-scan
     if not prescan:
+        # num_vars = locals i.e. the space required on stack frame
+        # num_params = arguments i.e. how many vars in function call
+        num_vars = num_params = 0
+        if "local" in class_dict[class_name][func_name]["index_dict"]:
+            num_vars = class_dict[class_name][func_name]["index_dict"]["local"] + 1
+        num_params = len(class_dict[class_name][func_name]['args'])
+
         pcode = store_pcode(pcode, "\nfunction %s.%s %s // %s" % (class_name, func_name, num_vars, func_kind))
 
         if func_kind == "constructor":
             # allocate space on heap
-            pcode = store_pcode(pcode, "push constant %s" % num_vars)
+            pcode = store_pcode(pcode, "push constant %s" % num_params)
             # non-void return (no pop)
             pcode = store_pcode(pcode, "call Memory.alloc 1 // allocate object + params on heap")
             pcode = store_pcode(pcode, "pop pointer 0 // *this = &<heap>")
@@ -1190,6 +1183,4 @@ if __name__ == '__main__':
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
 
-    # FIXME: num_args should not increase for members
-    # FIXME: all functions treated as constructors (see above)
     # FIXME: if without else (see above)
