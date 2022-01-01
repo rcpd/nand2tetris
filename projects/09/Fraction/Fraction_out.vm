@@ -61,7 +61,6 @@ pop local 0
 push local 0
 push this 1
 push argument 1
-push pointer 0
 call Fraction.getDenominator 1
 call Math.multiply 2
 call Fraction.new 2

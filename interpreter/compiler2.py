@@ -165,7 +165,7 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
         # assign space for the implicit "this" argument for class methods
         class_dict[class_name][func_name]["index_dict"]["argument"] = 0
         class_dict[class_name][func_name]["args"]["this"] = \
-            {"kind": "argument", "type": "this", "index": 0}
+            {"kind": "argument", "type": class_name, "index": 0}
 
     # don't emit pcode on pre-scan
     if not prescan:
@@ -412,21 +412,22 @@ def compile_call(pcode, call_class, call_func, num_args, statement, class_name, 
         return exp_buffer
 
     else:
-        # implicit this param on unqualified class method call
-        if not qualified and class_name == call_class:
-            if call_class in sys_func:
-                if sys_func[call_class][call_func]['kind'] == 'method':
-                    pcode = store_pcode(pcode, "push pointer 0 // this")
-            elif call_class in class_dict:
-                if class_dict[call_class][call_func]['kind'] == 'method':
-                    pcode = store_pcode(pcode, "push pointer 0 // this")
-            else:
-                raise RuntimeError("class not found: '%s'" % call_class)
-
-        pcode = store_pcode(pcode, "\ncall %s.%s %s" % (call_class, call_func, num_args))
-        if statement == 'do':
-            pcode = store_pcode(pcode, "\npop temp 0 // discard return on do call")
-        return pcode
+        raise NotImplementedError
+    #     # implicit this param on unqualified class method call
+    #     if not qualified and class_name == call_class:
+    #         if call_class in sys_func:
+    #             if sys_func[call_class][call_func]['kind'] == 'method':
+    #                 pcode = store_pcode(pcode, "push pointer 0 // this")
+    #         elif call_class in class_dict:
+    #             if class_dict[call_class][call_func]['kind'] == 'method':
+    #                 pcode = store_pcode(pcode, "push pointer 0 // this")
+    #         else:
+    #             raise RuntimeError("class not found: '%s'" % call_class)
+    #
+    #     pcode = store_pcode(pcode, "\ncall %s.%s %s" % (call_class, call_func, num_args))
+    #     if statement == 'do':
+    #         pcode = store_pcode(pcode, "\npop temp 0 // discard return on do call")
+    #     return pcode
 
 
 def compile_return(pcode, class_dict, class_name, func_name):
@@ -946,7 +947,8 @@ def main(filepath, file_list):
                 elif statement in ('while', 'if', 'return'):
                     pcode, exp_buffer, parent_obj, child_func = \
                         expression_handler(pcode, statement, exp_buffer, class_dict=class_dict,
-                                           identifier=identifier, class_name=class_name, func_name=func_name)
+                                           identifier=identifier, class_name=class_name, func_name=func_name,
+                                           parent_obj=parent_obj, child_func=child_func)
                 else:
                     raise RuntimeError("unexpected keyword/statement '%s'/'%s' for identifier '%s'" %
                                        (keyword, statement, elem.text))
@@ -1193,5 +1195,3 @@ if __name__ == '__main__':
 
     # FIXME: 2nd call in expression out of order
     #  let sum = (numerator * other.getDenominator()) + (other.getNumerator() * denominator);
-    # FIXME: call is incorrectly compiled as unqualified
-    #  return Fraction.new(sum, denominator * other.getDenominator());
