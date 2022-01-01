@@ -591,6 +591,10 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
                 if class_dict[class_name][func_name]['args'][identifier]['type'] in objects:
                     parent_obj = class_dict[class_name][func_name]['args'][identifier]['type']
 
+            elif identifier in class_dict[class_name]['args']:
+                if class_dict[class_name]['args'][identifier]['type'] in objects:
+                    parent_obj = class_dict[class_name]['args'][identifier]['type']
+
         elif not child_func:
             if parent_obj in sys_func:
                 if identifier in sys_func[parent_obj]:
@@ -1129,11 +1133,10 @@ if __name__ == '__main__':
         [r"..\09\Fraction\Main.jack",
          r"..\09\Fraction\Fraction.jack"],
         [r"..\09\HelloWorld\Main.jack"],
-
-        # wip
-        [r"..\09\List\Main.jack",  # FIXME: misc
+        [r"..\09\List\Main.jack",
          r"..\09\List\List.jack"],
 
+        # wip
         # [r"..\09\Square\Main.jack",  # FIXME: unexpected identifier
         #  r"..\09\Square\Square.jack",
         #  r"..\09\Square\SquareGame.jack"],
