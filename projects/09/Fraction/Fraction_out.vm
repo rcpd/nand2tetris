@@ -11,9 +11,8 @@ call Fraction.reduce 1
 pop temp 0
 push pointer 0
 return
-function Fraction.reduce 2
-push constant 2
-call Memory.alloc 1
+function Fraction.reduce 1
+push argument 0
 pop pointer 0
 push this 0
 push this 1
@@ -36,21 +35,18 @@ pop this 1
 goto IF_END0
 push constant 0
 return
-function Fraction.getNumerator 2
-push constant 2
-call Memory.alloc 1
+function Fraction.getNumerator 0
+push argument 0
 pop pointer 0
 push this 0
 return
-function Fraction.getDenominator 2
-push constant 2
-call Memory.alloc 1
+function Fraction.getDenominator 0
+push argument 0
 pop pointer 0
 push this 1
 return
-function Fraction.plus 2
-push constant 2
-call Memory.alloc 1
+function Fraction.plus 1
+push argument 0
 pop pointer 0
 push this 0
 push argument 1
@@ -72,18 +68,16 @@ call Fraction.getDenominator 1
 call Math.multiply 2
 call Fraction.new 2
 return
-function Fraction.dispose 2
-push constant 2
-call Memory.alloc 1
+function Fraction.dispose 0
+push argument 0
 pop pointer 0
 push pointer 0
 call Memory.deAlloc 1
 pop temp 0
 push constant 0
 return
-function Fraction.print 2
-push constant 2
-call Memory.alloc 1
+function Fraction.print 0
+push argument 0
 pop pointer 0
 push this 0
 call Output.printInt 1
@@ -101,10 +95,7 @@ call Output.printInt 1
 pop temp 0
 push constant 0
 return
-function Fraction.gcd 2
-push constant 2
-call Memory.alloc 1
-pop pointer 0
+function Fraction.gcd 1
 label WHILE_EXP0
 push argument 1
 push constant 0
