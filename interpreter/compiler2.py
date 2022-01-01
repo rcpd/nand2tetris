@@ -729,23 +729,22 @@ def main(filepath, file_list):
                         raise RuntimeError("illegal identifier '%s'" % identifier)
 
                 elif statement in ('var', 'param', 'class_var'):
+                    # external or built-in types
+                    if identifier in types or identifier in objects:
+                        var_type = identifier
+                        continue  # process on next loop
+
+                    # param in function declaration
+                    elif keyword in types or keyword in objects:
+                        var_type = keyword
+
+                    # local var passed as param
+                    elif func_name and (identifier in class_dict[class_name][func_name]['args']
+                                        or identifier in class_dict[class_name]['args']):
+                        continue  # already processed
+
                     if not var_type:
-                        # param in function declaration
-                        if keyword in types or keyword in objects:
-                            var_type = keyword
-
-                        # local var passed as param
-                        elif func_name and (identifier in class_dict[class_name][func_name]['args']
-                                            or identifier in class_dict[class_name]['args']):
-                            continue  # already processed
-
-                        # external or built-in types
-                        elif identifier in types or identifier in objects:
-                            var_type = identifier
-                            continue  # process on next loop
-
-                        if not var_type:
-                            raise RuntimeError()
+                        raise RuntimeError()
 
                     if keyword in ('field', 'static'):
                         pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
