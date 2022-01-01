@@ -1137,17 +1137,15 @@ if __name__ == '__main__':
          r"..\09\List\List.jack"],
 
         # wip
-        # [r"..\09\Square\Main.jack",  # FIXME: unexpected identifier
-        #  r"..\09\Square\Square.jack",
-        #  r"..\09\Square\SquareGame.jack"],
-
-        # [r"..\10\Square\Main.jack",  # FIXME: unexpected identifier
-        #  r"..\10\Square\Square.jack",
-        #  r"..\10\Square\SquareGame.jack"],
-
-        # [r"..\11\Square\Main.jack",  # FIXME: unexpected identifier
-        #  r"..\11\Square\Square.jack",
-        #  r"..\11\Square\SquareGame.jack"],
+        [r"..\09\Square\Main.jack",
+         r"..\09\Square\Square.jack",  # FIXME: labels
+         r"..\09\Square\SquareGame.jack"],  # FIXME: constructor count, labels
+        [r"..\10\Square\Main.jack",
+         r"..\10\Square\Square.jack",
+         r"..\10\Square\SquareGame.jack"],
+        [r"..\11\Square\Main.jack",
+         r"..\11\Square\Square.jack",
+         r"..\11\Square\SquareGame.jack"],
 
         # [r"..\10\ExpressionLessSquare\Main.jack",  # FIXME: unexpected identifier
         #  r"..\10\ExpressionLessSquare\Square.jack",
