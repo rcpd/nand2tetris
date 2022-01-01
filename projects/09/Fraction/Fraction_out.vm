@@ -80,11 +80,9 @@ pop pointer 0
 push this 0
 call Output.printInt 1
 pop temp 0
-push constant 2
+push constant 1
 call String.new 1
 push constant 47
-call String.appendChar 2
-push constant 32
 call String.appendChar 2
 call Output.printString 1
 pop temp 0

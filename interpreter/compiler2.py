@@ -534,13 +534,11 @@ def compile_var(pcode, class_dict, class_name, func_name, var_name, var_scope, e
 
 
 def compile_string(pcode, string):
-    pcode = store_pcode(pcode, "push constant %s // strlen" % (len(string) + 1))
+    pcode = store_pcode(pcode, "push constant %s // strlen" % len(string))
     pcode = store_pcode(pcode, "call String.new 1 // \"%s\"" % string)
     for c, char in enumerate(string):
         pcode = compile_char(pcode, char)
         pcode = store_pcode(pcode, "call String.appendChar 2")
-    pcode = compile_char(pcode, " ")  # pad with space
-    pcode = store_pcode(pcode, "call String.appendChar 2 // padding space\n")
     return pcode
 
 
@@ -674,8 +672,9 @@ def main(filepath, file_list):
         tree = Et.parse(pre_file.replace(".jack", "_out.xml"))
 
         for elem in tree.iter():
-            elem.tag = (elem.tag or '').strip()
-            elem.text = (elem.text or '').strip()
+            elem.tag = (elem.tag or '')
+            elem.text = (elem.text or '')[1:-1]  # strip outermost padding
+
             # skip rootnode
             if elem.tag == 'class':
                 continue
@@ -780,8 +779,8 @@ def main(filepath, file_list):
     print("Parsing: %s\n" % filepath)
     tree = Et.parse(filepath.replace(".jack", "_out.xml"))
     for elem in tree.iter():
-        elem.tag = (elem.tag or '').strip()
-        elem.text = (elem.text or '').strip()
+        elem.tag = (elem.tag or '')
+        elem.text = (elem.text or '')[1:-1]  # strip outermost padding
         # skip rootnode
         if elem.tag == 'class':
             continue
@@ -1196,4 +1195,3 @@ if __name__ == '__main__':
     #  let sum = (numerator * other.getDenominator()) + (other.getNumerator() * denominator);
     # FIXME: call is incorrectly compiled as unqualified
     #  return Fraction.new(sum, denominator * other.getDenominator());
-    # FIXME: remove string padding / fix analyzer stripping
