@@ -695,6 +695,9 @@ def main(filepath, file_list):
                 keyword = var_type = func_type = ''  # reset tag context on depth change
 
             if elem.tag == 'keyword':
+                # if elem.text == 'null' and 'List.jack' in pre_file:
+                #     print()
+
                 if not keyword:
                     keyword = elem.text  # preserved for later
                 elif not var_type:
@@ -715,6 +718,9 @@ def main(filepath, file_list):
 
             elif elem.tag == 'identifier':
                 identifier = elem.text
+
+                # if identifier == 'List' and 'List.jack' in pre_file:
+                #     print()
 
                 if keyword == 'class':
                     class_name = identifier  # preserved for later
@@ -803,6 +809,7 @@ def main(filepath, file_list):
                 if elem.tag != 'keyword' and elem.text != 'else' and block[-1] == 'if':
                     pcode = store_pcode(pcode, "\nlabel IF_FALSE%s // end if_block" % (if_count - 1))
                     block.pop()
+                    if_count -= 1
 
                 # other statement blocks
                 elif block[-1] == 'else':
@@ -1138,7 +1145,7 @@ if __name__ == '__main__':
 
         # wip
         [r"..\09\Square\Main.jack",
-         r"..\09\Square\Square.jack",  # FIXME: labels
+         r"..\09\Square\Square.jack",
          r"..\09\Square\SquareGame.jack"],  # FIXME: constructor count, labels
         [r"..\10\Square\Main.jack",
          r"..\10\Square\Square.jack",
