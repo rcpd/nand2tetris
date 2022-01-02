@@ -813,27 +813,27 @@ def main(filepath, file_list):
             if block:
                 # TODO: compile_end_block
                 # if-without-else
-                if elem.tag != 'keyword' and elem.text != 'else' and block[-1] == 'if':
+                if elem.tag not in ('keyword', 'term') and elem.text != 'else' and block[-1] == 'if':
                     pcode = store_pcode(pcode, "\nlabel IF_FALSE%s // end if_block" % (if_list[-1]))
-                    block.pop()
-                    if_list.pop()
+                    pcode = store_pcode(pcode, "// popping '%s' from block" % block.pop())
+                    pcode = store_pcode(pcode, "// popping '%s' from if_list" % if_list.pop())
 
                 # other statement blocks
                 elif block[-1] == 'else':
                     pcode = store_pcode(pcode, "\nlabel IF_END%s // end if_block" % (if_list[-1]))
-                    block.pop()
-                    if_list.pop()
+                    pcode = store_pcode(pcode, "// popping '%s' from block" % block.pop())
+                    pcode = store_pcode(pcode, "// popping '%s' from if_list" % if_list.pop())
 
                 elif block[-1] == 'if':
                     pcode = store_pcode(pcode, "\ngoto IF_END%s // end if_true_block" % (if_list[-1]))
-                    block.pop()
+                    pcode = store_pcode(pcode, "// popping '%s' from block" % block.pop())
 
                 elif block[-1] == 'while':
                     pcode = store_pcode(pcode, "\ngoto WHILE_EXP%s // loop to start of while_block" %
                                         (while_list[-1]))
                     pcode = store_pcode(pcode, "\nlabel WHILE_END%s // end while_block" % (while_list[-1]))
-                    block.pop()
-                    while_list.pop()
+                    pcode = store_pcode(pcode, "// popping '%s' from block" % block.pop())
+                    pcode = store_pcode(pcode, "// popping '%s' from while_list" % while_list.pop())
 
                 else:
                     raise RuntimeError("unexpected block '%s'" % block[-1])
@@ -850,6 +850,7 @@ def main(filepath, file_list):
             if elem.text in ('true', 'false'):
                 exp_buffer = compile_boolean(pcode, elem.text, exp_buffer)
                 continue
+
             elif elem.text in ('this', 'null'):
                 pcode, exp_buffer, parent_obj, child_func = \
                     expression_handler(pcode, statement, exp_buffer, parent_obj=parent_obj, child_func=child_func,
@@ -1018,7 +1019,8 @@ def main(filepath, file_list):
 
                 elif statement == 'param':
                     pass
-                elif keyword not in ('class', 'function'):
+
+                elif keyword not in ('class', 'function') and not if_list:
                     raise RuntimeError("unexpected '{' (statement '%s', keyword '%s')" % (statement, keyword))
 
             elif symbol == "}":
@@ -1138,8 +1140,9 @@ def main(filepath, file_list):
 if __name__ == '__main__':
     """
     loop across multiple files:
+        - update the object list
         - call the main engine
-        - write pcode to output file (however much was processed)
+        - write pcode to output file
         - where possible, enforce match to course compiled programs
     """
 
@@ -1161,14 +1164,14 @@ if __name__ == '__main__':
         # wip
         # [r"..\11\ComplexArrays\Main.jack"],  # FIXME: array in rhs expression
 
-        # [r"..\11\Pong\Ball.jack",  # FIXME: unexpected identifier
-        #  r"..\11\Pong\Bat.jack",
-        #  r"..\11\Pong\Main.jack",
-        #  r"..\11\Pong\PongGame.jack"],
+        [r"..\11\Pong\Ball.jack",  # FIXME: order of 'this' in params
+         r"..\11\Pong\Bat.jack",  # match
+         r"..\11\Pong\Main.jack",  # match
+         r"..\11\Pong\PongGame.jack"],  # FIXME: static not this, other unknown issues
 
         # [r"..\10\ExpressionLessSquare\Main.jack",  # TODO: doesn't compile on course compiler
-        #  r"..\10\ExpressionLessSquare\Square.jack",  # illegal jack code: constructor must return 'this'
-        #  r"..\10\ExpressionLessSquare\SquareGame.jack"],  # illegal jack code: constructor this, run type confusion
+        #  r"..\10\ExpressionLessSquare\Square.jack",  # constructor must return 'this'
+        #  r"..\10\ExpressionLessSquare\SquareGame.jack"],  # constructor this, run type confusion
     ]
 
     # matched to course compiler
