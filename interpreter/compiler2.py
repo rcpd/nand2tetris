@@ -874,6 +874,9 @@ def main(filepath, file_list):
                                        keyword=elem.text)
                 continue
 
+            elif elem.text == 'if':
+                statement = 'if'  # TODO: missing some ifStatement(s) in AST
+
             # set on first instance only
             if elem.text in ('function', 'method', 'constructor'):
                 func_kind = elem.text
@@ -1102,7 +1105,7 @@ def main(filepath, file_list):
                 if exp_buffer:
                     raise RuntimeError("unparsed expressions still in buffer: %s" % exp_buffer)
 
-                lhs_var_name = lhs_array = ''
+                statement = lhs_var_name = lhs_array = ''
 
             elif symbol in op_map:
                 if symbol == "-" and find_parent(tree, elem).tag == "term":
@@ -1121,7 +1124,6 @@ def main(filepath, file_list):
 
         elif elem.tag == 'ifStatement':
             statement = 'if'
-            # TODO: compile_if_statement
             pcode = store_pcode(pcode, "\n// begin if expression")
         elif elem.tag == 'whileStatement':
             statement = 'while'

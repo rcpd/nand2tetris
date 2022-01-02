@@ -276,16 +276,19 @@ neg
 pop local 0
 goto IF_END3
 label IF_FALSE3
+push local 3
 push local 2
 push constant 10
 sub
 gt
-pop local 3
+if-goto IF_TRUE4
+goto IF_FALSE4
+label IF_TRUE4
 push local 0
 push constant 1
 eq
+label IF_FALSE4
 label IF_END3
-label IF_FALSE2
 push this 6
 push constant 2
 sub
@@ -305,9 +308,10 @@ pop temp 0
 push this 4
 call Output.printInt 1
 pop temp 0
+label IF_FALSE2
 label IF_FALSE1
-label IF_FALSE0
 push this 1
 push local 0
 call Ball.bounce 2
 pop temp 0
+label IF_FALSE0
