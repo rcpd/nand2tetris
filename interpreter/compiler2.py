@@ -170,7 +170,6 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
     if not prescan:
         # num_vars = locals i.e. the space required on stack frame
         # num_members = field i.e. how much space required on heap for alloc call
-        # FIXME: unsure about static
         num_vars = num_members = 0
         if "local" in class_dict[class_name][func_name]["index_dict"]:
             num_vars = class_dict[class_name][func_name]["index_dict"]["local"] + 1
@@ -270,7 +269,15 @@ def compile_assignment(class_dict, class_name, func_name, var_name, exp_buffer, 
                                                      class_dict[class_name][func_name]['args'][var_name]['index'],
                                                      var_name))
         elif var_scope == 'member':
-            exp_buffer.append("pop this %s // %s =" % (class_dict[class_name]['args'][var_name]['index'], var_name))
+            if class_dict[class_name]['args'][var_name]['kind'] == 'static':
+                exp_buffer.append("pop static %s // %s =" % (class_dict[class_name]['args'][var_name]['index'],
+                                                             var_name))
+
+            elif class_dict[class_name]['args'][var_name]['kind'] == 'field':
+                exp_buffer.append("pop this %s // %s =" % (class_dict[class_name]['args'][var_name]['index'],
+                                                           var_name))
+            else:
+                raise RuntimeError("unexpected kind: '%s'" % class_dict[class_name]['args'][var_name]['kind'])
 
     elif not class_dict[class_name][func_name]['args'][var_name]['initialized']:
         # array constructor
@@ -496,11 +503,20 @@ def compile_var(pcode, class_dict, class_name, func_name, var_name, var_scope, e
             exp_buffer.append("push %s %s // %s" %
                               (class_dict[class_name][func_name]['args'][var_name]['kind'],
                                class_dict[class_name][func_name]['args'][var_name]['index'], var_name))
+
             return exp_buffer
 
         elif var_scope == 'member':
-            exp_buffer.append("push this %s // %s" %
-                              (class_dict[class_name]['args'][var_name]['index'], var_name))
+            if class_dict[class_name]['args'][var_name]['kind'] == 'static':
+                exp_buffer.append("push static %s // %s" %
+                                  (class_dict[class_name]['args'][var_name]['index'], var_name))
+
+            elif class_dict[class_name]['args'][var_name]['kind'] == 'field':
+                exp_buffer.append("push this %s // %s" %
+                                  (class_dict[class_name]['args'][var_name]['index'], var_name))
+            else:
+                raise RuntimeError("unexpected kind: '%s'" % class_dict[class_name]['args'][var_name]['kind'])
+
             return exp_buffer
 
     else:
@@ -511,8 +527,16 @@ def compile_var(pcode, class_dict, class_name, func_name, var_name, var_scope, e
             return pcode
 
         elif var_scope == 'member':
-            pcode = store_pcode(pcode, "\npush this %s // %s" %
-                                (class_dict[class_name]['args'][var_name]['index'], var_name))
+            if class_dict[class_name]['args'][var_name]['kind'] == 'static':
+                pcode = store_pcode(pcode, "\npush static %s // %s" %
+                                    (class_dict[class_name]['args'][var_name]['index'], var_name))
+
+            elif class_dict[class_name]['args'][var_name]['kind'] == 'field':
+                pcode = store_pcode(pcode, "\npush this %s // %s" %
+                                    (class_dict[class_name]['args'][var_name]['index'], var_name))
+            else:
+                raise RuntimeError("unexpected kind: '%s'" % class_dict[class_name]['args'][var_name]['kind'])
+
             return pcode
 
 
@@ -1160,7 +1184,7 @@ if __name__ == '__main__':
         [r"..\11\Pong\Ball.jack",  # match
          r"..\11\Pong\Bat.jack",  # match
          r"..\11\Pong\Main.jack",  # match
-         r"..\11\Pong\PongGame.jack"],  # FIXME: static not this, other unknown issues
+         r"..\11\Pong\PongGame.jack"],  # FIXME: unknown issues in moveBall
 
         # [r"..\10\ExpressionLessSquare\Main.jack",  # TODO: doesn't compile on course compiler
         #  r"..\10\ExpressionLessSquare\Square.jack",  # constructor must return 'this'
