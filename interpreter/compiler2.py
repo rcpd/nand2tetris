@@ -880,6 +880,9 @@ def main(filepath, file_list):
             elif elem.text == 'let':
                 statement = 'let'
 
+            elif elem.text == 'return':  # TODO: return has classVarDec as parent in PongGame.moveBall ?
+                statement = 'return'
+
             # set on first instance only
             if elem.text in ('function', 'method', 'constructor'):
                 func_kind = elem.text
@@ -1182,14 +1185,13 @@ if __name__ == '__main__':
          r"..\09\Square\Square.jack",
          r"..\09\Square\SquareGame.jack"],
         [r"..\10\ArrayTest\Main.jack"],
+        [r"..\11\Pong\Ball.jack",
+         r"..\11\Pong\Bat.jack",
+         r"..\11\Pong\Main.jack",
+         r"..\11\Pong\PongGame.jack"],
 
         # wip
         # [r"..\11\ComplexArrays\Main.jack"],  # FIXME: array in rhs expression
-
-        [r"..\11\Pong\Ball.jack",  # match
-         r"..\11\Pong\Bat.jack",  # match
-         r"..\11\Pong\Main.jack",  # match
-         r"..\11\Pong\PongGame.jack"],  # FIXME: unknown issues in moveBall
 
         # [r"..\10\ExpressionLessSquare\Main.jack",  # TODO: doesn't compile on course compiler
         #  r"..\10\ExpressionLessSquare\Square.jack",  # constructor must return 'this'
@@ -1211,6 +1213,10 @@ if __name__ == '__main__':
         r"..\09\Square\Square.vm": 304,
         r"..\09\Square\SquareGame.vm": 179,
         r"..\10\ArrayTest\Main.vm": 183,
+        r"..\11\Pong\Bat.vm": 207,
+        r"..\11\Pong\Ball.vm": 444,
+        r"..\11\Pong\Main.vm": 13,
+        r"..\11\Pong\PongGame.vm": 318,
     }
 
     for file_list in jack_filepaths:
