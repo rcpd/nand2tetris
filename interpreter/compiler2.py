@@ -1156,20 +1156,19 @@ if __name__ == '__main__':
         [r"..\09\Square\Main.jack",
          r"..\09\Square\Square.jack",
          r"..\09\Square\SquareGame.jack"],
+        [r"..\10\ArrayTest\Main.jack"],
 
         # wip
-        # [r"..\10\ExpressionLessSquare\Main.jack",  # FIXME: unexpected identifier
-        #  r"..\10\ExpressionLessSquare\Square.jack",
-        #  r"..\10\ExpressionLessSquare\SquareGame.jack"],
-
-        # [r"..\10\ArrayTest\Main.jack"],  # FIXME: while labels
-
         # [r"..\11\ComplexArrays\Main.jack"],  # FIXME: array in rhs expression
 
         # [r"..\11\Pong\Ball.jack",  # FIXME: unexpected identifier
         #  r"..\11\Pong\Bat.jack",
         #  r"..\11\Pong\Main.jack",
         #  r"..\11\Pong\PongGame.jack"],
+
+        # [r"..\10\ExpressionLessSquare\Main.jack",  # TODO: doesn't compile on course compiler
+        #  r"..\10\ExpressionLessSquare\Square.jack",  # illegal jack code: constructor must return 'this'
+        #  r"..\10\ExpressionLessSquare\SquareGame.jack"],  # illegal jack code: constructor this, run type confusion
     ]
 
     # matched to course compiler
@@ -1178,10 +1177,15 @@ if __name__ == '__main__':
         r"..\09\Average\Main.vm": 149,
         r"..\11\Seven\Main.vm": 10,
         r"..\11\ConvertToBin\Main.vm": 114,
-        r"..\11\Average\Main.vm": 149,
         r"..\09\Fraction\Main.vm": 18,
         r"..\09\Fraction\Fraction.vm": 116,
         r"..\09\HelloWorld\Main.vm": 33,
+        r"..\09\List\Main.vm": 19,
+        r"..\09\List\List.vm": 65,
+        r"..\09\Square\Main.vm": 11,
+        r"..\09\Square\Square.vm": 304,
+        r"..\09\Square\SquareGame.vm": 179,
+        r"..\10\ArrayTest\Main.vm": 183,
     }
 
     for file_list in jack_filepaths:
@@ -1206,7 +1210,6 @@ if __name__ == '__main__':
                         f.write(line + "\n")
 
     # enforce matching for known samples
-    print("\nFinished parsing, results comparison:")
     for match in strict_matches:
         wip = match.replace(".vm", "_out.vm")
         with open(match) as org_file:
@@ -1217,5 +1220,5 @@ if __name__ == '__main__':
                 index += 1
                 if strict_matches[match] and index < strict_matches[match]:
                     raise RuntimeError("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
-                else:
-                    print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
+
+    print("\nAll compilation results match solution!")
