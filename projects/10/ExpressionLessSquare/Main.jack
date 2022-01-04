@@ -11,9 +11,9 @@ class Main {
 
     function void main() {
         var SquareGame game;
-        let game = game;
-        do game.run();
-        do game.dispose();
+        let game = game; // no constructor
+        do game.run(); // invalid object
+        do game.dispose(); // invalid object
         return;
     }
 
@@ -22,9 +22,9 @@ class Main {
         var String s;
         var Array a;
         if (i) {
-            let s = i;
-            let s = j;
-            let a[i] = j;
+            let s = i; // invalid type assignment
+            let s = j; // invalid type assignment
+            let a[i] = j; // no constructor / invalid object
         }
         else {              // There is no else keyword in the Square files.
             let i = i;

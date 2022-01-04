@@ -1173,31 +1173,31 @@ if __name__ == '__main__':
 
     jack_filepaths = [
         # compiled / tested
-        [r"..\09\Average\Main.jack"],
-        [r"..\11\Seven\Main.jack"],
-        [r"..\11\ConvertToBin\Main.jack"],
-        [r"..\09\Fraction\Main.jack",
-         r"..\09\Fraction\Fraction.jack"],
-        [r"..\09\HelloWorld\Main.jack"],
-        [r"..\09\List\Main.jack",
-         r"..\09\List\List.jack"],
-        [r"..\09\Square\Main.jack",
-         r"..\09\Square\Square.jack",
-         r"..\09\Square\SquareGame.jack"],
-        [r"..\10\ArrayTest\Main.jack"],
-        [r"..\11\Pong\Ball.jack",
-         r"..\11\Pong\Bat.jack",
-         r"..\11\Pong\Main.jack",
-         r"..\11\Pong\PongGame.jack"],
+        # [r"..\09\Average\Main.jack"],
+        # [r"..\11\Seven\Main.jack"],
+        # [r"..\11\ConvertToBin\Main.jack"],
+        # [r"..\09\Fraction\Main.jack",
+        #  r"..\09\Fraction\Fraction.jack"],
+        # [r"..\09\HelloWorld\Main.jack"],
+        # [r"..\09\List\Main.jack",
+        #  r"..\09\List\List.jack"],
+        # [r"..\09\Square\Main.jack",
+        #  r"..\09\Square\Square.jack",
+        #  r"..\09\Square\SquareGame.jack"],
+        # [r"..\10\ArrayTest\Main.jack"],
+        # [r"..\11\Pong\Ball.jack",
+        #  r"..\11\Pong\Bat.jack",
+        #  r"..\11\Pong\Main.jack",
+        #  r"..\11\Pong\PongGame.jack"],
 
         # wip
         # [r"..\11\ComplexArrays\Main.jack"],  # FIXME: array in rhs expression
 
         # TODO: add Project 12 test programs
 
-        [r"..\10\ExpressionLessSquare\Main.jack",  # static compilation testing only  # FIXME: var assignment to array
-         r"..\10\ExpressionLessSquare\Square.jack",  # nonsense code that doesn't / shouldn't compile or run
-         r"..\10\ExpressionLessSquare\SquareGame.jack"],  # nonsense code that doesn't / shouldn't compile or run
+        # [r"..\10\ExpressionLessSquare\Main.jack",  # nonsense code that doesn't / shouldn't compile or run
+        #  r"..\10\ExpressionLessSquare\Square.jack",  # nonsense code that doesn't / shouldn't compile or run
+        #  r"..\10\ExpressionLessSquare\SquareGame.jack"],  # nonsense code that doesn't / shouldn't compile or run
     ]
 
     # matched to course compiler

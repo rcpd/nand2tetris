@@ -15,7 +15,7 @@ class Square {
       let y = Ay;
       let size = Asize;
       do draw();
-      return x;
+      return x; // invalid: must return this
    }
 
    method void dispose() {
