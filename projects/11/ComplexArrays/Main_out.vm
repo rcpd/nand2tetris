@@ -402,9 +402,9 @@ call Output.println 0
 pop temp 0
 push constant 0
 pop local 2
+push local 2
 push constant 0
 eq
-push local 2
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
