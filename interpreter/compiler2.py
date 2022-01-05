@@ -109,8 +109,17 @@ def store_pcode(pcode, cmd, debug=True):
     """
 
     if debug:
-        if cmd.strip() not in ("", "// (", "// )"):
-            print("PCODE: %s" % cmd.strip())
+        # TODO: for performance reasons this should not be persistent not called every time
+        count = 0
+        for p in pcode:
+            if not p.startswith("//"):
+                count += 1
+
+        if not cmd.strip().startswith("//"):
+            count += 1
+            print("PCODE(%s): %s" % (count, cmd.strip()))
+        else:
+            print("PCODE(--): %s" % (cmd.strip()))
 
     # overwrite at end if successful
     # don't append empty debug "write" calls
