@@ -104,11 +104,7 @@ push local 2
 add
 pop pointer 1
 push that 0
-push local 2
-pop temp 0
-pop pointer 1
-push temp 0
-pop that 0
+pop local 2
 push constant 43
 call String.new 1
 push constant 84
@@ -405,11 +401,7 @@ pop temp 0
 call Output.println 0
 pop temp 0
 push constant 0
-push local 2
-pop temp 0
-pop pointer 1
-push temp 0
-pop that 0
+pop local 2
 push constant 0
 eq
 push local 2
@@ -425,11 +417,7 @@ push local 0
 add
 pop pointer 1
 push that 0
-push local 2
-pop temp 0
-pop pointer 1
-push temp 0
-pop that 0
+pop local 2
 push constant 1
 push local 2
 add
@@ -443,11 +431,7 @@ push local 0
 add
 pop pointer 1
 push that 0
-push local 2
-pop temp 0
-pop pointer 1
-push temp 0
-pop that 0
+pop local 2
 push constant 1
 push local 2
 add
@@ -461,11 +445,7 @@ push local 0
 add
 pop pointer 1
 push that 0
-push local 1
-pop temp 0
-pop pointer 1
-push temp 0
-pop that 0
+pop local 1
 push constant 1
 push local 1
 add
@@ -708,10 +688,14 @@ push constant 1
 sub
 pop argument 1
 push argument 1
-pop argument 0
+push argument 0
 add
 push constant 3
 call Array.new 1
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
 goto WHILE_EXP0
 label WHILE_END0
 push constant 0

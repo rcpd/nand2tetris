@@ -119,7 +119,7 @@ def store_pcode(pcode, cmd, debug=True):
             count += 1
             print("PCODE(%s): %s" % (count, cmd.strip()))
         else:
-            print("PCODE(--): %s" % (cmd.strip()))
+            print("PCODE(%s): %s" % (len(str(count))*"-", cmd.strip()))
 
     # overwrite at end if successful
     # don't append empty debug "write" calls
@@ -288,21 +288,13 @@ def compile_assignment(class_dict, class_name, func_name, var_name, exp_buffer, 
             else:
                 raise RuntimeError("unexpected kind: '%s'" % class_dict[class_name]['args'][var_name]['kind'])
 
-    elif not class_dict[class_name][func_name]['args'][var_name]['initialized']:
-        # array constructor
-        exp_buffer.append("pop %s %s // %s =" % (class_dict[class_name][func_name]['args'][var_name]['kind'],
-                                                 class_dict[class_name][func_name]['args'][var_name]['index'],
-                                                 var_name))
     else:
-        # array[index] assignment
-        exp_buffer.append("pop that 0 // **array[index] = result")
-        exp_buffer.append("push temp 0 // restore result")
-        exp_buffer.append("pop pointer 1 // that = *array[index]")
-        exp_buffer.append("pop temp 0 // save result (rhs/call/expression)")
-        exp_buffer.append("push %s %s // %s (*array var)" %
-                          (class_dict[class_name][func_name]['args'][var_name]['kind'],
-                           class_dict[class_name][func_name]['args'][var_name]['index'], var_name))
-        lhs_array = None  # None signifies lhs_array was true but now compiled/consumed
+        # assignment to an array var (constructor or overwriting the pointer)
+        # this is speculative and will be reversed if next symbol is [
+        # (i.e. assignment was intended for array content not array itself)
+        exp_buffer.append("pop %s %s // %s = (array var)"
+                          % (class_dict[class_name][func_name]['args'][var_name]['kind'],
+                             class_dict[class_name][func_name]['args'][var_name]['index'], var_name))
 
     if var_scope == 'local':
         class_dict[class_name][func_name]['args'][var_name]['initialized'] = True
@@ -843,6 +835,10 @@ def main(filepath, file_list):
         if elem.tag == 'class':
             continue
 
+        if lhs_array:
+            if not elem.tag == 'symbol' and not elem.text == '[':
+                lhs_array = None  # None signifies lhs_array was true but now compiled/consumed
+
         if end_block:
             if block:
                 # TODO: compile_end_block
@@ -1074,6 +1070,18 @@ def main(filepath, file_list):
                 end_block = True  # compilation triggered on next token due to if-no-else case
 
             elif symbol == "[":
+                if lhs_array:
+                    # array[index] (content) assignment
+                    exp_buffer.pop()  # remove the previous entry which assumed assignment to array var
+                    exp_buffer.append("pop that 0 // **array[index] = result")
+                    exp_buffer.append("push temp 0 // restore result")
+                    exp_buffer.append("pop pointer 1 // that = *array[index]")
+                    exp_buffer.append("pop temp 0 // save result (rhs/call/expression)")
+                    exp_buffer.append("push %s %s // %s (*array var)" %
+                                      (class_dict[class_name][func_name]['args'][identifier]['kind'],
+                                       class_dict[class_name][func_name]['args'][identifier]['index'], identifier))
+                    lhs_array = None  # None signifies lhs_array was true but now compiled/consumed
+
                 # mark the start of a new expression
                 pcode, exp_buffer, parent_obj, child_func = \
                     expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
