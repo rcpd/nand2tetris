@@ -35,11 +35,15 @@ pop that 0
 push constant 3
 push local 0
 add
+pop pointer 1
+push that 0
 push local 1
 add
 push constant 3
 push local 0
 add
+pop pointer 1
+push that 0
 push constant 3
 add
 pop temp 0
@@ -49,19 +53,29 @@ pop that 0
 push constant 3
 push local 0
 add
+pop pointer 1
+push that 0
 push local 1
 add
+pop pointer 1
+push that 0
 push local 0
 add
 push constant 5
 push local 0
 add
+pop pointer 1
+push that 0
 push local 0
 add
+pop pointer 1
+push that 0
 push constant 7
 push constant 3
 push local 0
 add
+pop pointer 1
+push that 0
 sub
 push constant 2
 call Main.double 1
@@ -70,6 +84,8 @@ push constant 1
 add
 push local 1
 add
+pop pointer 1
+push that 0
 call Math.multiply 2
 pop temp 0
 pop pointer 1
@@ -86,6 +102,8 @@ pop that 0
 push constant 0
 push local 2
 add
+pop pointer 1
+push that 0
 push local 2
 pop temp 0
 pop pointer 1
@@ -405,6 +423,8 @@ pop temp 0
 push constant 3
 push local 0
 add
+pop pointer 1
+push that 0
 push local 2
 pop temp 0
 pop pointer 1
@@ -421,6 +441,8 @@ pop that 0
 push constant 7
 push local 0
 add
+pop pointer 1
+push that 0
 push local 2
 pop temp 0
 pop pointer 1
@@ -437,6 +459,8 @@ pop that 0
 push constant 3
 push local 0
 add
+pop pointer 1
+push that 0
 push local 1
 pop temp 0
 pop pointer 1
@@ -448,9 +472,13 @@ add
 push constant 1
 push local 1
 add
+pop pointer 1
+push that 0
 push constant 1
 push local 2
 add
+pop pointer 1
+push that 0
 add
 pop temp 0
 pop pointer 1

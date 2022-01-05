@@ -216,7 +216,7 @@ def compile_statement(pcode=None, statement=None, class_dict=None, class_name=No
         pass
 
     elif statement == "let":
-        exp_buffer, class_dict = \
+        exp_buffer, class_dict, lhs_array = \
             compile_assignment(class_dict=class_dict, class_name=class_name, func_name=func_name, var_name=var_name,
                                exp_buffer=exp_buffer, lhs_array=lhs_array, var_scope=var_scope)
 
@@ -251,7 +251,7 @@ def compile_statement(pcode=None, statement=None, class_dict=None, class_name=No
     else:
         raise RuntimeError("Unexpected statement type '%s'" % statement)
 
-    return pcode, class_dict, num_args, while_count, if_count, exp_buffer
+    return pcode, class_dict, num_args, while_count, if_count, exp_buffer, lhs_array
 
 
 def compile_assignment(class_dict, class_name, func_name, var_name, exp_buffer, lhs_array, var_scope):
@@ -293,13 +293,14 @@ def compile_assignment(class_dict, class_name, func_name, var_name, exp_buffer, 
         exp_buffer.append("push %s %s // %s (*array var)" %
                           (class_dict[class_name][func_name]['args'][var_name]['kind'],
                            class_dict[class_name][func_name]['args'][var_name]['index'], var_name))
+        lhs_array = None  # None signifies lhs_array was true but now compiled/consumed
 
     if var_scope == 'local':
         class_dict[class_name][func_name]['args'][var_name]['initialized'] = True
     elif var_scope == 'member':
         class_dict[class_name]['args'][var_name]['initialized'] = True
 
-    return exp_buffer, class_dict
+    return exp_buffer, class_dict, lhs_array
 
 
 def compile_vardec(pcode, class_dict, class_name, func_name, var_kind, var_type, var_name, prescan=False):
@@ -789,12 +790,12 @@ def main(filepath, file_list):
 
                     # no if_count, while_count, exp_buffer during pre_scan
                     if keyword in ('field', 'static'):
-                        pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
+                        pcode, class_dict, num_args, while_count, if_count, exp_buffer, lhs_array = \
                             compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
                                               class_name=class_name, func_name=func_name, var_type=var_type,
                                               var_name=identifier, var_kind=keyword, prescan=True)
                     else:
-                        pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
+                        pcode, class_dict, num_args, while_count, if_count, exp_buffer, lhs_array = \
                             compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
                                               class_name=class_name, func_name=func_name, var_type=var_type,
                                               var_name=identifier, prescan=True)
@@ -828,6 +829,7 @@ def main(filepath, file_list):
     for elem in tree.iter():
         elem.tag = (elem.tag or '')
         elem.text = (elem.text or '')[1:-1]  # strip outermost padding
+
         # skip rootnode
         if elem.tag == 'class':
             continue
@@ -950,7 +952,7 @@ def main(filepath, file_list):
                             raise RuntimeError("No type found for '%s'" % identifier)
 
                     if keyword in ('field', 'static'):
-                        pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
+                        pcode, class_dict, num_args, while_count, if_count, exp_buffer, lhs_array = \
                             compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
                                               class_name=class_name, func_name=func_name, var_type=var_type,
                                               var_name=identifier, while_count=while_count, if_count=if_count,
@@ -959,7 +961,7 @@ def main(filepath, file_list):
                         if not var_kind and var_type in kinds:
                             var_kind = var_type
 
-                        pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
+                        pcode, class_dict, num_args, while_count, if_count, exp_buffer, lhs_array = \
                             compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
                                               class_name=class_name, func_name=func_name, var_type=var_type,
                                               var_name=identifier, while_count=while_count, if_count=if_count,
@@ -983,16 +985,20 @@ def main(filepath, file_list):
                         if lhs_var_name in class_dict[class_name][func_name]['args']:
                             var_scope = 'local'
                             if class_dict[class_name][func_name]['args'][lhs_var_name]['type'] == 'Array':
-                                lhs_array = True
+                                # None signifies lhs_array was true but already compiled/consumed
+                                if lhs_array is not None:
+                                    lhs_array = True
 
                         elif lhs_var_name in class_dict[class_name]['args']:
                             var_scope = 'member'
                             if class_dict[class_name]['args'][lhs_var_name]['type'] == 'Array':
-                                lhs_array = True
+                                # None signifies lhs_array was true but already compiled/consumed
+                                if lhs_array is not None:
+                                    lhs_array = True
                         else:
                             raise RuntimeError("var not found: %s" % lhs_var_name)
 
-                        pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
+                        pcode, class_dict, num_args, while_count, if_count, exp_buffer, lhs_array = \
                             compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
                                               class_name=class_name, func_name=func_name, var_name=identifier,
                                               exp_buffer=exp_buffer, while_count=while_count, if_count=if_count,
@@ -1073,13 +1079,9 @@ def main(filepath, file_list):
                 pcode = store_pcode(pcode, "add // *array var + [index]")
 
                 # if part of an expression deref the array[index] immediately
-                # FIXME: how to deref arrays in expression that doesn't also activate on LHS premuaturely?
-                #  let b[a[3]] = a[3] + 3;
-                if not lhs_array:
+                if not lhs_array and not find_parent(tree, elem).tag == "letStatement":
                     pcode = store_pcode(pcode, "pop pointer 1 // *that =")
                     pcode = store_pcode(pcode, "push that 0 // **that (array[index])")
-                else:
-                    pass  # <<
 
             elif symbol == "(":
                 # mark the start of a new expression
@@ -1103,7 +1105,7 @@ def main(filepath, file_list):
                 pcode, exp_buffer = pop_buffer(pcode, exp_buffer)  # empty the buffer
 
                 if statement == 'return':
-                    pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
+                    pcode, class_dict, num_args, while_count, if_count, exp_buffer, lhs_array = \
                         compile_statement(pcode=pcode, class_dict=class_dict, class_name=class_name,
                                           func_name=func_name, statement=statement, while_count=while_count,
                                           if_count=if_count)
@@ -1133,7 +1135,7 @@ def main(filepath, file_list):
             pcode = store_pcode(pcode, "\n// begin if expression")
         elif elem.tag == 'whileStatement':
             statement = 'while'
-            pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
+            pcode, class_dict, num_args, while_count, if_count, exp_buffer, lhs_array = \
                 compile_statement(pcode=pcode, statement=statement, class_dict=class_dict, num_args=num_args,
                                   while_count=while_count, if_count=if_count, exp_buffer=exp_buffer,
                                   class_name=class_name)
