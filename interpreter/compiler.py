@@ -1201,7 +1201,7 @@ def main(filepath, file_list):
     return pcode
 
 
-if __name__ == '__main__':
+def run(jack_filepaths, strict_matches):
     """
     loop across multiple files:
         - update the object list
@@ -1210,6 +1210,43 @@ if __name__ == '__main__':
         - where possible, enforce match to course compiled programs
     """
 
+    for file_list in jack_filepaths:
+        # check external modules at runtime
+        for _filepath in file_list:
+            if os.path.basename(_filepath).replace(".jack", "") not in objects:
+                objects.append(os.path.basename(_filepath).replace(".jack", ""))
+
+        for _filepath in file_list:
+            pcode = main(_filepath, file_list)
+
+            # strip debug for result comparison
+            with open(_filepath.replace(".jack", "_out.vm"), "w") as f:
+                print("\nWriting: %s" % _filepath.replace(".jack", "_out.vm"))
+                for line in pcode:
+                    comment = line.find("//")
+                    if line.startswith("//"):
+                        continue
+                    elif comment:
+                        f.write(line[:comment].strip() + "\n")
+                    else:
+                        f.write(line + "\n")
+
+    # enforce matching for known samples
+    for match in strict_matches:
+        wip = match.replace(".vm", "_out.vm")
+        with open(match) as org_file:
+            with open(wip) as cur_file:
+                for index, (solution, current) in enumerate(zip(org_file, cur_file)):
+                    if solution != current:
+                        break
+                index += 1
+                if strict_matches[match] and index < strict_matches[match]:
+                    raise RuntimeError("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
+
+    print("\nAll compilation results match solution!")
+
+
+if __name__ == '__main__':
     jack_filepaths = [
         # compiled / tested
         [r"..\09\Average\Main.jack"],
@@ -1259,37 +1296,4 @@ if __name__ == '__main__':
         r"..\11\ComplexArrays\Main.vm": 702,
     }
 
-    for file_list in jack_filepaths:
-        # check external modules at runtime
-        for _filepath in file_list:
-            if os.path.basename(_filepath).replace(".jack", "") not in objects:
-                objects.append(os.path.basename(_filepath).replace(".jack", ""))
-
-        for _filepath in file_list:
-            pcode = main(_filepath, file_list)
-
-            # strip debug for result comparison
-            with open(_filepath.replace(".jack", "_out.vm"), "w") as f:
-                print("\nWriting: %s" % _filepath.replace(".jack", "_out.vm"))
-                for line in pcode:
-                    comment = line.find("//")
-                    if line.startswith("//"):
-                        continue
-                    elif comment:
-                        f.write(line[:comment].strip() + "\n")
-                    else:
-                        f.write(line + "\n")
-
-    # enforce matching for known samples
-    for match in strict_matches:
-        wip = match.replace(".vm", "_out.vm")
-        with open(match) as org_file:
-            with open(wip) as cur_file:
-                for index, (solution, current) in enumerate(zip(org_file, cur_file)):
-                    if solution != current:
-                        break
-                index += 1
-                if strict_matches[match] and index < strict_matches[match]:
-                    raise RuntimeError("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
-
-    print("\nAll compilation results match solution!")
+    run(jack_filepaths, strict_matches)
