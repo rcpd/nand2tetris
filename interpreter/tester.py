@@ -1,5 +1,6 @@
 """
 Parse Nand2Tetris test files and execute them in the Nand2Tetris Python Interpreter
+Equivalent to the course provided CPUEmulator in non-interactive mode
 """
 
 import re
@@ -144,9 +145,7 @@ def load_cmp(cmp_filepath, debug=False):
 
 if __name__ == '__main__':
     tst_filepaths = [
-        # week 5 and below use different multi row format (tested manually)
-        # "../04/fill/fill.tst",  # no cmp, no meaningful test
-        # "../04/mult/mult.tst",
+        # week 5 and below use different multi row format (tested with HardwareSimulator/CPUEmulator)
 
         r"..\projects\07\MemoryAccess\BasicTest\BasicTest.tst",
         r"..\projects\07\MemoryAccess\PointerTest\PointerTest.tst",
