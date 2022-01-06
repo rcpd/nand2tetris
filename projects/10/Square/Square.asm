@@ -2511,11 +2511,11 @@ A=M-D // *LCL-5 (*LCL)
 A=M // d = [LCL-5] (*LCL)
 0;JMP // return (jump to RIP)
 
-// (-275) function Main.test 4
-(Main.test) // function Main.test 4
+// (-275) function Main.more 4
+(Main.more) // function Main.more 4
 
 // (-278) push constant 0
-@0 // push constant 0 // function Main.test 4
+@0 // push constant 0 // function Main.more 4
 D=A
 @SP
 A=M

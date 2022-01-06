@@ -13,7 +13,6 @@ label IF_FALSE0
 push argument 0
 call Memory.alloc 1
 return
-
 function Array.dispose 0
 push argument 0
 pop pointer 0

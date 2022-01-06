@@ -1279,7 +1279,7 @@ if __name__ == '__main__':
         # all
         r"..\09\Average\Main.vm": 149,
         r"..\11\Seven\Main.vm": 10,
-        r"..\11\ConvertToBin\Main.vm": 114,
+        r"..\11\ConvertToBin\Main.vm": 109,
         r"..\09\Fraction\Main.vm": 18,
         r"..\09\Fraction\Fraction.vm": 116,
         r"..\09\HelloWorld\Main.vm": 33,

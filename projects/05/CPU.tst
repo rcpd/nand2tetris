@@ -18,16 +18,16 @@ tick, output, tock, output;
 set instruction %B0101101110100000, // @23456
 tick, output, tock, output;
 
-set instruction %B1110000111010000, // D=A-D
+set instruction %B1110000111110000, // AD=A-D
 tick, output, tock, output;
 
-set instruction %B0000001111101000, // @1000
+set instruction %B0000001111101011, // @1003
 tick, output, tock, output;
 
 set instruction %B1110001100001000, // M=D
 tick, output, tock, output;
 
-set instruction %B0000001111101001, // @1001
+set instruction %B0000001111101100, // @1004
 tick, output, tock, output;
 
 set instruction %B1110001110011000, // MD=D-1
@@ -36,7 +36,7 @@ tick, output, tock, output;
 set instruction %B0000001111101000, // @1000
 tick, output, tock, output;
 
-set instruction %B1111010011010000, // D=D-M
+set instruction %B1111010011110000, // AD=D-M
 set inM 11111,
 tick, output, tock, output;
 
@@ -49,10 +49,10 @@ tick, output, tock, output;
 set instruction %B0000001111100111, // @999
 tick, output, tock, output;
 
-set instruction %B1110110111100000, // A=A+1
+set instruction %B1111110111100000, // A=M+1
 tick, output, tock, output;
 
-set instruction %B1110001100001000, // M=D
+set instruction %B1110001100101000, // AM=D
 tick, output, tock, output;
 
 set instruction %B0000000000010101, // @21
@@ -64,7 +64,13 @@ tick, output, tock, output;
 set instruction %B0000000000000010, // @2
 tick, output, tock, output;
 
-set instruction %B1110000010010000, // D=D+A
+set instruction %B1110000010111000, // AMD=D+A
+tick, output, tock, output;
+
+set instruction %B1111110111001000, // M=M+1
+tick, output, tock, output;
+
+set instruction %B1111110010101000, // AM=M-1
 tick, output, tock, output;
 
 set instruction %B0000001111101000, // @1000
