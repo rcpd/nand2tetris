@@ -7353,7 +7353,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-906) pop static 1
-@16 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // pop static 1 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -7449,7 +7449,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-913) pop static 0
-@16 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // pop static 0 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -7478,7 +7478,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-917) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @0
 A=D+A
@@ -7726,7 +7726,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-957) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @0
 A=D+A
@@ -7783,7 +7783,7 @@ M=M-D
 M=M+1
 
 // (-967) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @0
 A=D+A
@@ -7872,7 +7872,7 @@ M=M-D
 M=M+1
 
 // (-981) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @0
 A=D+A
@@ -9042,7 +9042,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1162) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @0
 A=D+A
@@ -9272,7 +9272,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1202) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @0
 A=D+A
@@ -10066,7 +10066,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1337) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @1
 A=D+A
@@ -10471,7 +10471,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1387) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @1
 A=D+A
@@ -10572,7 +10572,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1403) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @1
 A=D+A
@@ -10775,7 +10775,7 @@ M=D+M
 M=M+1
 
 // (-1439) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @1
 A=D+A
@@ -10811,7 +10811,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1445) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @1
 A=D+A
@@ -10879,7 +10879,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1455) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @1
 A=D+A
@@ -11052,7 +11052,7 @@ M=D+M
 M=M+1
 
 // (-1479) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @1
 A=D+A
@@ -11419,7 +11419,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1554) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @1
 A=D+A
@@ -11614,7 +11614,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1590) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @0
 A=D+A
@@ -11726,7 +11726,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1606) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @1
 A=D+A
@@ -12346,7 +12346,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1713) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Math.vm)
 D=A
 @0
 A=D+A
@@ -13299,7 +13299,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-1870) pop static 0
-@18 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Memory.vm)
+@18 // pop static 0 // static + src segment offset (..\projects\11\ConvertToBin\Memory.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -13328,7 +13328,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1874) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Memory.vm)
 D=A
 @0
 A=D+A
@@ -13442,7 +13442,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1890) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Memory.vm)
 D=A
 @0
 A=D+A
@@ -13632,7 +13632,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-1915) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Memory.vm)
 D=A
 @0
 A=D+A
@@ -13764,7 +13764,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-1932) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Memory.vm)
 D=A
 @0
 A=D+A
@@ -17189,7 +17189,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-2483) pop static 4
-@19 // pop static 4 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 4 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @4 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -17226,7 +17226,7 @@ M=!M
 M=M+1
 
 // (-2489) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -17255,7 +17255,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2493) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -17284,7 +17284,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2497) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -17380,7 +17380,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-2504) pop static 3
-@19 // pop static 3 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 3 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @3 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -17777,7 +17777,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-2542) pop static 5
-@19 // pop static 5 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 5 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @5 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -37562,7 +37562,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-5538) push static 5
-@19 // push static 5 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 5 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @5
 A=D+A
@@ -39106,7 +39106,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-5742) pop static 6
-@19 // pop static 6 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 6 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @6 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -39245,7 +39245,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-5766) push static 5
-@19 // push static 5 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 5 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @5
 A=D+A
@@ -39429,7 +39429,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-5785) push static 6
-@19 // push static 6 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 6 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @6
 A=D+A
@@ -40413,7 +40413,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE0) // label IF_FALSE0
 
 // (-5955) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @2
 A=D+A
@@ -40463,7 +40463,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-5966) push static 5
-@19 // push static 5 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 5 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @5
 A=D+A
@@ -40558,7 +40558,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-5983) push static 6
-@19 // push static 6 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 6 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @6
 A=D+A
@@ -40821,7 +40821,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6014) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @1
 A=D+A
@@ -40931,7 +40931,7 @@ D=M-D // d = [val1] - [val2] // leave esp here (pop equivalent)
 D;JNE // jump if not zero
 
 // (-6034) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @2
 A=D+A
@@ -40981,7 +40981,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6045) push static 4
-@19 // push static 4 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 4 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @4
 A=D+A
@@ -41105,7 +41105,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6068) push static 4
-@19 // push static 4 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 4 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @4
 A=D+A
@@ -41217,7 +41217,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6087) push static 4
-@19 // push static 4 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 4 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @4
 A=D+A
@@ -42068,7 +42068,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-6217) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -42242,7 +42242,7 @@ M=D+M
 M=M+1
 
 // (-6240) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @0
 A=D+A
@@ -42266,7 +42266,7 @@ M=D+M
 M=M+1
 
 // (-6244) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -42298,7 +42298,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6248) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @0
 A=D+A
@@ -42458,7 +42458,7 @@ M=D // [esp] = eq result
 M=M+1 // *esp++
 
 // (-6270) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -43306,7 +43306,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6373) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @2
 A=D+A
@@ -43352,7 +43352,7 @@ D;JNE // jump if not zero
 (Output.IF_TRUE2) // label IF_TRUE2
 
 // (-6384) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @0
 A=D+A
@@ -43385,7 +43385,7 @@ M=D+M
 M=M+1
 
 // (-6390) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -43405,7 +43405,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6392) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @1
 A=D+A
@@ -43438,7 +43438,7 @@ M=D+M
 M=M+1
 
 // (-6398) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -43461,7 +43461,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE2) // label IF_FALSE2
 
 // (-6403) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @0
 A=D+A
@@ -43638,7 +43638,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE3) // label IF_FALSE3
 
 // (-6431) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @2
 A=D+A
@@ -43658,7 +43658,7 @@ M=!M
 M=M+1
 
 // (-6435) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -44252,7 +44252,7 @@ A=M // d = [LCL-5] (*LCL)
 (Output.printInt) // function Output.printInt 0
 
 // (-6512) push static 3
-@19 // push static 3 // function Output.printInt 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 3 // function Output.printInt 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @3
 A=D+A
@@ -44398,7 +44398,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6529) push static 3
-@19 // push static 3 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 3 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @3
 A=D+A
@@ -44589,7 +44589,7 @@ A=M // d = [LCL-5] (*LCL)
 (Output.println) // function Output.println 0
 
 // (-6549) push static 1
-@19 // push static 1 // function Output.println 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 1 // function Output.println 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @1
 A=D+A
@@ -44621,7 +44621,7 @@ M=D+M
 M=M+1
 
 // (-6555) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @0
 A=D+A
@@ -44645,7 +44645,7 @@ M=M-D
 M=M+1
 
 // (-6559) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -44674,7 +44674,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6563) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -44711,7 +44711,7 @@ M=!M
 M=M+1
 
 // (-6569) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -44731,7 +44731,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6571) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @1
 A=D+A
@@ -44814,7 +44814,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6589) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -44911,7 +44911,7 @@ A=M // d = [LCL-5] (*LCL)
 (Output.backSpace) // function Output.backSpace 0
 
 // (-6603) push static 2
-@19 // push static 2 // function Output.backSpace 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 2 // function Output.backSpace 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @2
 A=D+A
@@ -44948,7 +44948,7 @@ D;JNE // jump if not zero
 (Output.IF_TRUE0) // label IF_TRUE0
 
 // (-6612) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @0
 A=D+A
@@ -45022,7 +45022,7 @@ D;JNE // jump if not zero
 (Output.IF_TRUE1) // label IF_TRUE1
 
 // (-6628) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @0
 A=D+A
@@ -45055,7 +45055,7 @@ M=M-D
 M=M+1
 
 // (-6634) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -45075,7 +45075,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6636) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @1
 A=D+A
@@ -45108,7 +45108,7 @@ M=M-D
 M=M+1
 
 // (-6642) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -45144,7 +45144,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6651) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -45164,7 +45164,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6653) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @1
 A=D+A
@@ -45247,7 +45247,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6671) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -45270,7 +45270,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE2) // label IF_FALSE2
 
 // (-6676) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @1
 A=D+A
@@ -45303,7 +45303,7 @@ M=M-D
 M=M+1
 
 // (-6682) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -45335,7 +45335,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6689) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -45379,7 +45379,7 @@ M=!M
 M=M+1
 
 // (-6700) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\ConvertToBin\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -45616,7 +45616,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-6731) pop static 1
-@26 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // pop static 1 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -45653,7 +45653,7 @@ M=!M
 M=M+1
 
 // (-6737) pop static 2
-@26 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // pop static 2 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -45749,7 +45749,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-6744) pop static 0
-@26 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // pop static 0 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -45778,7 +45778,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6748) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @0
 A=D+A
@@ -46026,7 +46026,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6788) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @0
 A=D+A
@@ -46083,7 +46083,7 @@ M=M-D
 M=M+1
 
 // (-6798) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @0
 A=D+A
@@ -46172,7 +46172,7 @@ M=M-D
 M=M+1
 
 // (-6812) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @0
 A=D+A
@@ -46482,7 +46482,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6862) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @1
 A=D+A
@@ -46721,7 +46721,7 @@ A=M // d = [LCL-5] (*LCL)
 (Screen.updateLocation) // function Screen.updateLocation 0
 
 // (-6898) push static 2
-@26 // push static 2 // function Screen.updateLocation 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // push static 2 // function Screen.updateLocation 0 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @2
 A=D+A
@@ -46770,7 +46770,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6909) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @1
 A=D+A
@@ -46806,7 +46806,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6915) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @1
 A=D+A
@@ -46977,7 +46977,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6942) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @1
 A=D+A
@@ -47013,7 +47013,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6948) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @1
 A=D+A
@@ -47261,7 +47261,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-6984) pop static 2
-@26 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // pop static 2 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -48229,7 +48229,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7121) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @0
 A=D+A
@@ -52831,7 +52831,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7791) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @0
 A=D+A
@@ -52969,7 +52969,7 @@ M=D+M
 M=M+1
 
 // (-7813) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @0
 A=D+A
@@ -55767,7 +55767,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8192) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @0
 A=D+A
@@ -55905,7 +55905,7 @@ M=D+M
 M=M+1
 
 // (-8214) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ConvertToBin\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ConvertToBin\Screen.vm)
 D=A
 @0
 A=D+A

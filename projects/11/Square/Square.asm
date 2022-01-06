@@ -12252,7 +12252,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-1532) pop static 1
-@16 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // pop static 1 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -12348,7 +12348,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-1539) pop static 0
-@16 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // pop static 0 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -12377,7 +12377,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1543) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @0
 A=D+A
@@ -12625,7 +12625,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1583) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @0
 A=D+A
@@ -12682,7 +12682,7 @@ M=M-D
 M=M+1
 
 // (-1593) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @0
 A=D+A
@@ -12771,7 +12771,7 @@ M=M-D
 M=M+1
 
 // (-1607) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @0
 A=D+A
@@ -13941,7 +13941,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1788) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @0
 A=D+A
@@ -14171,7 +14171,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1828) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @0
 A=D+A
@@ -14965,7 +14965,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1963) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @1
 A=D+A
@@ -15370,7 +15370,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2013) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @1
 A=D+A
@@ -15471,7 +15471,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2029) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @1
 A=D+A
@@ -15674,7 +15674,7 @@ M=D+M
 M=M+1
 
 // (-2065) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @1
 A=D+A
@@ -15710,7 +15710,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2071) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @1
 A=D+A
@@ -15778,7 +15778,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2081) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @1
 A=D+A
@@ -15951,7 +15951,7 @@ M=D+M
 M=M+1
 
 // (-2105) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @1
 A=D+A
@@ -16318,7 +16318,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2180) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @1
 A=D+A
@@ -16513,7 +16513,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2216) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @0
 A=D+A
@@ -16625,7 +16625,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2232) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @1
 A=D+A
@@ -17245,7 +17245,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2339) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\Square\Math.vm)
 D=A
 @0
 A=D+A
@@ -18198,7 +18198,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-2496) pop static 0
-@18 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Memory.vm)
+@18 // pop static 0 // static + src segment offset (..\projects\11\Square\Memory.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -18227,7 +18227,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2500) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\11\Square\Memory.vm)
 D=A
 @0
 A=D+A
@@ -18341,7 +18341,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2516) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\11\Square\Memory.vm)
 D=A
 @0
 A=D+A
@@ -18531,7 +18531,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-2541) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\11\Square\Memory.vm)
 D=A
 @0
 A=D+A
@@ -18663,7 +18663,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-2558) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\11\Square\Memory.vm)
 D=A
 @0
 A=D+A
@@ -22088,7 +22088,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-3109) pop static 4
-@19 // pop static 4 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 4 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @4 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -22125,7 +22125,7 @@ M=!M
 M=M+1
 
 // (-3115) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -22154,7 +22154,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-3119) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -22183,7 +22183,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-3123) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -22279,7 +22279,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-3130) pop static 3
-@19 // pop static 3 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 3 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @3 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -22676,7 +22676,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-3168) pop static 5
-@19 // pop static 5 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 5 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @5 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -42461,7 +42461,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6164) push static 5
-@19 // push static 5 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 5 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @5
 A=D+A
@@ -44005,7 +44005,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-6368) pop static 6
-@19 // pop static 6 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 6 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @6 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -44144,7 +44144,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6392) push static 5
-@19 // push static 5 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 5 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @5
 A=D+A
@@ -44328,7 +44328,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6411) push static 6
-@19 // push static 6 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 6 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @6
 A=D+A
@@ -45312,7 +45312,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE0) // label IF_FALSE0
 
 // (-6581) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @2
 A=D+A
@@ -45362,7 +45362,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6592) push static 5
-@19 // push static 5 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 5 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @5
 A=D+A
@@ -45457,7 +45457,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6609) push static 6
-@19 // push static 6 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 6 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @6
 A=D+A
@@ -45720,7 +45720,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6640) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @1
 A=D+A
@@ -45830,7 +45830,7 @@ D=M-D // d = [val1] - [val2] // leave esp here (pop equivalent)
 D;JNE // jump if not zero
 
 // (-6660) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @2
 A=D+A
@@ -45880,7 +45880,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6671) push static 4
-@19 // push static 4 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 4 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @4
 A=D+A
@@ -46004,7 +46004,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6694) push static 4
-@19 // push static 4 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 4 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @4
 A=D+A
@@ -46116,7 +46116,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6713) push static 4
-@19 // push static 4 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 4 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @4
 A=D+A
@@ -46967,7 +46967,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-6843) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -47141,7 +47141,7 @@ M=D+M
 M=M+1
 
 // (-6866) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @0
 A=D+A
@@ -47165,7 +47165,7 @@ M=D+M
 M=M+1
 
 // (-6870) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -47197,7 +47197,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6874) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @0
 A=D+A
@@ -47357,7 +47357,7 @@ M=D // [esp] = eq result
 M=M+1 // *esp++
 
 // (-6896) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -48205,7 +48205,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6999) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @2
 A=D+A
@@ -48251,7 +48251,7 @@ D;JNE // jump if not zero
 (Output.IF_TRUE2) // label IF_TRUE2
 
 // (-7010) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @0
 A=D+A
@@ -48284,7 +48284,7 @@ M=D+M
 M=M+1
 
 // (-7016) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -48304,7 +48304,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-7018) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @1
 A=D+A
@@ -48337,7 +48337,7 @@ M=D+M
 M=M+1
 
 // (-7024) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -48360,7 +48360,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE2) // label IF_FALSE2
 
 // (-7029) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @0
 A=D+A
@@ -48537,7 +48537,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE3) // label IF_FALSE3
 
 // (-7057) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @2
 A=D+A
@@ -48557,7 +48557,7 @@ M=!M
 M=M+1
 
 // (-7061) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -49151,7 +49151,7 @@ A=M // d = [LCL-5] (*LCL)
 (Output.printInt) // function Output.printInt 0
 
 // (-7138) push static 3
-@19 // push static 3 // function Output.printInt 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 3 // function Output.printInt 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @3
 A=D+A
@@ -49297,7 +49297,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-7155) push static 3
-@19 // push static 3 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 3 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @3
 A=D+A
@@ -49488,7 +49488,7 @@ A=M // d = [LCL-5] (*LCL)
 (Output.println) // function Output.println 0
 
 // (-7175) push static 1
-@19 // push static 1 // function Output.println 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 1 // function Output.println 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @1
 A=D+A
@@ -49520,7 +49520,7 @@ M=D+M
 M=M+1
 
 // (-7181) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @0
 A=D+A
@@ -49544,7 +49544,7 @@ M=M-D
 M=M+1
 
 // (-7185) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -49573,7 +49573,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7189) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -49610,7 +49610,7 @@ M=!M
 M=M+1
 
 // (-7195) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -49630,7 +49630,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-7197) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @1
 A=D+A
@@ -49713,7 +49713,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7215) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -49810,7 +49810,7 @@ A=M // d = [LCL-5] (*LCL)
 (Output.backSpace) // function Output.backSpace 0
 
 // (-7229) push static 2
-@19 // push static 2 // function Output.backSpace 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 2 // function Output.backSpace 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @2
 A=D+A
@@ -49847,7 +49847,7 @@ D;JNE // jump if not zero
 (Output.IF_TRUE0) // label IF_TRUE0
 
 // (-7238) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @0
 A=D+A
@@ -49921,7 +49921,7 @@ D;JNE // jump if not zero
 (Output.IF_TRUE1) // label IF_TRUE1
 
 // (-7254) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @0
 A=D+A
@@ -49954,7 +49954,7 @@ M=M-D
 M=M+1
 
 // (-7260) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -49974,7 +49974,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-7262) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @1
 A=D+A
@@ -50007,7 +50007,7 @@ M=M-D
 M=M+1
 
 // (-7268) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -50043,7 +50043,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7277) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -50063,7 +50063,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-7279) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @1
 A=D+A
@@ -50146,7 +50146,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7297) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -50169,7 +50169,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE2) // label IF_FALSE2
 
 // (-7302) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @1
 A=D+A
@@ -50202,7 +50202,7 @@ M=M-D
 M=M+1
 
 // (-7308) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -50234,7 +50234,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7315) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -50278,7 +50278,7 @@ M=!M
 M=M+1
 
 // (-7326) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\Square\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -50515,7 +50515,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-7357) pop static 1
-@26 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // pop static 1 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -50552,7 +50552,7 @@ M=!M
 M=M+1
 
 // (-7363) pop static 2
-@26 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // pop static 2 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -50648,7 +50648,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-7370) pop static 0
-@26 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // pop static 0 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -50677,7 +50677,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7374) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @0
 A=D+A
@@ -50925,7 +50925,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7414) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @0
 A=D+A
@@ -50982,7 +50982,7 @@ M=M-D
 M=M+1
 
 // (-7424) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @0
 A=D+A
@@ -51071,7 +51071,7 @@ M=M-D
 M=M+1
 
 // (-7438) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @0
 A=D+A
@@ -51381,7 +51381,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7488) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @1
 A=D+A
@@ -51620,7 +51620,7 @@ A=M // d = [LCL-5] (*LCL)
 (Screen.updateLocation) // function Screen.updateLocation 0
 
 // (-7524) push static 2
-@26 // push static 2 // function Screen.updateLocation 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // push static 2 // function Screen.updateLocation 0 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @2
 A=D+A
@@ -51669,7 +51669,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7535) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @1
 A=D+A
@@ -51705,7 +51705,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7541) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @1
 A=D+A
@@ -51876,7 +51876,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7568) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @1
 A=D+A
@@ -51912,7 +51912,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7574) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @1
 A=D+A
@@ -52160,7 +52160,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-7610) pop static 2
-@26 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // pop static 2 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -53128,7 +53128,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7747) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @0
 A=D+A
@@ -57730,7 +57730,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8417) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @0
 A=D+A
@@ -57868,7 +57868,7 @@ M=D+M
 M=M+1
 
 // (-8439) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @0
 A=D+A
@@ -60666,7 +60666,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8818) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @0
 A=D+A
@@ -60804,7 +60804,7 @@ M=D+M
 M=M+1
 
 // (-8840) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\Square\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\Square\Screen.vm)
 D=A
 @0
 A=D+A

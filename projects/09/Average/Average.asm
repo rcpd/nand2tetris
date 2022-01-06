@@ -10339,7 +10339,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-1004) pop static 1
-@16 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // pop static 1 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -10435,7 +10435,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-1011) pop static 0
-@16 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // pop static 0 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -10464,7 +10464,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1015) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @0
 A=D+A
@@ -10712,7 +10712,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1055) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @0
 A=D+A
@@ -10769,7 +10769,7 @@ M=M-D
 M=M+1
 
 // (-1065) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @0
 A=D+A
@@ -10858,7 +10858,7 @@ M=M-D
 M=M+1
 
 // (-1079) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @0
 A=D+A
@@ -12028,7 +12028,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1260) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @0
 A=D+A
@@ -12258,7 +12258,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1300) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @0
 A=D+A
@@ -13052,7 +13052,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1435) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @1
 A=D+A
@@ -13457,7 +13457,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1485) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @1
 A=D+A
@@ -13558,7 +13558,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1501) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @1
 A=D+A
@@ -13761,7 +13761,7 @@ M=D+M
 M=M+1
 
 // (-1537) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @1
 A=D+A
@@ -13797,7 +13797,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1543) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @1
 A=D+A
@@ -13865,7 +13865,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1553) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @1
 A=D+A
@@ -14038,7 +14038,7 @@ M=D+M
 M=M+1
 
 // (-1577) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @1
 A=D+A
@@ -14405,7 +14405,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1652) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @1
 A=D+A
@@ -14600,7 +14600,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1688) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @0
 A=D+A
@@ -14712,7 +14712,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1704) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @1
 A=D+A
@@ -15332,7 +15332,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1811) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\09\Average\Math.vm)
 D=A
 @0
 A=D+A
@@ -16285,7 +16285,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-1968) pop static 0
-@18 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Memory.vm)
+@18 // pop static 0 // static + src segment offset (..\projects\09\Average\Memory.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -16314,7 +16314,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1972) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\09\Average\Memory.vm)
 D=A
 @0
 A=D+A
@@ -16428,7 +16428,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-1988) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\09\Average\Memory.vm)
 D=A
 @0
 A=D+A
@@ -16618,7 +16618,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-2013) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\09\Average\Memory.vm)
 D=A
 @0
 A=D+A
@@ -16750,7 +16750,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-2030) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\09\Average\Memory.vm)
 D=A
 @0
 A=D+A
@@ -20175,7 +20175,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-2581) pop static 4
-@19 // pop static 4 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 4 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @4 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -20212,7 +20212,7 @@ M=!M
 M=M+1
 
 // (-2587) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -20241,7 +20241,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2591) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -20270,7 +20270,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2595) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -20366,7 +20366,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-2602) pop static 3
-@19 // pop static 3 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 3 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @3 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -20763,7 +20763,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-2640) pop static 5
-@19 // pop static 5 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 5 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @5 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -40548,7 +40548,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-5636) push static 5
-@19 // push static 5 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 5 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @5
 A=D+A
@@ -42092,7 +42092,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-5840) pop static 6
-@19 // pop static 6 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 6 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @6 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -42231,7 +42231,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-5864) push static 5
-@19 // push static 5 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 5 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @5
 A=D+A
@@ -42415,7 +42415,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-5883) push static 6
-@19 // push static 6 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 6 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @6
 A=D+A
@@ -43399,7 +43399,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE0) // label IF_FALSE0
 
 // (-6053) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @2
 A=D+A
@@ -43449,7 +43449,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6064) push static 5
-@19 // push static 5 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 5 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @5
 A=D+A
@@ -43544,7 +43544,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6081) push static 6
-@19 // push static 6 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 6 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @6
 A=D+A
@@ -43807,7 +43807,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6112) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @1
 A=D+A
@@ -43917,7 +43917,7 @@ D=M-D // d = [val1] - [val2] // leave esp here (pop equivalent)
 D;JNE // jump if not zero
 
 // (-6132) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @2
 A=D+A
@@ -43967,7 +43967,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6143) push static 4
-@19 // push static 4 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 4 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @4
 A=D+A
@@ -44091,7 +44091,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6166) push static 4
-@19 // push static 4 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 4 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @4
 A=D+A
@@ -44203,7 +44203,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6185) push static 4
-@19 // push static 4 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 4 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @4
 A=D+A
@@ -45054,7 +45054,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-6315) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -45228,7 +45228,7 @@ M=D+M
 M=M+1
 
 // (-6338) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @0
 A=D+A
@@ -45252,7 +45252,7 @@ M=D+M
 M=M+1
 
 // (-6342) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -45284,7 +45284,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6346) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @0
 A=D+A
@@ -45444,7 +45444,7 @@ M=D // [esp] = eq result
 M=M+1 // *esp++
 
 // (-6368) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -46292,7 +46292,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6471) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @2
 A=D+A
@@ -46338,7 +46338,7 @@ D;JNE // jump if not zero
 (Output.IF_TRUE2) // label IF_TRUE2
 
 // (-6482) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @0
 A=D+A
@@ -46371,7 +46371,7 @@ M=D+M
 M=M+1
 
 // (-6488) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -46391,7 +46391,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6490) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @1
 A=D+A
@@ -46424,7 +46424,7 @@ M=D+M
 M=M+1
 
 // (-6496) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -46447,7 +46447,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE2) // label IF_FALSE2
 
 // (-6501) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @0
 A=D+A
@@ -46624,7 +46624,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE3) // label IF_FALSE3
 
 // (-6529) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @2
 A=D+A
@@ -46644,7 +46644,7 @@ M=!M
 M=M+1
 
 // (-6533) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -47238,7 +47238,7 @@ A=M // d = [LCL-5] (*LCL)
 (Output.printInt) // function Output.printInt 0
 
 // (-6610) push static 3
-@19 // push static 3 // function Output.printInt 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 3 // function Output.printInt 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @3
 A=D+A
@@ -47384,7 +47384,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6627) push static 3
-@19 // push static 3 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 3 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @3
 A=D+A
@@ -47575,7 +47575,7 @@ A=M // d = [LCL-5] (*LCL)
 (Output.println) // function Output.println 0
 
 // (-6647) push static 1
-@19 // push static 1 // function Output.println 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 1 // function Output.println 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @1
 A=D+A
@@ -47607,7 +47607,7 @@ M=D+M
 M=M+1
 
 // (-6653) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @0
 A=D+A
@@ -47631,7 +47631,7 @@ M=M-D
 M=M+1
 
 // (-6657) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -47660,7 +47660,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6661) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -47697,7 +47697,7 @@ M=!M
 M=M+1
 
 // (-6667) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -47717,7 +47717,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6669) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @1
 A=D+A
@@ -47800,7 +47800,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6687) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -47897,7 +47897,7 @@ A=M // d = [LCL-5] (*LCL)
 (Output.backSpace) // function Output.backSpace 0
 
 // (-6701) push static 2
-@19 // push static 2 // function Output.backSpace 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 2 // function Output.backSpace 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @2
 A=D+A
@@ -47934,7 +47934,7 @@ D;JNE // jump if not zero
 (Output.IF_TRUE0) // label IF_TRUE0
 
 // (-6710) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @0
 A=D+A
@@ -48008,7 +48008,7 @@ D;JNE // jump if not zero
 (Output.IF_TRUE1) // label IF_TRUE1
 
 // (-6726) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @0
 A=D+A
@@ -48041,7 +48041,7 @@ M=M-D
 M=M+1
 
 // (-6732) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -48061,7 +48061,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6734) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @1
 A=D+A
@@ -48094,7 +48094,7 @@ M=M-D
 M=M+1
 
 // (-6740) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -48130,7 +48130,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6749) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -48150,7 +48150,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-6751) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @1
 A=D+A
@@ -48233,7 +48233,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6769) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -48256,7 +48256,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE2) // label IF_FALSE2
 
 // (-6774) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @1
 A=D+A
@@ -48289,7 +48289,7 @@ M=M-D
 M=M+1
 
 // (-6780) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -48321,7 +48321,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6787) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -48365,7 +48365,7 @@ M=!M
 M=M+1
 
 // (-6798) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\09\Average\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -48602,7 +48602,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-6829) pop static 1
-@26 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // pop static 1 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -48639,7 +48639,7 @@ M=!M
 M=M+1
 
 // (-6835) pop static 2
-@26 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // pop static 2 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -48735,7 +48735,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-6842) pop static 0
-@26 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // pop static 0 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -48764,7 +48764,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6846) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @0
 A=D+A
@@ -49012,7 +49012,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6886) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @0
 A=D+A
@@ -49069,7 +49069,7 @@ M=M-D
 M=M+1
 
 // (-6896) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @0
 A=D+A
@@ -49158,7 +49158,7 @@ M=M-D
 M=M+1
 
 // (-6910) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @0
 A=D+A
@@ -49468,7 +49468,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6960) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @1
 A=D+A
@@ -49707,7 +49707,7 @@ A=M // d = [LCL-5] (*LCL)
 (Screen.updateLocation) // function Screen.updateLocation 0
 
 // (-6996) push static 2
-@26 // push static 2 // function Screen.updateLocation 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // push static 2 // function Screen.updateLocation 0 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @2
 A=D+A
@@ -49756,7 +49756,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7007) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @1
 A=D+A
@@ -49792,7 +49792,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7013) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @1
 A=D+A
@@ -49963,7 +49963,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7040) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @1
 A=D+A
@@ -49999,7 +49999,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7046) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @1
 A=D+A
@@ -50247,7 +50247,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-7082) pop static 2
-@26 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // pop static 2 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -51215,7 +51215,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7219) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @0
 A=D+A
@@ -55817,7 +55817,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7889) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @0
 A=D+A
@@ -55955,7 +55955,7 @@ M=D+M
 M=M+1
 
 // (-7911) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @0
 A=D+A
@@ -58753,7 +58753,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8290) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @0
 A=D+A
@@ -58891,7 +58891,7 @@ M=D+M
 M=M+1
 
 // (-8312) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\09\Average\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\09\Average\Screen.vm)
 D=A
 @0
 A=D+A

@@ -148,18 +148,18 @@ if __name__ == '__main__':
         # "../04/fill/fill.tst",  # no cmp, no meaningful test
         # "../04/mult/mult.tst",
 
-        "../projects/07/MemoryAccess/BasicTest/BasicTest.tst",
-        "../projects/07/MemoryAccess/PointerTest/PointerTest.tst",
-        "../projects/07/MemoryAccess/StaticTest/StaticTest.tst",
-        "../projects/07/StackArithmetic/SimpleAdd/SimpleAdd.tst",
-        "../projects/07/StackArithmetic/StackTest/StackTest.tst",
+        r"..\projects\07\MemoryAccess\BasicTest\BasicTest.tst",
+        r"..\projects\07\MemoryAccess\PointerTest\PointerTest.tst",
+        r"..\projects\07\MemoryAccess\StaticTest\StaticTest.tst",
+        r"..\projects\07\StackArithmetic\SimpleAdd\SimpleAdd.tst",
+        r"..\projects\07\StackArithmetic\StackTest\StackTest.tst",
 
-        "../projects/08/FunctionCalls/FibonacciElement/FibonacciElement.tst",
-        "../projects/08/FunctionCalls/NestedCall/NestedCall.tst",
-        "../projects/08/FunctionCalls/SimpleFunction/SimpleFunction.tst",
-        "../projects/08/FunctionCalls/StaticsTest/StaticsTest.tst",
-        "../projects/08/ProgramFlow/BasicLoop/BasicLoop.tst",
-        "../projects/08/ProgramFlow/FibonacciSeries/FibonacciSeries.tst",
+        r"..\projects\08\FunctionCalls\FibonacciElement\FibonacciElement.tst",
+        r"..\projects\08\FunctionCalls\NestedCall\NestedCall.tst",
+        r"..\projects\08\FunctionCalls\SimpleFunction\SimpleFunction.tst",
+        r"..\projects\08\FunctionCalls\StaticsTest\StaticsTest.tst",
+        r"..\projects\08\ProgramFlow\BasicLoop\BasicLoop.tst",
+        r"..\projects\08\ProgramFlow\FibonacciSeries\FibonacciSeries.tst",
     ]
 
     debug_runs = [True, False]
