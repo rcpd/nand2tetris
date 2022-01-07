@@ -19,12 +19,6 @@ def dump_call_tree(call_tree, debug_msg):
 
 
 def run(asm_filepath, static_dict=None, tst_params=None, debug=False):
-    # TODO: translator finish stack mapping: other stack manip(stacksize), functions(stackframes)
-    # TODO: maybe stacksize should be <start-sp>-esp function instead?
-    # TODO: maybe stack metadata could use address labels dict?
-    # TODO: experiment with ebp (stackframe pointer) implementation
-    # TODO: move remaining python comments to asm: associate all asm with function, check linebreaks
-    # TODO: doc strings
     debug_log = []
 
     # initialize hardware
@@ -362,11 +356,6 @@ if __name__ == '__main__':
     Project 9-11: JACK > T_XML (CST) > XML (AST) > VM (tokenizer > analyzer > compiler) // VM > ASM > HACK as above
                   Only Project 10 has CST/AST solution XML files
     '''
-    # TODO: add integration for compiler (jack_filepaths list version)
-    # TODO: add integration for python_hdl to execute HACK programs (Project 9+ not yet tested)
-    # TODO: Project 9-11 compile + compare Jack VM/XML files
-    # TODO: Project 9-11 translate/execute/assemble ASM > HACK (integration test)
-    # TODO: Project 12: Implement the OS libraries in Jack, compile/test (test programs included)
 
     # compile jack programs (JackCompiler, translator) # TODO: projects 1-11 accounted for, not included in compiler
     jack_dirpaths = [
@@ -678,3 +667,16 @@ if __name__ == '__main__':
                             raise RuntimeError("%s mismatch after line %s" % (out_file, index))
                     line += 1
 
+    # TODO: map dependencies for OS libraries
+    # TODO: add integration for compiler (jack_filepaths list version)
+    # TODO: add integration for python_hdl to execute HACK programs (Project 9+ not yet tested)
+    # TODO: Project 9-11 compile + compare Jack VM/XML files
+    # TODO: Project 9-11 translate/execute/assemble ASM > HACK (integration test)
+    # TODO: Project 12: Implement the OS libraries in Jack, compile/test (test programs included)
+
+    # TODO: translator finish stack mapping: other stack manip(stacksize), functions(stackframes)
+    # TODO: maybe stacksize should be <start-sp>-esp function instead?
+    # TODO: maybe stack metadata could use address labels dict?
+    # TODO: experiment with ebp (stackframe pointer) implementation
+    # TODO: move remaining python comments to asm: associate all asm with function, check linebreaks
+    # TODO: doc strings
