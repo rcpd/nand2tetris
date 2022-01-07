@@ -1201,7 +1201,7 @@ def main(filepath, file_list):
     return pcode
 
 
-def run(jack_filepaths, strict_matches):
+def _compile(jack_filepaths, strict_matches):
     """
     loop across multiple files:
         - update the object list
@@ -1248,10 +1248,8 @@ def run(jack_filepaths, strict_matches):
 
 if __name__ == '__main__':
     jack_filepaths = [
-        # compiled / tested
+        # TODO: projects 1-11 accounted for, included in interpreter/tokenizer/analyzer
         [r"..\09\Average\Main.jack"],
-        [r"..\11\Seven\Main.jack"],
-        [r"..\11\ConvertToBin\Main.jack"],
         [r"..\09\Fraction\Main.jack",
          r"..\09\Fraction\Fraction.jack"],
         [r"..\09\HelloWorld\Main.jack"],
@@ -1261,17 +1259,24 @@ if __name__ == '__main__':
          r"..\09\Square\Square.jack",
          r"..\09\Square\SquareGame.jack"],
         [r"..\10\ArrayTest\Main.jack"],
+        # [r"..\10\ExpressionLessSquare\Main.jack",  # nonsense code that doesn't / shouldn't compile or run
+        #  r"..\10\ExpressionLessSquare\Square.jack",
+        #  r"..\10\ExpressionLessSquare\SquareGame.jack"],
+        [r"..\10\Square\Main.jack",
+         r"..\10\Square\Square.jack",
+         r"..\10\Square\SquareGame.jack"],
+        [r"..\11\Average\Main.jack"],
+        [r"..\11\ComplexArrays\Main.jack"],
+        [r"..\11\ConvertToBin\Main.jack"],
         [r"..\11\Pong\Ball.jack",
          r"..\11\Pong\Bat.jack",
          r"..\11\Pong\Main.jack",
          r"..\11\Pong\PongGame.jack"],
-        [r"..\11\ComplexArrays\Main.jack"],
-
+        [r"..\11\Seven\Main.jack"],
+        [r"..\11\Square\Main.jack",
+         r"..\11\Square\Square.jack",
+         r"..\11\Square\SquareGame.jack"],
         # TODO: add Project 12 test programs
-
-        # [r"..\10\ExpressionLessSquare\Main.jack",  # nonsense code that doesn't / shouldn't compile or run
-        #  r"..\10\ExpressionLessSquare\Square.jack",  # nonsense code that doesn't / shouldn't compile or run
-        #  r"..\10\ExpressionLessSquare\SquareGame.jack"],  # nonsense code that doesn't / shouldn't compile or run
     ]
 
     # matched to course compiler
@@ -1296,4 +1301,4 @@ if __name__ == '__main__':
         r"..\11\ComplexArrays\Main.vm": 702,
     }
 
-    run(jack_filepaths, strict_matches)
+    _compile(jack_filepaths, strict_matches)

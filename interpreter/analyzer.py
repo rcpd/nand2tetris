@@ -327,38 +327,34 @@ def main(filepath, debug=False):
 
 if __name__ == '__main__':
     jack_filepaths = [
-        r"..\09\Average\Main.jack",
-        r"..\09\Fraction\Main.jack",
-        r"..\09\Fraction\Fraction.jack",
-        r"..\09\HelloWorld\Main.jack",
-        r"..\09\List\Main.jack",
-        r"..\09\List\List.jack",
-        r"..\09\Square\Main.jack",
-        r"..\09\Square\Square.jack",
-        r"..\09\Square\SquareGame.jack",
-
-        r"..\10\ArrayTest\Main.jack",
+        # TODO: projects 1-11 accounted for, included in interpreter/tokenizer/compiler
+        r"..\projects\09\Average\Main.jack",
+        r"..\projects\09\Fraction\Main.jack",
+        r"..\projects\09\Fraction\Fraction.jack",
+        r"..\projects\09\HelloWorld\Main.jack",
+        r"..\projects\09\List\Main.jack",
+        r"..\projects\09\List\List.jack",
+        r"..\projects\09\Square\Main.jack",
+        r"..\projects\09\Square\Square.jack",
+        r"..\projects\09\Square\SquareGame.jack",
+        r"..\projects\10\ArrayTest\Main.jack",
         # r"..\10\ExpressionLessSquare\Main.jack",  # nonsense code that doesn't / shouldn't compile or run
         # r"..\10\ExpressionLessSquare\Square.jack",  # nonsense code that doesn't / shouldn't compile or run
         # r"..\10\ExpressionLessSquare\SquareGame.jack",  # nonsense code that doesn't / shouldn't compile or run
-        r"..\10\Square\Main.jack",
-        r"..\10\Square\Square.jack",
-        r"..\10\Square\SquareGame.jack",
-
-        r"..\11\Average\Main.jack",
-        r"..\11\ComplexArrays\Main.jack",
-        r"..\11\ConvertToBin\Main.jack",
-        r"..\11\Pong\Ball.jack",
-        r"..\11\Pong\Bat.jack",
-        r"..\11\Pong\Main.jack",
-        r"..\11\Pong\PongGame.jack",
-        r"..\11\Seven\Main.jack",
-        r"..\11\Square\Main.jack",
-        r"..\11\Square\Square.jack",
-        r"..\11\Square\SquareGame.jack",
-
-        # current
-        # r"..\11\ConvertToBin\Main.jack",
+        r"..\projects\10\Square\Main.jack",
+        r"..\projects\10\Square\Square.jack",
+        r"..\projects\10\Square\SquareGame.jack",
+        r"..\projects\11\Average\Main.jack",
+        r"..\projects\11\ComplexArrays\Main.jack",
+        r"..\projects\11\ConvertToBin\Main.jack",
+        r"..\projects\11\Pong\Ball.jack",
+        r"..\projects\11\Pong\Bat.jack",
+        r"..\projects\11\Pong\Main.jack",
+        r"..\projects\11\Pong\PongGame.jack",
+        r"..\projects\11\Seven\Main.jack",
+        r"..\projects\11\Square\Main.jack",
+        r"..\projects\11\Square\Square.jack",
+        r"..\projects\11\Square\SquareGame.jack",
     ]
 
     for _filepath in jack_filepaths:

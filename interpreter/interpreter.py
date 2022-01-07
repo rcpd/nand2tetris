@@ -19,14 +19,12 @@ def dump_call_tree(call_tree, debug_msg):
 
 
 def run(asm_filepath, static_dict=None, tst_params=None, debug=False):
-    # TODO: (week 6-8) all asm/tst/cmp/out/vms parsed/assembled/executed/passed
     # TODO: translator finish stack mapping: other stack manip(stacksize), functions(stackframes)
     # TODO: maybe stacksize should be <start-sp>-esp function instead?
     # TODO: maybe stack metadata could use address labels dict?
     # TODO: experiment with ebp (stackframe pointer) implementation
     # TODO: move remaining python comments to asm: associate all asm with function, check linebreaks
     # TODO: doc strings
-    # TODO: (future) write a HDL module for interpreter?
     debug_log = []
 
     # initialize hardware
@@ -357,20 +355,20 @@ def run(asm_filepath, static_dict=None, tst_params=None, debug=False):
 
 if __name__ == '__main__':
     '''
-    Projects 1-5: HDL (python_hdl) TST orchestration (HardwareSimulator/CPUEmulator), OUT matches CMP truth table 
-    Project 6:    ASM > HACK (assembler), HACK files are matched against CMP binary
-    Project 7-8:  VM > ASM (translator), TST file (CPUEmulator/VMEmulator), both tested against CMP machine state
-                  Integration test: ASM > HACK (no functional testing)
-    Project 9-11: JACK > T_XML (CST) > XML (AST) > VM (tokenizer > analyzer > compiler)
-                  Integration test: VM > ASM > HACK (no functional testing)
-                  Note: Project 9 does not have solution files for CST/AST
-    Project 12:   Implement the OS libraries in Jack
+    Projects 1-5: HDL, TST orchestration (HardwareSimulator/CPUEmulator), OUT matched to CMP truth table 
+    Project 6:    ASM (assembler/interpreter) > HACK (python_hdl) matched against CMP binary
+    Project 7-8:  VM (translator) > ASM // ASM > HACK as above
+                  TST file (CPUEmulator/VMEmulator/tester) > OUT matched to CMP machine state
+    Project 9-11: JACK > T_XML (CST) > XML (AST) > VM (tokenizer > analyzer > compiler) // VM > ASM > HACK as above
+                  Only Project 10 has CST/AST solution XML files
     '''
+    # TODO: add integration for compiler (jack_filepaths list version)
+    # TODO: add integration for python_hdl to execute HACK programs (Project 9+ not yet tested)
+    # TODO: Project 9-11 compile + compare Jack VM/XML files
+    # TODO: Project 9-11 translate/execute/assemble ASM > HACK (integration test)
+    # TODO: Project 12: Implement the OS libraries in Jack, compile/test (test programs included)
 
-    # TODO: when compiler is stable, add Project 9-11 Jack/VM/ASM/XML files (integration test)
-    # TODO: add Project 12 Jack/VM/ASM/XML files (test programs + libraries) (integration test)
-
-    # compile jack programs (JackCompiler, translator)
+    # compile jack programs (JackCompiler, translator) # TODO: projects 1-11 accounted for, not included in compiler
     jack_dirpaths = [
         r"..\projects\09\Average",
         r"..\projects\09\Fraction",
@@ -380,15 +378,15 @@ if __name__ == '__main__':
         r"..\projects\10\ArrayTest",
         # r"..\projects\10\ExpressionLessSquare",  # nonsense code that shouldn't compile or run
         r"..\projects\10\Square",
-        r"..\projects\11\ConvertToBin",
         r"..\projects\11\Average",
         r"..\projects\11\ComplexArrays",
+        r"..\projects\11\ConvertToBin",
         r"..\projects\11\Pong",
         r"..\projects\11\Seven",
         r"..\projects\11\Square",
     ]
 
-    # tokenizer/analyzer
+    # tokenizer/analyzer # TODO: projects 1-11 accounted for, included in tokenizer/analyzer/compiler
     jack_filepaths = [
         r"..\projects\09\Average\Main.jack",
         r"..\projects\09\Fraction\Main.jack",
@@ -419,19 +417,24 @@ if __name__ == '__main__':
         r"..\projects\11\Square\SquareGame.jack",
     ]
 
-    # VM programs (translator only, interpreted below)
+    # VM programs (translator only, interpreted below) # TODO: projects 1-11 accounted for, included in translator
     _vm_dirpaths = [
         r'..\projects\07\MemoryAccess\BasicTest',
         r'..\projects\07\MemoryAccess\PointerTest',
         r'..\projects\07\MemoryAccess\StaticTest',
         r'..\projects\07\StackArithmetic\SimpleAdd',
         r'..\projects\07\StackArithmetic\StackTest',
+        # r'..\projects\08\FunctionCalls\FibonacciElement',  # bootstrap
+        # r'..\projects\08\FunctionCalls\NestedCall',  # bootstrap
+        r'..\projects\08\FunctionCalls\SimpleFunction',
+        # r'..\projects\08\FunctionCalls\StaticsTest'  # bootstrap
         r'..\projects\08\ProgramFlow\BasicLoop',
         r'..\projects\08\ProgramFlow\FibonacciSeries',
-        r'..\projects\08\FunctionCalls\SimpleFunction',
+
     ]
 
-    # VM programs that require non-spec bootstrap to pass tests (translator only, interpreted/tested below)
+    # VM programs # TODO: projects 1-11 accounted for, included in translator
+    # that require non-spec bootstrap to pass tests (translator only, interpreted/tested below)
     # (bootstrap is injected into ASM which is loaded by tester + CPUEmulator)
     _vm_bootstrap_paths = [
         r'..\projects\08\FunctionCalls\FibonacciElement',
@@ -441,7 +444,7 @@ if __name__ == '__main__':
 
     _vm_dirpaths = _vm_dirpaths + _vm_bootstrap_paths + jack_dirpaths
 
-    # VM test scripts (assembler/tester/interpreter)
+    # VM test scripts (assembler/tester/interpreter) # TODO: projects 1-11 accounted for, included in assembler/python_hdl
     vm_asm_filepaths = [
         r"..\projects\07\MemoryAccess\BasicTest\BasicTest.asm",
         r"..\projects\07\MemoryAccess\PointerTest\PointerTest.asm",
@@ -456,7 +459,8 @@ if __name__ == '__main__':
         r"..\projects\08\ProgramFlow\FibonacciSeries\FibonacciSeries.asm",
     ]
 
-    # assembler/interpreter (no tests / execution only)
+    # assembler/interpreter # TODO: projects 1-11 accounted for, included in assembler/python_hdl
+    # (tested against HACK solutions for project 6)
     binary_asm_filepaths = [
         r"..\projects\04\fill\fill.asm",
         r"..\projects\04\mult\mult.asm",
@@ -467,26 +471,34 @@ if __name__ == '__main__':
         r"..\projects\06\pong\pongL.asm",
         r"..\projects\06\rect\rect.asm",
         r"..\projects\06\rect\rectL.asm",
-        r"..\projects\09\Average\Average.asm",
-        r"..\projects\09\Fraction\Fraction.asm",
-        r"..\projects\09\HelloWorld\HelloWorld.asm",
-        r"..\projects\09\List\List.asm",
-        r"..\projects\10\ArrayTest\ArrayTest.asm",
-        r"..\projects\11\ConvertToBin\ConvertToBin.asm",
-        r"..\projects\11\Average\Average.asm",
-        r"..\projects\11\Seven\Seven.asm",
-
-        # r"..\projects\10\ExpressionLessSquare\ExpressionLessSquare.asm",  # nonsense code that shouldn't compile/run
-
-        # too large, generates 17 bit addresses
-        # r"..\projects\11\ComplexArrays\ComplexArrays.asm",
-        # r"..\projects\11\Pong\Pong.asm",
-        # r"..\projects\09\Square\Square.asm",
-        # r"..\projects\10\Square\Square.asm",
-        # r"..\projects\11\Square\Square.asm",
+        # exercised during vm_asm_filepaths
+        # r"..\projects\07\MemoryAccess\BasicTest\BasicTest.asm",
+        # r"..\projects\07\MemoryAccess\PointerTest\PointerTest.asm",
+        # r"..\projects\07\MemoryAccess\StaticTest\StaticTest.asm",
+        # r"..\projects\07\StackArithmetic\SimpleAdd\SimpleAdd.asm",
+        # r"..\projects\07\StackArithmetic\StackTest\StackTest.asm",
+        # r"..\projects\08\FunctionCalls\FibonacciElement\FibonacciElement.asm",
+        # r"..\projects\08\FunctionCalls\NestedCall\NestedCall.asm",
+        # r"..\projects\08\FunctionCalls\SimpleFunction\SimpleFunction.asm",
+        # r"..\projects\08\FunctionCalls\StaticsTest\StaticsTest.asm",
+        # r"..\projects\08\ProgramFlow\BasicLoop\BasicLoop.asm",
+        # r"..\projects\08\ProgramFlow\FibonacciSeries\FibonacciSeries.asm",
+        r'..\projects\09\Average\Average.asm',
+        r'..\projects\09\Fraction\Fraction.asm',
+        r'..\projects\09\HelloWorld\HelloWorld.asm',
+        r'..\projects\09\List\List.asm',
+        # r'..\projects\09\Square\Square.asm',  # too large, generates 17 bit addresses
+        r'..\projects\10\ArrayTest\ArrayTest.asm',
+        # r'..\projects\10\Square\Square.asm',  # too large, generates 17 bit addresses
+        r'..\projects\11\Average\Average.asm',
+        # r'..\projects\11\ComplexArrays\ComplexArrays.asm',  # too large, generates 17 bit addresses
+        r'..\projects\11\ConvertToBin\ConvertToBin.asm',
+        # r'..\projects\11\Pong\Pong.asm',  # too large, generates 17 bit addresses
+        r'..\projects\11\Seven\Seven.asm',
+        # r'..\projects\11\Square\Square.asm',  # too large, generates 17 bit addresses
     ]
 
-    # HDL tests (HardwareSimulator)
+    # HDL tests (HardwareSimulator): project 1-12 accounted for, not included in tester/python_hdl
     hw_tst_files = [
         r'..\projects\01\And.tst',
         r'..\projects\01\And16.tst',
@@ -528,7 +540,7 @@ if __name__ == '__main__':
         # r'..\projects\05\Memory.tst',  # interactive test (passed manually)
     ]
     
-    # ASM tests (CPUEmulator)
+    # ASM tests (CPUEmulator): project 1-12 accounted for, included in tester
     cpu_tst_files = [
         # r'..\projects\04\fill\Fill.tst',  # interactive test (passed manually)
         r'..\projects\04\fill\FillAutomatic.tst',
@@ -548,9 +560,10 @@ if __name__ == '__main__':
         # r'..\projects\12\ArrayTest\ArrayTest.tst',  # TODO
         # r'..\projects\12\MathTest\MathTest.tst',  # TODO
         # r'..\projects\12\MemoryTest\MemoryTest.tst'  # TODO
+        # r'..\projects\12\MemoryTest\MemoryDiag.tst'  # TODO
     ]
 
-    # VM tests (VMEmulator)
+    # VM tests (VMEmulator): project 1-12 accounted for, VME not included in tester
     vm_tst_files = [
         r'..\projects\07\MemoryAccess\BasicTest\BasicTestVME.tst',
         r'..\projects\07\MemoryAccess\PointerTest\PointerTestVME.tst',
