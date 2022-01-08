@@ -433,7 +433,8 @@ if __name__ == '__main__':
 
     _vm_dirpaths = _vm_dirpaths + _vm_bootstrap_paths + jack_dirpaths
 
-    # VM test scripts (assembler/tester/interpreter) # TODO: projects 1-11 accounted for, included in assembler/python_hdl
+    # VM test scripts # TODO: projects 1-11 accounted for, included in assembler/python_hdl
+    # (assembler/tester/interpreter)
     vm_asm_filepaths = [
         r"..\projects\07\MemoryAccess\BasicTest\BasicTest.asm",
         r"..\projects\07\MemoryAccess\PointerTest\PointerTest.asm",
@@ -474,20 +475,20 @@ if __name__ == '__main__':
         # r"..\projects\08\ProgramFlow\BasicLoop\BasicLoop.asm",
         # r"..\projects\08\ProgramFlow\FibonacciSeries\FibonacciSeries.asm",
 
-        # exceeds limit of 32K instructions
-        # r'..\projects\09\Average\Average.asm',
-        # r'..\projects\09\Fraction\Fraction.asm',
-        # r'..\projects\09\HelloWorld\HelloWorld.asm',
-        # r'..\projects\09\List\List.asm',
-        # r'..\projects\09\Square\Square.asm',
-        # r'..\projects\10\ArrayTest\ArrayTest.asm',
-        # r'..\projects\10\Square\Square.asm',
-        # r'..\projects\11\Average\Average.asm',
-        # r'..\projects\11\ComplexArrays\ComplexArrays.asm',
-        # r'..\projects\11\ConvertToBin\ConvertToBin.asm',
-        # r'..\projects\11\Pong\Pong.asm',
-        # r'..\projects\11\Seven\Seven.asm',
-        # r'..\projects\11\Square\Square.asm',
+        # exceeds limit of 32k instructions (interpreter not affected by instruction/address limits)
+        r'..\projects\09\Average\Average.asm',
+        r'..\projects\09\Fraction\Fraction.asm',
+        r'..\projects\09\HelloWorld\HelloWorld.asm',
+        r'..\projects\09\List\List.asm',
+        r'..\projects\09\Square\Square.asm',
+        r'..\projects\10\ArrayTest\ArrayTest.asm',
+        r'..\projects\10\Square\Square.asm',  # too large, generates 17 bit addresses (different Main.jack to 9/11)
+        r'..\projects\11\Average\Average.asm',
+        r'..\projects\11\ComplexArrays\ComplexArrays.asm',  # too large, generates 17 bit addresses
+        r'..\projects\11\ConvertToBin\ConvertToBin.asm',
+        r'..\projects\11\Pong\Pong.asm',  # too large, generates 17 bit addresses
+        r'..\projects\11\Seven\Seven.asm',
+        r'..\projects\11\Square\Square.asm',
     ]
 
     # HDL tests (HardwareSimulator): project 1-12 accounted for, not included in tester/python_hdl
@@ -670,7 +671,6 @@ if __name__ == '__main__':
                             raise RuntimeError("%s mismatch after line %s" % (out_file, index))
                     line += 1
 
-    # TODO: check/adjust translator/assembler asm/hack outputs for length
     # TODO: map dependencies for OS libraries
     # TODO: add integration for compiler (jack_filepaths list version)
     # TODO: add integration for python_hdl to execute HACK programs (Project 9+ not yet tested)

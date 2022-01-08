@@ -684,7 +684,7 @@ def parse_asm(vm_filepath, asm, guids, local_dict, static_dict, offset_list, com
             asm_segment = None
 
         if type(comment_count) != int:
-            raise Exception("last command was bad")
+            raise RuntimeError("last command was bad")
 
         if debug:
             print(cmd, stored_comment)
