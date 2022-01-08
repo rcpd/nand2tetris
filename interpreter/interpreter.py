@@ -673,9 +673,8 @@ if __name__ == '__main__':
 
     # TODO: map dependencies for OS libraries
     # TODO: add integration for compiler (jack_filepaths list version)
-    # TODO: add integration for python_hdl to execute HACK programs (Project 9+ not yet tested)
-    # TODO: Project 9-11 compile + compare Jack VM/XML files
-    # TODO: Project 9-11 translate/execute/assemble ASM > HACK (integration test)
+    # TODO: add integration for Project 9-11 compile + compare Jack VM/XML files
+    # TODO: add integration for Project 9-11 translate/execute/assemble ASM > HACK (integration test)
     # TODO: Project 12: Implement the OS libraries in Jack, compile/test (test programs included)
 
     # TODO: translator finish stack mapping: other stack manip(stacksize), functions(stackframes)
