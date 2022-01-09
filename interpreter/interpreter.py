@@ -635,7 +635,11 @@ if __name__ == '__main__':
 
         # compile Jack to VM (course compiler)
         for jack_dir in jack_dirpaths:
-            subprocess.run([r"..\tools\JackCompiler.bat", jack_dir])
+            result = subprocess.run([r"..\tools\JackCompiler.bat", jack_dir], capture_output=True, text=True)
+            if result.stderr:
+                raise RuntimeError(result.stderr)
+            else:
+                print("Course Compiler: %s" % result.stdout.strip())
 
         # compile Jack to VM (match against course compiler)
         compiler._compile(jack_filepath_lists, jack_matches)
@@ -727,11 +731,9 @@ if __name__ == '__main__':
                             raise RuntimeError("%s mismatch after line %s" % (out_file, index))
                     line += 1
 
-    # TODO: collect/test/print output from course compiler run via interpreter
-    # TODO: cleanup output for compiler in interpreter run
     # TODO: map dependencies for OS libraries
-    # TODO: add integration for Project 9-11 translate/execute/assemble ASM > HACK (integration test)
     # TODO: Project 12: Implement the OS libraries in Jack, compile/test (test programs included)
+    # TODO: add integration for Project 12 translate/execute/assemble ASM > HACK (integration test)
 
     # TODO: translator finish stack mapping: other stack manip(stacksize), functions(stackframes)
     # TODO: maybe stacksize should be <start-sp>-esp function instead?
