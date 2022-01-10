@@ -731,7 +731,6 @@ if __name__ == '__main__':
                             raise RuntimeError("%s mismatch after line %s" % (out_file, index))
                     line += 1
 
-    # TODO: map dependencies for OS libraries
     # TODO: Project 12: Implement the OS libraries in Jack, compile/test (test programs included)
     # TODO: add integration for Project 12 translate/execute/assemble ASM > HACK (integration test)
 
