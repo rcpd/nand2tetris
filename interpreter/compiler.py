@@ -575,7 +575,7 @@ def compile_char(pcode, char):
 
 
 def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier=None, class_name=None, func_name=None,
-                       parent_obj=None, child_func=None, symbol=None, keyword=None):
+                       parent_obj=None, child_func=None, symbol=None, keyword=None, filepath=None):
     """
     expressions call the buffered version of compile functions so they are parsed first in, last out
     expressions are found in let (rhs), array indexes, if/while conditions and optionally as return values
@@ -622,6 +622,9 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
             pcode, exp_buffer = pop_buffer(pcode, exp_buffer, stop_at="// (")  # i.e. expression was not bracketed
 
     elif identifier:
+        if filepath == "..\\projects\\12\\Sys\\Sys.jack":
+            pass  # TODO: handle Main.main resolution for Sys.jack
+
         # identify array var
         array = False
         if func_name and identifier in class_dict[class_name][func_name]['args']:
@@ -1007,7 +1010,7 @@ def main(filepath, file_list):
                     pcode, exp_buffer, parent_obj, child_func = \
                             expression_handler(pcode, statement, exp_buffer, class_dict=class_dict,
                                                identifier=identifier, class_name=class_name, func_name=func_name,
-                                               parent_obj=parent_obj, child_func=child_func)
+                                               parent_obj=parent_obj, child_func=child_func, filepath=filepath)
 
                 # buffer assignee compilation first, then buffer any remaining expressions
                 elif statement == 'let':
@@ -1288,6 +1291,7 @@ if __name__ == '__main__':
         [r"..\projects\11\Square\Main.jack",
          r"..\projects\11\Square\Square.jack",
          r"..\projects\11\Square\SquareGame.jack"],
+        [r"..\projects\12\Sys\Sys.jack"],
     ]
 
     # matched to course compiler

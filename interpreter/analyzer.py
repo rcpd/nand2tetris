@@ -355,6 +355,7 @@ if __name__ == '__main__':
         r"..\projects\11\Square\Main.jack",
         r"..\projects\11\Square\Square.jack",
         r"..\projects\11\Square\SquareGame.jack",
+        r"..\projects\12\Sys\Sys.jack",
     ]
 
     for _filepath in jack_filepaths:
