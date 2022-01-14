@@ -575,7 +575,7 @@ def compile_char(pcode, char):
 
 
 def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier=None, class_name=None, func_name=None,
-                       parent_obj=None, child_func=None, symbol=None, keyword=None, filepath=None):
+                       parent_obj=None, child_func=None, symbol=None, keyword=None):
     """
     expressions call the buffered version of compile functions so they are parsed first in, last out
     expressions are found in let (rhs), array indexes, if/while conditions and optionally as return values
@@ -1007,7 +1007,7 @@ def main(filepath, file_list):
                     pcode, exp_buffer, parent_obj, child_func = \
                             expression_handler(pcode, statement, exp_buffer, class_dict=class_dict,
                                                identifier=identifier, class_name=class_name, func_name=func_name,
-                                               parent_obj=parent_obj, child_func=child_func, filepath=filepath)
+                                               parent_obj=parent_obj, child_func=child_func)
 
                 # buffer assignee compilation first, then buffer any remaining expressions
                 elif statement == 'let':
