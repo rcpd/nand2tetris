@@ -38,19 +38,19 @@ sys_func = {
                "alloc": {"kind": "func", "type": "Array", "args": ("int",), "len": 1},
                "deAlloc": {"kind": "func", "type": "void", "args": ("Array",), "len": 1}},
     "String": {"new": {"kind": "const", "type": "String", "args": ("int",), "len": 1},
-               "dispose": {"kind": "method", "type": "void", "args": (), "len": 0},
-               "length": {"kind": "method", "type": "int", "args": (), "len": 0},
-               "charAt": {"kind": "method", "type": "int", "args": ("int",), "len": 1},
-               "setCharAt": {"kind": "method", "type": "void", "args": ("int", "char"), "len": 2},
-               "appendChar": {"kind": "method", "type": "String", "args": ("char",), "len": 1},
-               "eraselastChar": {"kind": "method", "type": "void", "args": (), "len": 0},
-               "intValue": {"kind": "method", "type": "int", "args": ("int",), "len": 1},
-               "setInt": {"kind": "method", "type": "void", "args": ("int",), "len": 1},
+               "dispose": {"kind": "method", "type": "void", "args": (), "len": 1},
+               "length": {"kind": "method", "type": "int", "args": (), "len": 1},
+               "charAt": {"kind": "method", "type": "int", "args": ("int",), "len": 2},
+               "setCharAt": {"kind": "method", "type": "void", "args": ("int", "char"), "len": 3},
+               "appendChar": {"kind": "method", "type": "String", "args": ("char",), "len": 2},
+               "eraselastChar": {"kind": "method", "type": "void", "args": (), "len": 1},
+               "intValue": {"kind": "method", "type": "int", "args": ("int",), "len": 2},
+               "setInt": {"kind": "method", "type": "void", "args": ("int",), "len": 2},
                "backSpace": {"kind": "func", "type": "char", "args": (), "len": 0},
                "doubleQuote": {"kind": "func", "type": "char", "args": (), "len": 0},
                "newLine": {"kind": "func", "type": "char", "args": (), "len": 0}},
     "Array": {"new": {"kind": "const", "type": "Array", "args": ("int",), "len": 1},
-              "dispose": {"kind": "method", "type": "void", "args": (), "len": 0}},
+              "dispose": {"kind": "method", "type": "void", "args": (), "len": 1}},
     "Output": {"init": {"kind": "func", "type": "void", "args": (), "len": 0},
                "moveCursor": {"kind": "func", "type": "void", "args": ("int", "int"), "len": 2},
                "printChar": {"kind": "func", "type": "void", "args": ("char",), "len": 1},
@@ -627,9 +627,11 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
         if func_name and identifier in class_dict[class_name][func_name]['args']:
             if class_dict[class_name][func_name]['args'][identifier]['type'] == 'Array':
                 array = True
+                parent_obj = 'Array'
         elif identifier in class_dict[class_name]['args']:
             if class_dict[class_name]['args'][identifier]['type'] == 'Array':
                 array = True
+                parent_obj = 'Array'
 
         # attempt to lookup class/func attributes (2 passes)
         if not array and not parent_obj:
