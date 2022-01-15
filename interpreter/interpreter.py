@@ -39,8 +39,7 @@ def run(asm_filepath, static_dict=None, tst_params=None, debug=False):
         hw["RAM"] = tst_params["RAM"]
         hw["MAX"] = tst_params["MAX"]
 
-    if debug:
-        print('\n%s: Running' % asm_filepath)
+    print('Interpreter: Running %s' % asm_filepath)
 
     address_labels = {
         # alternate notation
@@ -464,7 +463,7 @@ if __name__ == '__main__':
         r"..\projects\11\Pong\PongGame.vm": 318,
         r"..\projects\11\ComplexArrays\Main.vm": 702,
         r"..\projects\12\SysTest\Main.vm": 281,
-        # r"..\projects\12\SysTest\Sys.vm": 999,  # TODO
+        r"..\projects\12\SysTest\Sys.vm": 83,
     }
 
     # VM programs (translator only, interpreted below) # TODO: projects 1-11 accounted for, included in translator
@@ -564,6 +563,8 @@ if __name__ == '__main__':
         r'..\projects\11\Pong\Pong.asm',  # too large, generates 17 bit addresses
         r'..\projects\11\Seven\Seven.asm',
         r'..\projects\11\Square\Square.asm',
+
+        r"..\projects\12\SysTest\SysTest.asm",
     ]
 
     # HDL tests (HardwareSimulator): project 1-12 accounted for, not included in tester/python_hdl
@@ -753,7 +754,6 @@ if __name__ == '__main__':
                             raise RuntimeError("%s mismatch after line %s" % (out_file, index))
                     line += 1
 
-    # FIXME: analyzer is dropping } if no token after { in while (Sys.jack)
     # TODO: Project 12: Implement the OS libraries in Jack, compile/test (test programs included)
     # TODO: add integration for Project 12 translate/execute/assemble ASM > HACK (integration test)
 

@@ -307,6 +307,8 @@ if __name__ == '__main__':
         r'..\projects\11\Pong\Pong.asm',  # too large, generates 17 bit addresses
         r'..\projects\11\Seven\Seven.asm',
         r'..\projects\11\Square\Square.asm',
+
+        r"..\projects\12\SysTest\SysTest.asm",
     ]
 
     # debug_runs = [True, False]

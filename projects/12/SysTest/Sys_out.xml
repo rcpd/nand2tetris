@@ -124,6 +124,8 @@
           </expression>
           <symbol> ) </symbol>
           <symbol> { </symbol>
+          <statements/>
+          <symbol> } </symbol>
         </whileStatement>
         <returnStatement>
           <keyword> return </keyword>

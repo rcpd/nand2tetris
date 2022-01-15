@@ -21,10 +21,10 @@ push constant 0
 not
 not
 if-goto WHILE_END0
-push constant 0
-return
 goto WHILE_EXP0
 label WHILE_END0
+push constant 0
+return
 function Sys.wait 1
 push argument 0
 push constant 0
