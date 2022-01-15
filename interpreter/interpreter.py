@@ -373,7 +373,10 @@ if __name__ == '__main__':
         r"..\projects\11\Pong",
         r"..\projects\11\Seven",
         r"..\projects\11\Square",
+
+        # TODO: Project 12
         r"..\projects\12\SysTest",
+        r"..\projects\12\ArrayTest",
     ]
 
     # tokenizer/analyzer # TODO: projects 1-11 accounted for, included in tokenizer/analyzer/compiler
@@ -405,8 +408,12 @@ if __name__ == '__main__':
         r"..\projects\11\Square\Main.jack",
         r"..\projects\11\Square\Square.jack",
         r"..\projects\11\Square\SquareGame.jack",
+
+        # TODO: Project 12
         r"..\projects\12\SysTest\Main.jack",
         r"..\projects\12\SysTest\Sys.jack",
+        r"..\projects\12\ArrayTest\Main.jack",
+        r"..\projects\12\ArrayTest\Array.jack",
     ]
 
     # compiler
@@ -438,8 +445,12 @@ if __name__ == '__main__':
         [r"..\projects\11\Square\Main.jack",
          r"..\projects\11\Square\Square.jack",
          r"..\projects\11\Square\SquareGame.jack"],
+
+        # TODO: Project 12
         [r"..\projects\12\SysTest\Main.jack",
          r"..\projects\12\SysTest\Sys.jack"],
+        [r"..\projects\12\ArrayTest\Main.jack",
+         r"..\projects\12\ArrayTest\Array.jack"],
     ]
 
     # enforce matching of compiler against course compiler
@@ -462,8 +473,12 @@ if __name__ == '__main__':
         r"..\projects\11\Pong\Main.vm": 13,
         r"..\projects\11\Pong\PongGame.vm": 318,
         r"..\projects\11\ComplexArrays\Main.vm": 702,
+
+        # TODO: Project 12
         r"..\projects\12\SysTest\Main.vm": 281,
         r"..\projects\12\SysTest\Sys.vm": 83,
+        r"..\projects\12\ArrayTest\Main.vm": 131,
+        r"..\projects\12\ArrayTest\Array.vm": 23,
     }
 
     # VM programs (translator only, interpreted below) # TODO: projects 1-11 accounted for, included in translator
@@ -493,7 +508,10 @@ if __name__ == '__main__':
         r"..\projects\11\Pong",
         r"..\projects\11\Seven",
         r"..\projects\11\Square",
+
+        # TODO: Project 12
         r"..\projects\12\SysTest",
+        r"..\projects\12\ArrayTest",
     ]
 
     # VM programs # TODO: projects 1-11 accounted for, included in translator
@@ -567,7 +585,7 @@ if __name__ == '__main__':
         r"..\projects\12\SysTest\SysTest.asm",
     ]
 
-    # HDL tests (HardwareSimulator): project 1-12 accounted for, not included in tester/python_hdl
+    # HDL tests (HardwareSimulator): project 1-12 accounted for, not included in tester/python_hdl!
     hw_tst_files = [
         r'..\projects\01\And.tst',
         r'..\projects\01\And16.tst',
@@ -609,7 +627,7 @@ if __name__ == '__main__':
         # r'..\projects\05\Memory.tst',  # interactive test (passed manually)
     ]
     
-    # ASM tests (CPUEmulator): project 1-12 accounted for, included in tester
+    # ASM tests (CPUEmulator): # project 1-12 accounted for & included in tester!
     cpu_tst_files = [
         # r'..\projects\04\fill\Fill.tst',  # interactive test (passed manually)
         r'..\projects\04\fill\FillAutomatic.tst',
@@ -625,14 +643,9 @@ if __name__ == '__main__':
         r'..\projects\08\FunctionCalls\StaticsTest\StaticsTest.tst',
         r'..\projects\08\ProgramFlow\BasicLoop\BasicLoop.tst',
         r'..\projects\08\ProgramFlow\FibonacciSeries\FibonacciSeries.tst',
-
-        # r'..\projects\12\ArrayTest\ArrayTest.tst',  # TODO
-        # r'..\projects\12\MathTest\MathTest.tst',  # TODO
-        # r'..\projects\12\MemoryTest\MemoryTest.tst'  # TODO
-        # r'..\projects\12\MemoryTest\MemoryDiag.tst'  # TODO
     ]
 
-    # VM tests (VMEmulator): project 1-12 accounted for, VME not included in tester
+    # VM tests (VMEmulator): # TODO: project 1-12 accounted for, not included in tester
     vm_tst_files = [
         r'..\projects\07\MemoryAccess\BasicTest\BasicTestVME.tst',
         r'..\projects\07\MemoryAccess\PointerTest\PointerTestVME.tst',
@@ -645,17 +658,18 @@ if __name__ == '__main__':
         r'..\projects\08\FunctionCalls\StaticsTest\StaticsTestVME.tst',
         r'..\projects\08\ProgramFlow\BasicLoop\BasicLoopVME.tst',
         r'..\projects\08\ProgramFlow\FibonacciSeries\FibonacciSeriesVME.tst',
+
+        # TODO: Project 12
+        r'..\projects\12\ArrayTest\ArrayTest.tst',
+        # r'..\projects\12\MathTest\MathTest.tst',
+        # r'..\projects\12\MemoryTest\MemoryTest.tst',
+        # r'..\projects\12\MemoryTest\MemoryDiag.tst'
     ]
 
     debug_runs = [False]
 
     vm_static_dicts = {}
     for _debug in debug_runs:
-        # tokenize / analyze Jack (not required with course compiler)
-        for _filepath in jack_filepaths:
-            tokenizer.main(_filepath, debug=False)
-            analyzer.main(_filepath, debug=False)
-
         # compile Jack to VM (course compiler)
         for jack_dir in jack_dirpaths:
             result = subprocess.run([r"..\tools\JackCompiler.bat", jack_dir], capture_output=True, text=True)
@@ -663,6 +677,11 @@ if __name__ == '__main__':
                 raise RuntimeError(result.stderr)
             else:
                 print("Course Compiler: %s" % result.stdout.strip())
+
+        # tokenize / analyze Jack (not required with course compiler)
+        for _filepath in jack_filepaths:
+            tokenizer.main(_filepath, debug=False)
+            analyzer.main(_filepath, debug=False)
 
         # compile Jack to VM (match against course compiler)
         compiler._compile(jack_filepath_lists, jack_matches)
@@ -766,3 +785,7 @@ if __name__ == '__main__':
     # TODO: experiment with ebp (stackframe pointer) implementation
     # TODO: move remaining python comments to asm: associate all asm with function, check linebreaks
     # TODO: doc strings
+
+    # TODO: int cannot exceed 32767
+    # TODO: non-void without return value
+    # TODO: statement without keyword

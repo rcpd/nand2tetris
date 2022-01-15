@@ -368,8 +368,12 @@ if __name__ == '__main__':
         r"..\projects\11\Square\Main.jack",
         r"..\projects\11\Square\Square.jack",
         r"..\projects\11\Square\SquareGame.jack",
+
+        # TODO: Project 12
         r"..\projects\12\SysTest\Main.jack",
         r"..\projects\12\SysTest\Sys.jack",
+        r"..\projects\12\ArrayTest\Main.jack",
+        r"..\projects\12\ArrayTest\Array.jack",
     ]
 
     for _filepath in jack_filepaths:
