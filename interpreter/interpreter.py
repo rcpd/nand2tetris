@@ -381,6 +381,7 @@ if __name__ == '__main__':
         r"..\projects\12\SysTest",
         r"..\projects\12\ArrayTest",
         r"..\projects\12\KeyboardTest",
+        r"..\projects\12\StringTest",
     ]
 
     # tokenizer/analyzer # TODO: projects 1-11 accounted for, included in tokenizer/analyzer/compiler
