@@ -377,6 +377,7 @@ if __name__ == '__main__':
         # TODO: Project 12
         r"..\projects\12\SysTest",
         r"..\projects\12\ArrayTest",
+        r"..\projects\12\KeyboardTest",
     ]
 
     # tokenizer/analyzer # TODO: projects 1-11 accounted for, included in tokenizer/analyzer/compiler
@@ -511,7 +512,7 @@ if __name__ == '__main__':
 
         # TODO: Project 12
         r"..\projects\12\SysTest",
-        r"..\projects\12\ArrayTest",
+        r"..\projects\12\ArrayTest",  # interactive test (passed manually on VMEmulator)
     ]
 
     # VM programs # TODO: projects 1-11 accounted for, included in translator
@@ -788,4 +789,5 @@ if __name__ == '__main__':
 
     # TODO: int cannot exceed 32767
     # TODO: non-void without return value
-    # TODO: statement without keyword
+    # TODO: statement without keyword/statement type
+    # TODO: non-terminated statement
