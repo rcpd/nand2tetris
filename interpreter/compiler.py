@@ -8,6 +8,7 @@ import xml.etree.ElementTree as Et
 
 op_map = {"+": "add", "-": "sub", "*": "call Math.multiply 2", "/": "call Math.divide 2", "&": "and", "|": "or",
           "~": "not", "<": "lt", ">": "gt", "=": "eq"}  # Math.multiply/divide = non-void return (no pop)
+op_words = ["add", "sub", "call Math.multiply 2", "call Math.divide 2", "and", "or", "not", "lt", "gt", "eq", "neg"]
 
 char_map = {
         " ": 32, "!": 33, '"': 34, '#': 35, '$': 36, '%': 37, '&': 38, "'": 39, "(": 40, ")": 41, "*": 42, "+": 43,
@@ -43,8 +44,8 @@ sys_func = {
                "charAt": {"kind": "method", "type": "int", "args": ("int",), "len": 2},
                "setCharAt": {"kind": "method", "type": "void", "args": ("int", "char"), "len": 3},
                "appendChar": {"kind": "method", "type": "String", "args": ("char",), "len": 2},
-               "eraselastChar": {"kind": "method", "type": "void", "args": (), "len": 1},
-               "intValue": {"kind": "method", "type": "int", "args": ("int",), "len": 2},
+               "eraseLastChar": {"kind": "method", "type": "void", "args": (), "len": 1},
+               "intValue": {"kind": "method", "type": "int", "args": (), "len": 1},
                "setInt": {"kind": "method", "type": "void", "args": ("int",), "len": 2},
                "backSpace": {"kind": "func", "type": "char", "args": (), "len": 0},
                "doubleQuote": {"kind": "func", "type": "char", "args": (), "len": 0},
@@ -808,7 +809,7 @@ def main(filepath, file_list):
                         continue  # already processed
 
                     if not var_type:
-                        raise RuntimeError()
+                        raise RuntimeError("var type not found/defined")
 
                     # no if_count, while_count, exp_buffer during pre_scan
                     if keyword in ('field', 'static'):
@@ -840,7 +841,7 @@ def main(filepath, file_list):
     block = []
     if_list = []
     while_list = []
-    end_block = False
+    end_block = first_eq = False
     num_args = while_count = if_count = 0
     class_name = statement = func_name = func_type = keyword = var_type = var_kind = identifier = ''
     lhs_var_name = lhs_array = parent_obj = child_func = func_kind = ''
@@ -1061,8 +1062,10 @@ def main(filepath, file_list):
 
             if symbol in ".":
                 pass
-            elif symbol == "=" and statement == 'let':
-                pass  # ignore first '=' in let statement (expressions will have different parent)
+            elif symbol == "=" and statement == 'let' and not first_eq:
+                # ignore first '=' in let statement while allowing subsequent ones to compile
+                first_eq = True
+
             elif symbol == "{":
                 if exp_buffer:
                     raise RuntimeError("unparsed expressions still in buffer: %s" % exp_buffer)
@@ -1159,11 +1162,18 @@ def main(filepath, file_list):
                 if exp_buffer:
                     raise RuntimeError("unparsed expressions still in buffer: %s" % exp_buffer)
 
+                # reset statement scoped vars
                 statement = lhs_var_name = lhs_array = ''
+                first_eq = False
 
             elif symbol in op_map:
                 if symbol == "-" and find_parent(tree, elem).tag == "term":
                     exp_buffer.append("neg")  # not "sub"
+                elif exp_buffer and exp_buffer[-1] in op_words:
+                    # if concurrent symbols are buffered pop the previous one first
+                    # i.e. process a & b & c as ((a & b) & c)
+                    pcode = store_pcode(pcode, exp_buffer.pop())
+                    exp_buffer.append(op_map[symbol])
                 else:
                     exp_buffer.append(op_map[symbol])
 
