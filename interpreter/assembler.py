@@ -293,7 +293,7 @@ if __name__ == '__main__':
         r"..\projects\08\ProgramFlow\BasicLoop\BasicLoop.asm",
         r"..\projects\08\ProgramFlow\FibonacciSeries\FibonacciSeries.asm",
 
-        # exceeds limit of 32k instructions (interpreter not affected by instruction/address limits)
+        # exceeds ROM limit of 32k instructions
         r'..\projects\09\Average\Average.asm',
         r'..\projects\09\Fraction\Fraction.asm',
         r'..\projects\09\HelloWorld\HelloWorld.asm',
@@ -302,15 +302,16 @@ if __name__ == '__main__':
         r'..\projects\10\ArrayTest\ArrayTest.asm',
         r'..\projects\10\Square\Square.asm',  # generates 17 bit addresses (different Main.jack to 9/11)
         r'..\projects\11\Average\Average.asm',
-        r'..\projects\11\ComplexArrays\ComplexArrays.asm',  # too large, generates 17 bit addresses
+        r'..\projects\11\ComplexArrays\ComplexArrays.asm',  # 17 bit addresses
         r'..\projects\11\ConvertToBin\ConvertToBin.asm',
-        r'..\projects\11\Pong\Pong.asm',  # too large, generates 17 bit addresses
+        r'..\projects\11\Pong\Pong.asm',  # 17 bit addresses
         r'..\projects\11\Seven\Seven.asm',
         r'..\projects\11\Square\Square.asm',
 
         # TODO: Project 12
         r"..\projects\12\SysTest\SysTest.asm",
         r"..\projects\12\ArrayTest\ArrayTest.asm",
+        r"..\projects\12\KeyboardTest\KeyboardTest.asm",  # 17 bit addresses
     ]
 
     # debug_runs = [True, False]

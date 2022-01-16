@@ -75,7 +75,7 @@ class Keyboard {
     function String readLine(String message) {
         var char inputChar, newline, backspace;
         var String inputString;
-        var bool endOfLine;
+        var boolean endOfLine;
 
         let inputString = String.new(80); // is length ever tested?
         do Output.printString(message);
@@ -88,10 +88,10 @@ class Keyboard {
 
             if (~endOfLine) {
                 if (inputChar = backspace) {
-                    do String.eraseLastChar(inputString);
+                    do inputString.eraseLastChar();
                 }
                 else {
-                    let inputString = String.appendChar(inputString, inputChar);
+                    let inputString = inputString.appendChar(inputChar);
                 }
             }
         }
@@ -110,7 +110,7 @@ class Keyboard {
         var int inputInt;
 
         let inputString = Keyboard.readLine(message);
-        let inputInt = String.intValue(inputString); // inputString = implicit cast of String* to int?
+        let inputInt = inputString.intValue();
         do inputString.dispose();
         return inputInt;
     }
