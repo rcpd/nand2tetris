@@ -56,7 +56,7 @@ def main(filepath, debug=False):
             # close decs/expressions/statements ;
             # varDec/classVarDec, term/expression, letStatement/doStatement/returnStatement
             if input_list[i][0] == "symbol" and input_list[i][1] == ";":
-                if parent.tag in ("term", "expression"):
+                while parent.tag in ("term", "expression"):
                     # close parent until all desired tags closed
                     for tag in ("term", "expression"):
                         if tag == parent.tag:
@@ -70,11 +70,12 @@ def main(filepath, debug=False):
                     if parent.tag in ("letStatement", "doStatement", "returnStatement"):
                         parent = find_parent(output_root, parent)
 
-                elif parent.tag in ("varDec", "classVarDec", "doStatement", "returnStatement"):
-                    # insert current token and update parent
-                    child = Et.SubElement(parent, input_tuple[0])
-                    child.text = " %s " % input_tuple[1]
-                    parent = find_parent(output_root, parent)
+                else:
+                    if parent.tag in ("varDec", "classVarDec", "doStatement", "returnStatement"):
+                        # insert current token and update parent
+                        child = Et.SubElement(parent, input_tuple[0])
+                        child.text = " %s " % input_tuple[1]
+                        parent = find_parent(output_root, parent)
 
             # open class definition: class className {
             elif input_list[i][0] == "keyword" and input_list[i][1] == "class":
