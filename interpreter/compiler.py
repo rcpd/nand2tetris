@@ -275,30 +275,21 @@ def compile_assignment(class_dict, class_name, func_name, var_name, exp_buffer, 
     if var_scope not in ('local', 'member'):
         raise RuntimeError("Unexpected scope '%s'" % var_scope)
 
-    if not lhs_array:
-        # typical assignment
-        if var_scope == 'local':
-            exp_buffer.append("pop %s %s // %s =" % (class_dict[class_name][func_name]['args'][var_name]['kind'],
-                                                     class_dict[class_name][func_name]['args'][var_name]['index'],
-                                                     var_name))
-        elif var_scope == 'member':
-            if class_dict[class_name]['args'][var_name]['kind'] == 'static':
-                exp_buffer.append("pop static %s // %s =" % (class_dict[class_name]['args'][var_name]['index'],
-                                                             var_name))
+    # typical assignment (local, static, field)
+    if var_scope == 'local':
+        exp_buffer.append("pop %s %s // %s =" % (class_dict[class_name][func_name]['args'][var_name]['kind'],
+                                                 class_dict[class_name][func_name]['args'][var_name]['index'],
+                                                 var_name))
+    elif var_scope == 'member':
+        exp_buffer.append("pop %s %s // %s =" % (
+            class_dict[class_name]['args'][var_name]['kind'].replace("field", "this"),
+            class_dict[class_name]['args'][var_name]['index'], var_name))
 
-            elif class_dict[class_name]['args'][var_name]['kind'] == 'field':
-                exp_buffer.append("pop this %s // %s =" % (class_dict[class_name]['args'][var_name]['index'],
-                                                           var_name))
-            else:
-                raise RuntimeError("unexpected kind: '%s'" % class_dict[class_name]['args'][var_name]['kind'])
-
-    else:
+    if lhs_array:
         # assignment to an array var (constructor or overwriting the pointer)
-        # this is speculative and will be reversed if next symbol is [
+        # this assignment is speculative and will be reversed if next symbol is [
         # (i.e. assignment was intended for array content not array itself)
-        exp_buffer.append("pop %s %s // %s = (*array var)"
-                          % (class_dict[class_name][func_name]['args'][var_name]['kind'],
-                             class_dict[class_name][func_name]['args'][var_name]['index'], var_name))
+        exp_buffer[-1] = exp_buffer[-1] + " (*array var)"  # add the metadata that triggers this test
 
     if var_scope == 'local':
         class_dict[class_name][func_name]['args'][var_name]['initialized'] = True
@@ -844,7 +835,7 @@ def main(filepath, file_list):
     end_block = first_eq = False
     num_args = while_count = if_count = 0
     class_name = statement = func_name = func_type = keyword = var_type = var_kind = identifier = ''
-    lhs_var_name = lhs_array = parent_obj = child_func = func_kind = ''
+    lhs_var_name = lhs_array = parent_obj = child_func = func_kind = var_scope = ''
 
     # walk AST
     print("Parsing AST: %s" % filepath)
@@ -873,17 +864,18 @@ def main(filepath, file_list):
             if block:
                 # TODO: compile_end_block
                 # if-without-else
-                if elem.tag not in ('keyword', 'term') and elem.text != 'else' and block[-1] == 'if':
+                if elem.text != 'else' and block[-1] == 'if':
                     pcode = store_pcode(pcode, "\nlabel IF_FALSE%s // end if_block" % (if_list[-1]))
                     pcode = store_pcode(pcode, "// popping '%s' from block" % block.pop())
                     pcode = store_pcode(pcode, "// popping '%s' from if_list" % if_list.pop())
 
-                # other statement blocks
+                # if-else
                 elif block[-1] == 'else':
                     pcode = store_pcode(pcode, "\nlabel IF_END%s // end if_block" % (if_list[-1]))
                     pcode = store_pcode(pcode, "// popping '%s' from block" % block.pop())
                     pcode = store_pcode(pcode, "// popping '%s' from if_list" % if_list.pop())
 
+                # if-else
                 elif block[-1] == 'if':
                     pcode = store_pcode(pcode, "\ngoto IF_END%s // end if_true_block" % (if_list[-1]))
                     pcode = store_pcode(pcode, "// popping '%s' from block" % block.pop())
@@ -903,7 +895,7 @@ def main(filepath, file_list):
         # has children
         if elem:
             # reset select tag contexts on depth change
-            keyword = var_type = var_kind = identifier = ''
+            keyword = var_type = var_kind = identifier = var_scope = ''
 
         # set keyword flag (single depth)
         if elem.tag == 'keyword':
@@ -918,12 +910,12 @@ def main(filepath, file_list):
                 continue
 
             elif elem.text == 'if':
-                statement = 'if'  # TODO: missing some ifStatement(s) in AST
+                statement = 'if'
 
             elif elem.text == 'let':
                 statement = 'let'
 
-            elif elem.text == 'return':  # TODO: return has classVarDec as parent in PongGame.moveBall ?
+            elif elem.text == 'return':
                 statement = 'return'
 
             # set on first instance only
@@ -943,6 +935,12 @@ def main(filepath, file_list):
         elif elem.tag == 'identifier':
             if keyword or statement:
                 identifier = elem.text
+
+                if class_name:
+                    if func_name and identifier in class_dict[class_name][func_name]['args']:
+                        var_scope = 'local'
+                    elif identifier in class_dict[class_name]['args']:
+                        var_scope = 'member'
 
                 # class declaration
                 if keyword == 'class':
@@ -1109,9 +1107,20 @@ def main(filepath, file_list):
                     exp_buffer.append("push temp 0 // restore result")
                     exp_buffer.append("pop pointer 1 // that = *array[index]")
                     exp_buffer.append("pop temp 0 // save result (rhs/call/expression)")
-                    exp_buffer.append("push %s %s // %s (*array var)" %
-                                      (class_dict[class_name][func_name]['args'][identifier]['kind'],
-                                       class_dict[class_name][func_name]['args'][identifier]['index'], identifier))
+
+                    if var_scope == 'local':
+                        exp_buffer.append("push %s %s // %s (*array var)" %
+                                          (class_dict[class_name][func_name]['args'][identifier]['kind'],
+                                           class_dict[class_name][func_name]['args'][identifier]['index'], identifier))
+
+                    elif var_scope == 'member':
+                        exp_buffer.append("push %s %s // %s (*array var)" %
+                                          (class_dict[class_name]['args'][identifier]['kind'].replace("field", "this"),
+                                           class_dict[class_name]['args'][identifier]['index'], identifier))
+
+                    else:
+                        raise RuntimeError("Unexpected var_scope %s" % var_scope)
+
                     lhs_array = None  # None signifies lhs_array was true but now compiled/consumed
 
                 # mark the start of a new expression
