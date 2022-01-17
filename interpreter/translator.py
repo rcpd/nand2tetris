@@ -804,7 +804,7 @@ def translate(vm_dir, vm_bootstrap_paths=(), debug=False):
     offset_list = []
 
     # TODO: this should probably be a glob pattern w/ logic to preserve order where it matters (sys.vm)
-    # TODO: _out.vm files not processed
+    # TODO: _out.vm files not processed (relevant if diverging later)
     # spec dictates that Sys.init() is first function to run on boot which then calls Main.main()
     # so functionally anything after sys.vm doesn't matter other than changing compilation order
     vm_filelist = [
@@ -908,6 +908,7 @@ if __name__ == "__main__":
         r"..\projects\12\SysTest",
         r"..\projects\12\ArrayTest",
         r"..\projects\12\KeyboardTest",
+        r"..\projects\12\StringTest",
     ]
 
     # VM programs that require non-spec bootstrap to pass tests
