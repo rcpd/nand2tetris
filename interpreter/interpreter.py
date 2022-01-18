@@ -810,6 +810,7 @@ if __name__ == '__main__':
                     line += 1
 
     # project
+    # TODO: comment remaining sys.errors
     # TODO: Project 12: Implement the OS libraries in Jack, compile/test (test programs included)
     # TODO: add integration for Project 12 translate/execute/assemble ASM > HACK (integration test)
     # TODO: VMEmulator equivalent for Jack debugging + tests (no instruction limit)

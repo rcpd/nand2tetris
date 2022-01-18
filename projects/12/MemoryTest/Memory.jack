@@ -33,58 +33,71 @@ class Memory {
     /** Finds an available RAM block of the given size and returns
      *  a reference to its base address. */
     function int alloc(int size) {
-        var Array local0; // heap size remaining?
-        var int local1;
+        var Array heapPtr; // heap size remaining?
+        var int freePtr;
 
         if (size < 0) {
-            do Sys.error(5);
+            do Sys.error(5); // Allocated memory size must be positive
         }
 
         if (size = 0) {
-            let size = 1;
+            let size = 1; // min allocation is 1
         }
 
-        let local0 = 2048;
+        let heapPtr = 2048; // heapStart
+        // heapPtr[0]{2048} = blocksFree(14334)
+        // heapPtr[1]{2049} = freePtr(2050)
+        // heapPtr[2]{2050} = freeBlock
 
-        // 16383 = end of heap, while pointer inbounds & remaining(?) < size:
-        while ((local0 < 16383) & (local0[0] < size) ) {
-            let local1 = local0[1]; // next free block?
+        // while heapPtr in bounds and blocksFree < size
+        // 1st alloc (non-max size): true
+        while ((heapPtr < 16383) & (heapPtr[0] < size) ) {
+            let freePtr = heapPtr[1]; // {2049} = 2050 (freeBlock)
 
-            if ((local0[0] = 0) | (local1 > 16382) | (local1[0] = 0)) {
-                let local0 = local1;
+            // if no blocksFree or freePtr at end of heap or freePtr referencing at empty block
+            // 1st alloc (non-max size): true
+            if ((heapPtr[0] = 0) | (freePtr > 16382) | (freePtr[0] = 0)) {
+                let heapPtr = freePtr; // {2048} = 2050 (freeBlock)
             }
-            else {
-                let local0[0] = (local0[1] - local0) + local1[0];
 
-                if (local1[1] = (local1+2)) {
-                    let local0[1] = local0 + 2;
+            // TODO
+            else {
+                let heapPtr[0] = (heapPtr[1] - heapPtr) + freePtr[0];
+
+                if (freePtr[1] = (freePtr + 2)) {
+                    let heapPtr[1] = heapPtr + 2;
                 }
                 else {
-                    let local0[1] = local1[1];
+                    let heapPtr[1] = freePtr[1];
                 }
             }
         }
 
-        if ((local0 + size) > 16379) {
-            // label IF_TRUE4
-            do Sys.error(6);
+        // TODO: why 4 words?
+        if ((heapPtr + size) > 16379) {
+            do Sys.error(6); // Heap overflow
         }
 
-        if (local0[0] > (size + 2)) {
-            let local0[size + 2] = local0[0] - size - 2;
+        // 1st alloc (non-max size): {2050} > size+2 (false)
+        // TODO
+        if (heapPtr[0] > (size + 2)) {
+            let heapPtr[size + 2] = heapPtr[0] - size - 2;
 
-            if (local0[1] = (local0 + 2)) {
-                let local0[size + 3] = local0 + size + 4;
+            if (heapPtr[1] = (heapPtr + 2)) {
+                let heapPtr[size + 3] = heapPtr + size + 4;
             }
             else {
-                let local0[size + 3] = local0[1];
+                let heapPtr[size + 3] = heapPtr[1];
             }
 
-            let local0[1] = local0+size+2;
+            let heapPtr[1] = heapPtr + size + 2;
         }
 
-        let local0[0] = 0;
-        return local0+2;
+        // return first word after linked list?
+        // 1st alloc (non-max size): {2050} = 0 (no effect), {2051} also 0
+        // 1st alloc (non-max size): return 2052
+        let heapPtr[0] = 0;
+        return heapPtr + 2;
     }
 
     /** De-allocates the given object (cast as an array) by making
