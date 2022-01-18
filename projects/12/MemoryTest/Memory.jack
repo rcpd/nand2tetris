@@ -1,0 +1,95 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/12/Memory.jack
+
+/**
+ * This library provides two services: direct access to the computer's main
+ * memory (RAM), and allocation and recycling of memory blocks. The Hack RAM
+ * consists of 32,768 words, each holding a 16-bit binary number.
+ */ 
+class Memory {
+    static Array static0;
+
+    /** Initializes the class. */
+    function void init() {
+        let static0 = 0; // manually assign pointer value as zero
+        let static0[2048] = 14334; // 2048 = heap start, 16383=heap end (14334+2048+1 = 163823)
+        let static0[2049] = 2050; // 2050 = next free block?
+        return;
+    }
+
+    /** Returns the RAM value at the given address. */
+    function int peek(int address) {
+        return static0[address];
+    }
+
+    /** Sets the RAM value at the given address to the given value. */
+    function void poke(int address, int value) {
+        let static0[address] = value;
+        return;
+    }
+
+    /** Finds an available RAM block of the given size and returns
+     *  a reference to its base address. */
+    function int alloc(int size) {
+        var Array local0; // heap size remaining?
+        var int local1;
+
+        if (size < 0) {
+            do Sys.error(5);
+        }
+
+        if (size = 0) {
+            let size = 1;
+        }
+
+        let local0 = 2048;
+
+        // 16383 = end of heap, while pointer inbounds & remaining(?) < size:
+        while ((local0 < 16383) & (local0[0] < size) ) {
+            let local1 = local0[1]; // next free block?
+
+            if ((local0[0] = 0) | (local1 > 16382) | (local1[0] = 0)) {
+                let local0 = local1;
+            }
+            else {
+                let local0[0] = (local0[1] - local0) + local1[0];
+
+                if (local1[1] = (local1+2)) {
+                    let local0[1] = local0 + 2;
+                }
+                else {
+                    let local0[1] = local1[1];
+                }
+            }
+        }
+
+        if ((local0 + size) > 16379) {
+            // label IF_TRUE4
+            do Sys.error(6);
+        }
+
+        if (local0[0] > (size + 2)) {
+            let local0[size + 2] = local0[0] - size - 2;
+
+            if (local0[1] = (local0 + 2)) {
+                let local0[size + 3] = local0 + size + 4;
+            }
+            else {
+                let local0[size + 3] = local0[1];
+            }
+
+            let local0[1] = local0+size+2;
+        }
+
+        let local0[0] = 0;
+        return local0+2;
+    }
+
+    /** De-allocates the given object (cast as an array) by making
+     *  it available for future allocations. */
+    function void deAlloc(Array o) {
+        return; // placeholder
+    }
+}

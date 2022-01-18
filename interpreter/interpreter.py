@@ -382,6 +382,7 @@ if __name__ == '__main__':
         r"..\projects\12\ArrayTest",
         r"..\projects\12\KeyboardTest",
         r"..\projects\12\StringTest",
+        r"..\projects\12\MemoryTest",
     ]
 
     # tokenizer/analyzer # TODO: projects 1-11 accounted for, included in tokenizer/analyzer/compiler
@@ -830,6 +831,7 @@ if __name__ == '__main__':
     # TODO: check subroutine returns
     # TODO: check constructor return type is class type
     # TODO: check constructor returns this
+    # TODO: check for unexpected tokens after statement expression (if/while)
 
     # interpreter
     # TODO: translator finish stack mapping: other stack manip(stacksize), functions(stackframes)
