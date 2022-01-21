@@ -17,7 +17,7 @@ class Memory {
         // 2048 = first heap, 16383 = last heap
         let static0[2048] = 14334; // blockSize (size+2)
         let static0[2049] = 2050; // *nextPtr = &blockData
-        // static0[2050] = 0; // &blockData (**nextPtr = null)
+        // static0[2050] = 0; // &blockData
         return;
     }
 
@@ -48,45 +48,38 @@ class Memory {
 
         let blockPtr = 2048; // start of heap
 
-        // search from start of heap until suitable free block (first fit) or heap exhausted
+        // search from start of heap until suitable freeBlock (first fit) or heap exhausted
+        // defrag if two adjacent free blocks found while interating
 
-        // 1st alloc: always false if size < maxSize (entire heap is freeBlock)
-        // 2nd+ alloc: always true on first loop (initial blockSize == 0)
+        // 1st alloc: always skip if size < maxSize (entire heap is freeBlock)
+        // 2nd+ alloc: iterate through allocated blocks (blockSize == 0)
         // 2nd+ alloc: break when out of bounds or found a block with blockSize > size required
-
-        // recycle: break when out of bounds or found a block with blockSize > size required
-        // {2051} = 2 freeBlockSize (*blockPtr, *freeBlock)
-        // {2052} = 2055 *freeNextPtr
-        // {2053} = <freeBlockData>
-        // {2054} = <freeBlockData>
-        // {2055} = 0 allocBlockSize (*allocBlock)
-        // {2056} = 2058 *allocNextPtr (**null)
-        // {2057} = <allocBlockData>
-        // {2058} = 14327 freeBlockSize2 (*freeBlock2)
-        // {2059} = 2060 *freeNextPtr2 (**null)
-        // {2060} = <freeBlockData2>
 
         while ((blockPtr < 16383) & (blockPtr[0] < size)) {
             let nextBlock = blockPtr[1];
 
-            // if blockSize/nextBlockSize is zero or *nextBlock would exceed heap boundary
+            // if blockSize or nextBlockSize is zero or *nextBlock would exceed heap boundary
+            // advance to next block and continue
             if ((blockPtr[0] = 0) | (nextBlock > 16382) | (nextBlock[0] = 0)) {
-                let blockPtr = nextBlock; // advance to next block and continue
+                let blockPtr = nextBlock;
             }
 
-            // TODO
-            else { // if blockSize/nextBlockSize is not zero (two adjacent free blocks)
-                // update blockSize and *nextPtr
+            // elif two adjacent freeBlocks are found: defrag
+            else {
+                // combine blockSize and currentBlock inherits nextBlock *nextPtr (flink or terminate)
 
-                // blockSize = (&blockData - *blockPtr) + nextBlockSize
+                // blockSize = len(freeBlock) + nextBlockSize
                 let blockPtr[0] = (blockPtr[1] - blockPtr) + nextBlock[0];
 
-                // if **(nextPtr+1) == &blockData
+                // if nextBlock is end of list (**(nextPtr+1) == &blockData)
                 if (nextBlock[1] = (nextBlock + 2)) {
+                    // currentBlock updated to reference closest data block (terminate list)
                     // *nextPtr = &blockData+2
                     let blockPtr[1] = blockPtr + 2;
                 }
-                else {
+
+                //
+                else { // else currentBlock inherits nextBlock flink
                     // *nextPtr = *nextBlockPtr
                     let blockPtr[1] = nextBlock[1];
                 }
@@ -99,27 +92,31 @@ class Memory {
             do Sys.error(6); // Heap overflow
         }
         
-        // if blockSize is sufficient split into allocBlock and freeBlock
+        // if blockSize is sufficient split into allocBlock/freeBlock and link them together
         if (blockPtr[0] > (size + 2)) {           
             // freeBlockSize = blockSize - allocBlockSize
             let blockPtr[size + 2] = blockPtr[0] - size - 2;
 
-            // TODO: what case causes it to be updated?
-            // if *allocNextPtr == &allocBlockData (i.e. *allocNextPtr has not been updated)
+            // freeBlock inherits allocBlock *nextPtr (flink or terminate)
+
+            // if *allocNextPtr is at the end of the list (allocNextPtr == &allocBlockData)
             if (blockPtr[1] = (blockPtr + 2)) {
-                // *freeNextPtr = &freeBlockData (**null)
+                // freeBlock updated to reference closest data block (terminate list)
                 let blockPtr[size + 3] = blockPtr + size + 4;
             }
-            else {
+
+            else { // freeBlock inherits allocBlock flink
                 // *freeNextPtr = *allocNextPtr
                 let blockPtr[size + 3] = blockPtr[1];
             }
+
+            // complete the chain by linking allocBlock to freeBlock
 
             // *allocNextPtr = *freeBlock
             let blockPtr[1] = blockPtr + size + 2;
         }
 
-        let blockPtr[0] = 0; // allocBlockSize = 0, flagging it as allocated
+        let blockPtr[0] = 0; // allocBlockSize = 0, flag it as allocated
         return blockPtr + 2; // return &allocBlockData
     }
 
@@ -132,26 +129,25 @@ class Memory {
         let blockPtr = o - 2; // move backwards from &allocBlockData to start of *allocBlock header
         let nextPtr = blockPtr[1]; // *nextPtr
 
-        // if *nextPtr references an allocated block update current block in place as free
+        // if nextBlock is allocated update currentBlock in place as free
         if (nextPtr[0] = 0) {
             // restore allocBlockSize
             let blockPtr[0] = blockPtr[1] - blockPtr - 2;
         }
 
-        // elif *nextPtr references a free block combine it with this one (defrag)
+        // elif nextBlock is a free combine it with currentBlock (defrag)
         else {
-            // size = what is required for current block + total size of the adjacent free block
+            // increase currentBlock size by total size of the adjacent freeBlock
             let blockPtr[0] = blockPtr[1] - blockPtr + nextPtr[0];
 
-            // update *nextPtr to reference the block after the one just combined - flink or data (terminate)
+            // currentblock inherits the freeBlock *nextPtr (flink or terminate)
 
-            // if nextBlock was at end of freeList continue to reference freeBlockData to terminate the list
+            // if nextBlock was at end of freeList continue to reference nearest data block to terminate the list
             if (nextPtr[1] = (nextPtr + 2)) {
                 let blockPtr[1] = blockPtr + 2;
             }
 
-            // if nextBlock was another freed block
-            // set it to the *blockPtr of the block following it to link the entries
+            // else currentBlock inherits freeBlock flink
             else {
                 let blockPtr[1] = nextPtr[1];
             }
