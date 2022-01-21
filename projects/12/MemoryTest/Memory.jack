@@ -146,8 +146,32 @@ class Memory {
     /** De-allocates the given object (cast as an array) by making
      *  it available for future allocations. */
     function void deAlloc(Array o) {
-        // append alloc block to end of existing list
-        // freeList[-1][0] = head of block
-        return; // placeholder
+        var int local0, local1;
+
+        // append returned block to end of freeList
+        let local0 = o-2; // blockPtr
+        let local1 = local0[1]; // *nextPtr
+
+        if (local1[0] = 0) {
+            // label IF_TRUE0
+            let local0[0] = local0[1] - local0 - 2;
+            // goto IF_END0
+        }
+        else {
+            // label IF_FALSE0
+            let local0[0] = local0[1] - local0 + local1[0];
+
+            if (local1[1] = (local1 + 2)) {
+                // label IF_TRUE1
+                let local0[1] = local0 + 2;
+                // goto IF_END1
+            }
+            else {
+                // label IF_FALSE1
+                let local0[1] = local1[1];
+                // label IF_END1
+            }
+        } // label IF_END0
+        return;
     }
 }
