@@ -49,32 +49,34 @@ class Memory {
         let blockPtr = 2048; // start of heap
 
         // search from start of heap until suitable free block (first fit) or heap exhausted
+
         // 1st alloc: always false if size < maxSize (entire heap is freeBlock)
         // 2nd+ alloc: always true on first loop (initial blockSize == 0)
         // 2nd+ alloc: break when out of bounds or found a block with blockSize > size required
-        while ((blockPtr < 16383) & (blockPtr[0] < size)) {
-            
-            // 2nd alloc 1st loop:
-            // {2048} = 0 allocBlockSize (*blockPtr, &allocBlock)
-            // {2049} = 2051 *allocNextPtr
-            // {2050} = <allocBlockData>
-            // {2051} = 14331 freeBlockSize (&freeBlock)
-            // {2052} = 2053 *freeNextPtr (**null)
-            // {2053} = <freeBlockData>
 
-            // 2nd alloc 1st loop: *nextBlock = 2051
+        // recycle: break when out of bounds or found a block with blockSize > size required
+        // {2051} = 2 freeBlockSize (*blockPtr, *freeBlock)
+        // {2052} = 2055 *freeNextPtr
+        // {2053} = <freeBlockData>
+        // {2054} = <freeBlockData>
+        // {2055} = 0 allocBlockSize (*allocBlock)
+        // {2056} = 2058 *allocNextPtr (**null)
+        // {2057} = <allocBlockData>
+        // {2058} = 14327 freeBlockSize2 (*freeBlock2)
+        // {2059} = 2060 *freeNextPtr2 (**null)
+        // {2060} = <freeBlockData2>
+
+        while ((blockPtr < 16383) & (blockPtr[0] < size)) {
             let nextBlock = blockPtr[1];
 
             // if blockSize/nextBlockSize is zero or *nextBlock would exceed heap boundary
-            // 2nd alloc 1st loop: true (blockSize == 0)
             if ((blockPtr[0] = 0) | (nextBlock > 16382) | (nextBlock[0] = 0)) {
-                // 2nd alloc 1st loop: *blockPtr = 2051
-                let blockPtr = nextBlock; // advance to next block & continue
+                let blockPtr = nextBlock; // advance to next block and continue
             }
 
-            // TODO: unsure when entered
-            else { // if blockSize/nextBlockSize is not zero
-                // update blockSize & *nextPtr
+            // TODO
+            else { // if blockSize/nextBlockSize is not zero (two adjacent free blocks)
+                // update blockSize and *nextPtr
 
                 // blockSize = (&blockData - *blockPtr) + nextBlockSize
                 let blockPtr[0] = (blockPtr[1] - blockPtr) + nextBlock[0];
@@ -97,70 +99,28 @@ class Memory {
             do Sys.error(6); // Heap overflow
         }
         
-        // if blockSize is sufficient split into allocBlock & freeBlock
+        // if blockSize is sufficient split into allocBlock and freeBlock
         if (blockPtr[0] > (size + 2)) {           
             // freeBlockSize = blockSize - allocBlockSize
             let blockPtr[size + 2] = blockPtr[0] - size - 2;
-            
-            // 1st alloc (1): {2051} = 14331
-            // 2nd alloc (1):
-            // {2051} = 14331 allocBlockSize (*blockPtr, &allocBlock)
-            // {2052} = 2053 *allocNextPtr
-            // {2053} = <allocBlockData>
-            // {2054} = 14328 freeBlockSize (&freeBlock)
-            // {2055} = <freeNextPtr>
-            // {2056} = <freeBlockData>
 
-            // if *allocNextPtr == &allocBlockData (i.e. *allocNextPtr has not been updated)
             // TODO: what case causes it to be updated?
+            // if *allocNextPtr == &allocBlockData (i.e. *allocNextPtr has not been updated)
             if (blockPtr[1] = (blockPtr + 2)) {
                 // *freeNextPtr = &freeBlockData (**null)
                 let blockPtr[size + 3] = blockPtr + size + 4;
-                
-                // 1st alloc (1):
-                // {2048} = 14334 allocBlockSize (*blockPtr, &allocBlock)
-                // {2049} = 2050 allocNextPtr
-                // {2050} = <allocBlockData>
-                // {2051} = 14331 freeBlockSize (&freeBlock)
-                // {2052} = 2053 freeNextPtr (**null)
-                // {2053} = <freeBlockData>
-                
-                // 2nd alloc (1):
-                // {2051} = 14331 allocBlockSize (*blockPtr, &allocBlock)
-                // {2052} = 2053 *allocNextPtr
-                // {2053} = <allocBlockData>
-                // {2054} = 14328 freeBlockSize (&freeBlock)
-                // {2055} = 2056 *freeNextPtr (**null)
-                // {2056} = <freeBlockData>
-                
             }
             else {
                 // *freeNextPtr = *allocNextPtr
                 let blockPtr[size + 3] = blockPtr[1];
             }
 
-            // *allocNextPtr = &freeBlock
+            // *allocNextPtr = *freeBlock
             let blockPtr[1] = blockPtr + size + 2;
-
-            // 2nd alloc (1):
-            // {2051} = 14331 allocBlockSize (*blockPtr, &allocBlock)
-            // {2052} = 2054 *allocNextPtr
-            // {2053} = <allocBlockData>
-            // {2054} = 14328 freeBlockSize (&freeBlock)
-            // {2055} = 2056 *freeNextPtr (**null)
-            // {2056} = <freeBlockData>
         }
 
         let blockPtr[0] = 0; // allocBlockSize = 0, flagging it as allocated
         return blockPtr + 2; // return &allocBlockData
-
-        // 2nd alloc (1):
-        // {2051} = 0 allocBlockSize (*blockPtr, &allocBlock)
-        // {2052} = 2054 *allocNextPtr
-        // {2053} = <allocBlockData>
-        // {2054} = 14328 freeBlockSize (&freeBlock)
-        // {2055} = 2056 *freeNextPtr (**null)
-        // {2056} = <freeBlockData>
     }
 
     /** De-allocates the given object (cast as an array) by making
@@ -172,57 +132,28 @@ class Memory {
         let blockPtr = o - 2; // move backwards from &allocBlockData to start of *allocBlock header
         let nextPtr = blockPtr[1]; // *nextPtr
 
-        // if *nextPtr references a consumed block update current block in place as available
-        // **nextPtr == 0 // allocBlockSize
+        // if *nextPtr references an allocated block update current block in place as free
         if (nextPtr[0] = 0) {
-            // restore allocBlockSize (allocBlockSize = *allocNextPtr - *blockPtr - 2)
+            // restore allocBlockSize
             let blockPtr[0] = blockPtr[1] - blockPtr - 2;
-
-            // fabricated example
-            // {2051} = 1 allocBlockSize (*blockPtr, &allocBlock)
-            // {2052} = 2054 *allocNextPtr
-            // {2053} = <allocBlockData>
-            // {2054} = 0 allocBlockSize2 (&allocBlock2)
-            // {2055} = 2056 *allocNextPtr2 (**null)
-            // {2056} = <allocBlockData2>
         }
-        else { // if *nextPtr references a free block append this block to it
 
-            // set the size to the current block + total size of the adjacent free block
-            // allocBlockSize = *allocNextPtr - *blockPtr + **allocNextPtr
+        // elif *nextPtr references a free block combine it with this one (defrag)
+        else {
+            // size = what is required for current block + total size of the adjacent free block
             let blockPtr[0] = blockPtr[1] - blockPtr + nextPtr[0];
 
-            // 2nd alloc (1):
-            // {2051} = 14331 allocBlockSize (*blockPtr, &allocBlock)
-            // {2052} = 2054 *allocNextPtr
-            // {2053} = <allocBlockData>
-            // {2054} = // 14328 freeBlockSize (&freeBlock)
-            // {2055} = // 2056 *freeNextPtr (**null)
-            // {2056} = // <freeBlockData>
+            // update *nextPtr to reference the block after the one just combined - flink or data (terminate)
 
-            // if nextBlock was end of freeList (**(nextPtr+1) == nextPtr+2)
+            // if nextBlock was at end of freeList continue to reference freeBlockData to terminate the list
             if (nextPtr[1] = (nextPtr + 2)) {
-                // *allocNextPtr = &allocBlockData (&allocBlock is now effectively &freeBlock)
                 let blockPtr[1] = blockPtr + 2;
-
-                // 2nd alloc (1):
-                // {2051} = 14331 freeBlockSize (*blockPtr, &freeBlock)
-                // {2052} = 2053 *freeNextPtr (**null)
-                // {2053} = <freeBlockData>
             }
-            else { // if nextBlock was another freed block
 
-                // *allocNextPtr = **(nextPtr+1)
+            // if nextBlock was another freed block
+            // set it to the *blockPtr of the block following it to link the entries
+            else {
                 let blockPtr[1] = nextPtr[1];
-
-                // TODO: does *freeNextPtr == first or last freeBlockData when multiple?
-                // fabricated example
-                // {2051} = 4 freeBlockSize (*blockPtr, &freeBlock)
-                // {2052} = 2056 *freeNextPtr
-                // {2053} = // <freeBlockData>
-                // {2054} = // 1 freeBlockSize2 (&freeBlock2)
-                // {2055} = // 2056 *freeNextPtr2 (**null)
-                // {2056} = <freeBlockData2>
             }
         }
         return;
