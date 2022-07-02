@@ -29,14 +29,115 @@
 //  "ARG": 2, "THIS": 3, "THAT": 4, "BASE": 15
 //  }
 
-// address_labels stored at 16+
+// address_labels stored at BASE+
 // len, n-chars, value
 
 // -----------------------------------------------------------------------------------
 
-@start_of_data // FIXME
+@BASE
 D=A
-@0
+@4
+M=D // initialize R4(code_ptr) = BASE
+
+@R7
+M=0 // R7(line_count) init
+
+// for int in instructions, process labels
+    (check_newline)
+    @128
+    D=A
+    @R0
+    A=M
+    D=D-M
+    @pre_test_label
+    D;JNE // jump if *ptr != "newline"
+    
+    // newline_found
+    @R5
+    D=M-1
+    @close_label
+    D;JEQ // jump if R5(label) == 1
+    
+    @R7
+    M=M+1 // R7(line_count)++ on non-label line
+    
+    (close_label)
+    @R5
+    M=0 // R5(label) = 0
+    @R6
+    D=M // save R6(len)
+    M=0 // clear R6(len)
+    @R4
+    A=A-D
+    A=A-1 // code_ptr-len-1
+    M=D // update label.len
+    @R7
+    D=M // R7(line_count)
+    @R4
+    M=D // *code_ptr = line_count
+    @pre_next
+    0;JMP // continue
+
+    (pre_test_label)
+    @R5
+    D=M-1
+    @pre_check_right_bracket
+    D;JEQ // jump if R5(label) == 1
+
+    // pre_check_left_bracket
+    @40
+    D=A
+    @R0
+    A=M
+    D=D-M
+    @pre_next
+    D;JNE // jump if *ptr != "("
+    
+    // pre_new_label
+    @R5
+    M=1 // R5(label)
+    @pre_next
+    0;JMP // continue
+
+    (pre_check_right_bracket)
+    @41
+    D=A
+    @R0
+    A=M
+    D=D-M
+    @pre_next
+    D;JEQ // jump if *ptr == ")"
+
+    // pre_append_label
+    @R0
+    A=M
+    D=M
+    @R4
+    A=M
+    M=D // *code_ptr = *ptr
+    @R4
+    M=M+1 // code_ptr++
+    @R6
+    M=M+1 // len++
+
+    (pre_next)
+    @R0
+    M=M+1 // ptr++
+
+    // pre_test_eof
+    @32767
+    D=A
+    @R0
+    A=M
+    D=D-M
+    @check_newline
+    D;JNE // loop until exhausted then fall through
+
+// -----------------------------------------------------------------------------------
+
+@start_of_data // BASE + <len of this program>
+D=A
+@R0
 M=D // initialize R0(ptr) as start_of_data
 
 @15
@@ -44,27 +145,28 @@ D=A
 @4
 M=D // initialize R4(code_ptr) as BASE
 
-// for int in instructions
-    @0
-    A=M // *ptr
+// -----------------------------------------------------------------------------------
 
+// for int in instructions
+
+    (test_a_or_c_instruction)
     // if a command (instruction[0] == "@")
     @64
-    D=A // @
-    @0
+    D=A
+    @R0
     A=M
     D=M-D // test *ptr == @
 
-    @0
+    @R0
     M=M+1 // ptr++
 
     @c_instruction // FIXME
     D;JNE // jump if false
-
+        (a_instruction)
         // if instruction[1].isnumeric() // 48-57
         @48
         D=A
-        @0
+        @R0
         A=M
         D=M-D
         @non_numeric // FIXME
@@ -72,7 +174,7 @@ M=D // initialize R4(code_ptr) as BASE
 
         @57
         D=A
-        @0
+        @R0
         A=M
         D=M-D
         @non_numeric // FIXME
@@ -82,10 +184,10 @@ M=D // initialize R4(code_ptr) as BASE
             // inc until newline (128)
             @128
             D=A
-            @0
+            @R0
             A=M
             D=M-D
-            @0
+            @R0
             M=M+1 // ptr++
             @// inc until newline (128) // FIXME
             D;JNE // jump if *ptr != 128
@@ -97,16 +199,16 @@ M=D // initialize R4(code_ptr) as BASE
             @2
             M=0 // R2(base10) = 0
 
-            @0
+            @R0
             M=M-1 // ptr--, back to &newline
 
             // read in from smallest to largest
-            @0
+            @R0
             M=M-1 // ptr--, next digit
 
             @64
             D=A
-            @0
+            @R0
             A=M
             D=M-A
             @// write a_instruction to RAM // FIXME
@@ -114,7 +216,7 @@ M=D // initialize R4(code_ptr) as BASE
 
             // TODO: simulate base10 multiplication by looping
 
-            @0
+            @R0
             A=M
             D=M
             @3
@@ -142,7 +244,7 @@ M=D // initialize R4(code_ptr) as BASE
 
         @1
         D=M
-        @0
+        @R0
         M=D // R0(ptr) = R1(next_instruction)
 
         // TODO: test if next_instruction is eof?
@@ -150,16 +252,21 @@ M=D // initialize R4(code_ptr) as BASE
         @// for int in instructions // FIXME
         0;JMP // loop
 
-// if c instruction
-    // prefix = instruction[0:2]
-    // a/m = instruction[3:3]
-    // comp = instruction[4:9]
-    // dest = instruction[10:12]
-    // jump = instruction[13:15]
+    // else c instruction
+        (c_instruction)
+        // prefix = instruction[0:2]
+        // a/m = instruction[3:3]
+        // comp = instruction[4:9]
+        // dest = instruction[10:12]
+        // jump = instruction[13:15]
 
 // inc ptr
-@0
+@R0
 M=M+1
+
+(eof)
+@eof
+0;JMP // trap
 
 
 
