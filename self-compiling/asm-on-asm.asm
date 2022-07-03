@@ -50,27 +50,27 @@ M=D // initialize R0(ptr) as start_of_data
 
 // label pre-scan
 // for int in instructions, process labels
-    (check_comment)
+    (pre_check_comment)
     @R9
     D=M-1
-    @check_newline
-    D;JGE // jump if R9(comment_flag_t) >= 1
+    @pre_check_newline
+    D;JGE // jump if R9(comment_flag) >= 1
 
     @47
     D=A
     @R0
     A=M
     D=D-M
-    @check_newline
+    @pre_check_newline
     D;JNE // jump if *ptr != "/"
 
     // comment_found
     @R9
     M=1
     @pre_next
-    0;JMP // set R9(comment_flag_t) and skip
+    0;JMP // set R9(comment_flag) and skip
 
-    (check_newline)
+    (pre_check_newline)
     @128
     D=A
     @R0
@@ -81,30 +81,30 @@ M=D // initialize R0(ptr) as start_of_data
 
     // newline_found
     @R9
-    M=0 // reset R9(comment_flag_t)
+    M=0 // reset R9(comment_flag)
 
     @R5
     D=M-1
-    @close_label
-    D;JEQ // jump if R5(label_t) == 1
+    @pre_close_label
+    D;JEQ // jump if R5(label_flag) == 1
 
     @R10
     D=M-1
     @pre_next
-    D;JNE // jump if R10(line_data_t) != 1
+    D;JNE // jump if R10(line_data) != 1
 
     @R7
     M=M+1 // R7(line_count_t)++ on non-label/comment line
 
     @R10
-    M=0 // reset R10(line_data_t)
+    M=0 // reset R10(line_data)
 
     @pre_next
     0;JMP // continue
 
-    (close_label)
+    (pre_close_label)
     @R5
-    M=0 // R5(label_t) = 0
+    M=0 // R5(label_flag) = 0
     @R6
     D=M // save R6(len)
     M=0 // clear R6(len)
@@ -125,12 +125,12 @@ M=D // initialize R0(ptr) as start_of_data
     @R9
     D=M-1
     @pre_next
-    D;JGE // jump if R9(comment_flag_t) >= 1
+    D;JGE // jump if R9(comment_flag) >= 1
 
     @R5
     D=M-1
     @pre_check_right_bracket
-    D;JEQ // jump if R5(label_t) == 1
+    D;JEQ // jump if R5(label_flag) == 1
 
     // pre_check_left_bracket
     @40
@@ -143,11 +143,11 @@ M=D // initialize R0(ptr) as start_of_data
 
     // non_comment_label
     @R10
-    M=1 // set R10(line_data_t)
+    M=1 // set R10(line_data)
 
     (pre_new_label)
     @R5
-    M=1 // R5(label_t)
+    M=1 // R5(label_flag)
     @pre_next
     0;JMP // continue
 
@@ -182,7 +182,7 @@ M=D // initialize R0(ptr) as start_of_data
     @R0
     A=M
     D=D-M
-    @check_newline
+    @pre_check_newline
     D;JNE // loop until exhausted then fall through
 
 // -----------------------------------------------------------------------------------
@@ -223,8 +223,8 @@ M=D // initialize R0(ptr) as start_of_data
     D;JGT // jump if *ptr > 57
 
     // address = instruction[1:]  # assign if literal
-    // advance until newline for rev_read
-    (newline) 
+    // advance until newline
+    (a_check_newline)
     @128
     D=A
     @R0
@@ -232,7 +232,7 @@ M=D // initialize R0(ptr) as start_of_data
     D=M-D
     @R0
     M=M+1 // ptr++
-    @newline
+    @a_check_newline
     D;JNE // jump if *ptr != newline (128)
 
     D=A
@@ -247,7 +247,7 @@ M=D // initialize R0(ptr) as start_of_data
     @R0
     M=M-1 // ptr--, back to &newline
 
-    (rev_read) // loop through digits smallest to largest
+    (a_rev_read) // loop through digits smallest to largest
     @R0
     M=M-1 // ptr--, next digit
 
@@ -256,7 +256,7 @@ M=D // initialize R0(ptr) as start_of_data
     @R0
     A=M
     D=M-A
-    @write_a
+    @a_write
     D;JEQ // jump if *ptr == @
     
     @R2
@@ -270,7 +270,7 @@ M=D // initialize R0(ptr) as start_of_data
 
     @R2
     D=M-1
-    @start_base10
+    @a_start_base10
     D;JEQ // jump if R2(base10_t) == 1
     
     @10
@@ -282,7 +282,7 @@ M=D // initialize R0(ptr) as start_of_data
     D=M
     @2
     D=D-A
-    @start_base10
+    @a_start_base10
     D;JEQ // jump if R2(base10_t) == 2
     
     @100
@@ -294,7 +294,7 @@ M=D // initialize R0(ptr) as start_of_data
     D=M
     @3
     D=D-A
-    @start_base10
+    @a_start_base10
     D;JEQ // jump if R2(base10_t) == 3
     
     @1000
@@ -306,7 +306,7 @@ M=D // initialize R0(ptr) as start_of_data
     D=M
     @4
     D=D-A
-    @start_base10
+    @a_start_base10
     D;JEQ // jump if R2(base10_t) == 4
     
     @10000
@@ -318,10 +318,10 @@ M=D // initialize R0(ptr) as start_of_data
     D=M
     @5
     D=D-A
-    @start_base10
+    @a_start_base10
     D;JEQ // jump if R2(base10_t) == 5
     
-    (start_base10)
+    (a_start_base10)
     
     // cumulative sum
     @R0
@@ -333,10 +333,10 @@ M=D // initialize R0(ptr) as start_of_data
     @R5
     M=M-1 // R5(base10_count_t)--
     D=M
-    @start_base10
+    @a_start_base10
     D;JNE // jump if R5(base10_count_t) != 0
 
-    @rev_read
+    @a_rev_read
     0;JMP // loop to next char
 
     // else:
@@ -347,7 +347,7 @@ M=D // initialize R0(ptr) as start_of_data
             // address_labels["BASE"] += 1  # if not, increment to next slot on the heap and assign it
             // address = address_labels[temp_label] = address_labels["BASE"]
 
-    (write_a)
+    (a_write)
     @R3
     M=D
     @R4
@@ -359,24 +359,22 @@ M=D // initialize R0(ptr) as start_of_data
     @R1
     D=M
     @R0
-    M=D // R0(ptr) = R1(next_instruction_t)
-
-    // TODO: test if next_instruction is eof?
-
-    @(a_or_c)
-    0;JMP // loop to next instruction
+    M=D // R0(ptr) = R1(next_instruction_t) // TODO: test if next_instruction is eof?
+    @check_comment
+    0;JMP // continue
 
     // else c instruction
-        (c)
-        // prefix = instruction[0:2]
-        // a/m = instruction[3:3]
-        // comp = instruction[4:9]
-        // dest = instruction[10:12]
-        // jump = instruction[13:15]
+
+    (c_instruction)
+    // prefix = instruction[0:2]
+    // a/m = instruction[3:3]
+    // comp = instruction[4:9]
+    // dest = instruction[10:12]
+    // jump = instruction[13:15]
 
 (eof)
 @eof
-0;JMP // trap
+0;JMP // halt
 
 
 
