@@ -50,24 +50,58 @@ M=D // initialize R0(ptr) as start_of_data
 
 // label pre-scan
 // for int in instructions, process labels
+    (check_comment)
+    @R9
+    D=M-1
+    @check_newline
+    D;JGE // jump if R9(comment_flag_t) >= 1
+
+    @47
+    D=A
+    @R0
+    A=M
+    D=D-M
+    @check_newline
+    D;JNE // jump if *ptr != "/"
+
+    // comment_found
+    @R9
+    M=1
+    @pre_next
+    0;JMP // set R9(comment_flag_t) and skip
+
     (check_newline)
     @128
     D=A
     @R0
     A=M
     D=D-M
-    @pre_test_label
+    @pre_test_label_comment
     D;JNE // jump if *ptr != "newline"
-    
+
     // newline_found
+    @R9
+    M=0 // reset R9(comment_flag_t)
+
     @R5
     D=M-1
     @close_label
     D;JEQ // jump if R5(label_t) == 1
-    
+
+    @R10
+    D=M-1
+    @pre_next
+    D;JNE // jump if R10(line_data_t) != 1
+
     @R7
-    M=M+1 // R7(line_count_t)++ on non-label line
-    
+    M=M+1 // R7(line_count_t)++ on non-label/comment line
+
+    @R10
+    M=0 // reset R10(line_data_t)
+
+    @pre_next
+    0;JMP // continue
+
     (close_label)
     @R5
     M=0 // R5(label_t) = 0
@@ -76,18 +110,23 @@ M=D // initialize R0(ptr) as start_of_data
     M=0 // clear R6(len)
     @R4
     A=A-D
-    A=A-1 // code_ptr-len-1
+    A=A-1 // code_ptr-len-1 (&label.value)
     M=D // update label.len
     @R7
     D=M // R7(line_count_t)
     @R8
     M=M+1 // R8(label_count)++
     @R4
-    M=D // *code_ptr = line_count
+    M=D // *code_ptr(label.value) = line_count
     @pre_next
     0;JMP // continue
 
-    (pre_test_label)
+    (pre_test_label_comment)
+    @R9
+    D=M-1
+    @pre_next
+    D;JGE // jump if R9(comment_flag_t) >= 1
+
     @R5
     D=M-1
     @pre_check_right_bracket
@@ -99,10 +138,14 @@ M=D // initialize R0(ptr) as start_of_data
     @R0
     A=M
     D=D-M
-    @pre_next
-    D;JNE // jump if *ptr != "("
-    
-    // pre_new_label
+    @pre_new_label
+    D;JEQ // jump if *ptr == "("
+
+    // non_comment_label
+    @R10
+    M=1 // set R10(line_data_t)
+
+    (pre_new_label)
     @R5
     M=1 // R5(label_t)
     @pre_next
@@ -145,6 +188,8 @@ M=D // initialize R0(ptr) as start_of_data
 // -----------------------------------------------------------------------------------
 
 // for int in instructions
+    # TODO: skip comment lines
+    # TODO: mark inline vs comment lines
 
     (a_or_c)
     // if a command (instruction[0] == "@")
@@ -318,7 +363,7 @@ M=D // initialize R0(ptr) as start_of_data
 
     // TODO: test if next_instruction is eof?
 
-    @(a_or_c) // FIXME
+    @(a_or_c)
     0;JMP // loop to next instruction
 
     // else c instruction
