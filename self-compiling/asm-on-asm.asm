@@ -12,9 +12,11 @@
 //      "f3": 143, "f4": 144, "f5": 145, "f6": 146, "f7": 147, "f8": 148, "f9": 149, "f10": 150, "f11": 151, "f12": 152
 //  }
 
+// history
+    // v1: no formatting/comments, hard-coded/manually resolved labels only
+    // v2: formatting/comments/label resolution
+
 // assumptions
-    // no white space or empty lines
-    // no comments
     // addresses are correctly padded/limited to 16 bits
     // code to read in is appended to end of this program in ROM at start_of_data
     // code is encoded in the Jack string format
@@ -36,12 +38,17 @@
 
 @BASE
 D=A
-@4
+@R4
 M=D // initialize R4(code_ptr) = BASE
 
-@R7
-M=0 // R7(line_count) init
+@start_of_data // BASE + <len of this program>
+D=A
+@R0
+M=D // initialize R0(ptr) as start_of_data
 
+// -----------------------------------------------------------------------------------
+
+// label pre-scan
 // for int in instructions, process labels
     (check_newline)
     @128
@@ -56,14 +63,14 @@ M=0 // R7(line_count) init
     @R5
     D=M-1
     @close_label
-    D;JEQ // jump if R5(label) == 1
+    D;JEQ // jump if R5(label_t) == 1
     
     @R7
-    M=M+1 // R7(line_count)++ on non-label line
+    M=M+1 // R7(line_count_t)++ on non-label line
     
     (close_label)
     @R5
-    M=0 // R5(label) = 0
+    M=0 // R5(label_t) = 0
     @R6
     D=M // save R6(len)
     M=0 // clear R6(len)
@@ -72,7 +79,9 @@ M=0 // R7(line_count) init
     A=A-1 // code_ptr-len-1
     M=D // update label.len
     @R7
-    D=M // R7(line_count)
+    D=M // R7(line_count_t)
+    @R8
+    M=M+1 // R8(label_count)++
     @R4
     M=D // *code_ptr = line_count
     @pre_next
@@ -82,7 +91,7 @@ M=0 // R7(line_count) init
     @R5
     D=M-1
     @pre_check_right_bracket
-    D;JEQ // jump if R5(label) == 1
+    D;JEQ // jump if R5(label_t) == 1
 
     // pre_check_left_bracket
     @40
@@ -95,7 +104,7 @@ M=0 // R7(line_count) init
     
     // pre_new_label
     @R5
-    M=1 // R5(label)
+    M=1 // R5(label_t)
     @pre_next
     0;JMP // continue
 
@@ -135,21 +144,9 @@ M=0 // R7(line_count) init
 
 // -----------------------------------------------------------------------------------
 
-@start_of_data // BASE + <len of this program>
-D=A
-@R0
-M=D // initialize R0(ptr) as start_of_data
-
-@15
-D=A
-@4
-M=D // initialize R4(code_ptr) as BASE
-
-// -----------------------------------------------------------------------------------
-
 // for int in instructions
 
-    (test_a_or_c_instruction)
+    (a_or_c)
     // if a command (instruction[0] == "@")
     @64
     D=A
@@ -160,109 +157,177 @@ M=D // initialize R4(code_ptr) as BASE
     @R0
     M=M+1 // ptr++
 
-    @c_instruction // FIXME
+    @c
     D;JNE // jump if false
-        (a_instruction)
-        // if instruction[1].isnumeric() // 48-57
-        @48
-        D=A
-        @R0
-        A=M
-        D=M-D
-        @non_numeric // FIXME
-        D;JLT // jump if *ptr < 48
 
-        @57
-        D=A
-        @R0
-        A=M
-        D=M-D
-        @non_numeric // FIXME
-        D;JGT // jump if *ptr > 57
+    (a_instruction) // if instruction[1].isnumeric() // 48-57
+    @48
+    D=A
+    @R0
+    A=M
+    D=M-D
+    @nan
+    D;JLT // jump if *ptr < 48
 
-            // address = instruction[1:]  # assign if literal
-            // inc until newline (128)
-            @128
-            D=A
-            @R0
-            A=M
-            D=M-D
-            @R0
-            M=M+1 // ptr++
-            @// inc until newline (128) // FIXME
-            D;JNE // jump if *ptr != 128
+    @57
+    D=A
+    @R0
+    A=M
+    D=M-D
+    @nan
+    D;JGT // jump if *ptr > 57
 
-            D=A
-            @1
-            M=D // R1 = next_instruction
+    // address = instruction[1:]  # assign if literal
+    // advance until newline for rev_read
+    (newline) 
+    @128
+    D=A
+    @R0
+    A=M
+    D=M-D
+    @R0
+    M=M+1 // ptr++
+    @newline
+    D;JNE // jump if *ptr != newline (128)
 
-            @2
-            M=0 // R2(base10) = 0
+    D=A
+    @R1
+    M=D // R1(next_instruction_t)
 
-            @R0
-            M=M-1 // ptr--, back to &newline
+    @R2
+    M=0 // reset R2(base10_t)
+    @R5
+    M=0 // reset R5(base10_count_t)
 
-            // read in from smallest to largest
-            @R0
-            M=M-1 // ptr--, next digit
+    @R0
+    M=M-1 // ptr--, back to &newline
 
-            @64
-            D=A
-            @R0
-            A=M
-            D=M-A
-            @// write a_instruction to RAM // FIXME
-            D;JEQ // jump if *ptr == @
+    (rev_read) // loop through digits smallest to largest
+    @R0
+    M=M-1 // ptr--, next digit
 
-            // TODO: simulate base10 multiplication by looping
+    @64
+    D=A
+    @R0
+    A=M
+    D=M-A
+    @write_a
+    D;JEQ // jump if *ptr == @
+    
+    @R2
+    M=M+1 // R2(base10_t)++
 
-            @R0
-            A=M
-            D=M
-            @3
-            M=M+D // R3(sum) += *ptr
+    // simulate base10_t multiplication by looping
+    
+    // init base10_count_t
+    @R5
+    M=1
 
-            @// read in from smallest to largest // FIXME
-            0;JMP // loop
+    @R2
+    D=M-1
+    @start_base10
+    D;JEQ // jump if R2(base10_t) == 1
+    
+    @10
+    D=A
+    @R5
+    M=D
+    
+    @R2
+    D=M
+    @2
+    D=D-A
+    @start_base10
+    D;JEQ // jump if R2(base10_t) == 2
+    
+    @100
+    D=A
+    @R5
+    M=D
+    
+    @R2
+    D=M
+    @3
+    D=D-A
+    @start_base10
+    D;JEQ // jump if R2(base10_t) == 3
+    
+    @1000
+    D=A
+    @R5
+    M=D
+    
+    @R2
+    D=M
+    @4
+    D=D-A
+    @start_base10
+    D;JEQ // jump if R2(base10_t) == 4
+    
+    @10000
+    D=A
+    @R5
+    M=D
+    
+    @R2
+    D=M
+    @5
+    D=D-A
+    @start_base10
+    D;JEQ // jump if R2(base10_t) == 5
+    
+    (start_base10)
+    
+    // cumulative sum
+    @R0
+    A=M
+    D=M // *ptr
+    @R3
+    M=M+D // R3(sum_t) += *ptr
 
+    @R5
+    M=M-1 // R5(base10_count_t)--
+    D=M
+    @start_base10
+    D;JNE // jump if R5(base10_count_t) != 0
+
+    @rev_read
+    0;JMP // loop to next char
+
+    // else:
+        // temp_label = instruction[1:]
+        // if temp_label in address_labels:
+            // address = address_labels[temp_label]  # if label has an address, assign address
         // else:
-            // temp_label = instruction[1:]
-            // if temp_label in address_labels:
-                // address = address_labels[temp_label]  # if label has an address, assign address
-            // else:
-                // address_labels["BASE"] += 1  # if not, increment to next slot on the heap and assign it
-                // address = address_labels[temp_label] = address_labels["BASE"]
+            // address_labels["BASE"] += 1  # if not, increment to next slot on the heap and assign it
+            // address = address_labels[temp_label] = address_labels["BASE"]
 
-        // write a_instruction to RAM
-        @3
-        M=D
-        @4
-        A=M
-        M=D // *R4(code_ptr) = R3(sum)
-        @4
-        M=M+1 // R4(code_ptr)++
+    (write_a)
+    @R3
+    M=D
+    @R4
+    A=M
+    M=D // *R4(code_ptr) = R3(sum_t)
+    @R4
+    M=M+1 // R4(code_ptr)++
 
-        @1
-        D=M
-        @R0
-        M=D // R0(ptr) = R1(next_instruction)
+    @R1
+    D=M
+    @R0
+    M=D // R0(ptr) = R1(next_instruction_t)
 
-        // TODO: test if next_instruction is eof?
+    // TODO: test if next_instruction is eof?
 
-        @// for int in instructions // FIXME
-        0;JMP // loop
+    @(a_or_c) // FIXME
+    0;JMP // loop to next instruction
 
     // else c instruction
-        (c_instruction)
+        (c)
         // prefix = instruction[0:2]
         // a/m = instruction[3:3]
         // comp = instruction[4:9]
         // dest = instruction[10:12]
         // jump = instruction[13:15]
-
-// inc ptr
-@R0
-M=M+1
 
 (eof)
 @eof
