@@ -188,8 +188,6 @@ M=D // initialize R0(ptr) as start_of_data
 // -----------------------------------------------------------------------------------
 
 // for int in instructions
-    # TODO: a/c should also be flags
-
     (check_comment_flag)
     @R9
     D=M-1
@@ -238,7 +236,7 @@ M=D // initialize R0(ptr) as start_of_data
     @R0
     A=M
     D=D-M
-    @test_a
+    @check_c_flag
     D;JNE // jump if *ptr != "newline"
     
     @newline_found
@@ -262,11 +260,25 @@ M=D // initialize R0(ptr) as start_of_data
     @R0
     D=M
     @R1
-    M=D+1 // R1(next_instruction_t)++
+    M=D+1 // R1(next_instruction) = R0(ptr)+1
 
     @next
     0;JMP // continue
-    
+
+    (check_c_flag)
+    @R7
+    D=M-1
+    @c_instruction
+    D;JEQ // jump if R7(c_flag_t) == 1
+
+    (check_a_flag)
+    @R11
+    D=M-1
+    @a_instruction
+    D;JEQ // jump if R11(a_flag_t) == 1
+
+    // if neither, test for a instruction
+
     (test_a)
     // if a command (instruction[0] == "@")
     @64
@@ -278,8 +290,12 @@ M=D // initialize R0(ptr) as start_of_data
     @R0
     M=M+1 // ptr++
 
-    @c_instruction
-    D;JNE // jump if false
+    @set_c_instruction
+    D;JNE // jump if instruction[0] != "@"
+
+    // set_a_instruction
+    @R11
+    M=1 // R11(a_flag_t) = 1
 
     (a_instruction) // if instruction[1].isnumeric() // 48-57
     @48
@@ -299,8 +315,9 @@ M=D // initialize R0(ptr) as start_of_data
     D;JGT // jump if *ptr > 57
 
     // address = instruction[1:]  # assign if literal
-    // advance until newline
+
     (a_check_newline)
+    // advance until newline
     @128
     D=A
     @R0
@@ -310,10 +327,6 @@ M=D // initialize R0(ptr) as start_of_data
     M=M+1 // ptr++
     @a_check_newline
     D;JNE // jump if *ptr != newline (128)
-
-    D=A // FIXME?
-    @R1
-    M=D // R1(next_instruction_t)
 
     @R2
     M=0 // reset R2(base10_t)
@@ -437,9 +450,17 @@ M=D // initialize R0(ptr) as start_of_data
 
     // else c instruction
 
+    (set_c_instruction)
+    @R7
+    M=1 // R7(c_flag_t) = 1
+
+    // prefix = instruction[0:2], first 3 bits always set
+    @57344
+    D=A
+    @R3
+    M=D // R3(sum_t) = 1110 0000 0000 0000
+
     (c_instruction)
-    // prefix = instruction[0:2]
-    // a/m = instruction[3:3]
     // comp = instruction[4:9]
     // dest = instruction[10:12]
     // jump = instruction[13:15]
@@ -448,7 +469,7 @@ M=D // initialize R0(ptr) as start_of_data
     @R1
     D=M
     @R0
-    M=D // R0(ptr) = R1(next_instruction_t) // TODO: test if next_instruction is eof?
+    M=D // R0(ptr) = R1(next_instruction) // TODO: test if next_instruction is eof?
     @check_comment_flag
     0;JMP // continue
 
