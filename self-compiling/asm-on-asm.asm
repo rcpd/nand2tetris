@@ -31,15 +31,18 @@
 //  "ARG": 2, "THIS": 3, "THAT": 4, "BASE": 15
 //  }
 
-// address_labels stored at BASE+
+// max asm instruction len = 7
+// 16-22 reserved for ASM chars
+
+// address_labels stored at 50+
 // len, n-chars, value
 
 // -----------------------------------------------------------------------------------
 
-@BASE
+@50
 D=A
 @R4
-M=D // initialize R4(code_ptr) = BASE
+M=D // initialize R4(code_ptr) = 50
 
 @start_of_data // BASE + <len of this program>
 D=A
@@ -262,6 +265,8 @@ M=D // initialize R0(ptr) as start_of_data
     @R1
     M=D+1 // R1(next_instruction) = R0(ptr)+1
 
+    // TODO: write/clear op buffer
+
     @next
     0;JMP // continue
 
@@ -453,6 +458,8 @@ M=D // initialize R0(ptr) as start_of_data
     (set_c_instruction)
     @R7
     M=1 // R7(c_flag_t) = 1
+    @R4
+    M=0 // R4(code_ptr) = 0
 
     // prefix = instruction[0:2], first 3 bits always set
     @57344
@@ -462,8 +469,75 @@ M=D // initialize R0(ptr) as start_of_data
 
     (c_instruction)
     // comp = instruction[4:9]
+
+    // if not jump/assign, read into op buffer
+    @R2
+    D=M
+    @R3
+    D=D+M
+    @2
+    D=D-A
+    @ // TODO: jump to non-op buffer read
+    D;JNE
+
+    // if ";" or "=" set flag stop reading into op buffer
+
+    @59
+    D=A
+    @R0
+    A=M
+    D=D-M
+    @set_jump_flag
+    D;JEQ // jump if *ptr == ";"
+
+    @61
+    D=A
+    @R0
+    A=M
+    D=D-M
+    @set_assignment_flag
+    D;JEQ // jump if *ptr == "="
+
+    // continue reading into op buffer
+    @R0
+    D=M
+    @R4
+    A=M
+    M=D // *code_ptr = *ptr
+    @R4
+    M=M+1 // code_ptr++
+
+    @check_m
+    0;JMP
+
     // dest = instruction[10:12]
     // jump = instruction[13:15]
+
+    // a/m = instruction[3:3]
+    (check_m)
+    // TODO: if "M" in operation
+    @inc_instruction
+    0;JMP
+
+    (m_encountered)
+    @4096
+    D=A
+    @R3
+    M=M+D // R3(sum_t) += 4096 (set 4th bit)
+
+    (set_jump_flag)
+    @R2
+    M=1 // R2(jump_flag_t) = 1
+    @inc_instruction
+    0;JMP
+
+    (set_assignment_flag)
+    @R3
+    M=1 // R3(assignment_flag_t) = 1
+
+    (inc_instruction)
+    @R1
+    M=M+1
 
     (next)
     @R1
