@@ -31,6 +31,22 @@
 //  "ARG": 2, "THIS": 3, "THAT": 4, "BASE": 15
 //  }
 
+// R0 = rom_ptr
+// R1 = next_instruction
+// R2 = base10_t
+// R3 = sum_t
+// R4 = heap_ptr
+// R5 = label_flag
+// R6 = len_t, int_buffer_ptr // ok
+// R7 = line_count_t, c_flag_t // ok
+// R8 = label_count
+// R9 = comment_flag
+// R10 = line_data_t
+// R11 = a_flag_t
+// R12 = jump_flag_t
+// R13 = base10_count_t
+// R14 = m_flag
+
 // max asm instruction len = 7
 // 16-22 reserved for ASM chars (int_buffer_ptr)
 
@@ -96,13 +112,13 @@ M=D // initialize R0(rom_ptr) as start_of_data
     @R10
     D=M-1
     @pre_next
-    D;JNE // jump if R10(line_data) != 1
+    D;JNE // jump if R10(line_data_t) != 1
 
     @R7
     M=M+1 // R7(line_count_t)++ on non-label/comment line
 
     @R10
-    M=0 // reset R10(line_data)
+    M=0 // reset R10(line_data_t)
 
     @pre_next
     0;JMP // continue
@@ -148,7 +164,7 @@ M=D // initialize R0(rom_ptr) as start_of_data
 
     // non_comment_label
     @R10
-    M=1 // set R10(line_data)
+    M=1 // set R10(line_data_t)
 
     (pre_new_label)
     @R5
@@ -171,11 +187,11 @@ M=D // initialize R0(rom_ptr) as start_of_data
     D=M
     @R4
     A=M
-    M=D // *heap_ptr = *rom_ptr
+    M=D // R4(*heap_ptr) = *rom_ptr
     @R4
-    M=M+1 // heap_ptr++
+    M=M+1 // R4(heap_ptr)++
     @R6
-    M=M+1 // len++
+    M=M+1 // R6(len_t)++
 
     (pre_next)
     @R0
@@ -286,6 +302,13 @@ M=D // heap_ptr = 16384 (binary output base)
 
     // process c_instruction results
 
+    // test_jump_flag
+    @R12
+    D=M
+    D=D-1
+    @end_jump_case
+    D;JNE // jump if R12(jump_flag_t) != 1
+
     // case for converting jump bits
     // "JGT": 74+71+84 = 229 / 001 = 1
     // "JEQ": 74+69+81 = 224 / 010 = 2
@@ -337,8 +360,8 @@ M=D // heap_ptr = 16384 (binary output base)
     @jump_JLE
     D;JEQ // jump if R3(sum_t) == 219
 
-    @jump_JMP
-    0;JMP // unconditonal jump (231)
+    @end_jump_case
+    0;JMP // jump_JMP == 231 (nothing to add)
 
     (jump_JGT)
     @R3
@@ -386,17 +409,13 @@ M=D // heap_ptr = 16384 (binary output base)
     @end_jump_case
     0;JMP
 
-    (jump_JMP)
-
     (end_jump_case)
-
 
     // prefix = instruction[0:2], first 3 bits always set
     @57344
     D=A
     @R3
     M=M+D // R3(sum_t) = 1110 0000 0000 0000
-
 
     // clear instruction buffer
     @16
@@ -415,10 +434,10 @@ M=D // heap_ptr = 16384 (binary output base)
     M=0
 
     // test_m_flag
-    @R8
+    @R14
     D=M-1
     @write_binary
-    D;JNE // jump if R8(m_flag) != 1
+    D;JNE // jump if R14(m_flag) != 1
 
     // m_instruction_found
     @4096
@@ -507,8 +526,8 @@ M=D // heap_ptr = 16384 (binary output base)
 
     @R2
     M=0 // reset R2(base10_t)
-    @R5
-    M=0 // reset R5(base10_count_t)
+    @R13
+    M=0 // reset R13(base10_count_t)
 
     @R0
     M=M-1 // rom_ptr--, back to &newline
@@ -531,7 +550,7 @@ M=D // heap_ptr = 16384 (binary output base)
     // simulate base10_t multiplication by looping
     
     // init base10_count_t
-    @R5
+    @R13
     M=1
 
     @R2
@@ -596,11 +615,11 @@ M=D // heap_ptr = 16384 (binary output base)
     @R3
     M=M+D // R3(sum_t) += *rom_ptr
 
-    @R5
-    M=M-1 // R5(base10_count_t)--
+    @R13
+    M=M-1 // R13(base10_count_t)--
     D=M
     @a_start_base10
-    D;JNE // jump if R5(base10_count_t) != 0
+    D;JNE // jump if R13(base10_count_t) != 0
 
     @a_rev_read
     0;JMP // loop to next char
@@ -632,31 +651,25 @@ M=D // heap_ptr = 16384 (binary output base)
     (set_c_instruction)
     @R7
     M=1 // R7(c_flag_t) = 1
+    @16
+    D=A
     @R6
-    M=0 // R6(int_buffer_ptr) = 16 (reset)
+    M=D // R6(int_buffer_ptr) = 16 (reset)
 
     (c_instruction)
     // comp = instruction[4:9]
 
     // test_jump
-    @R2
+    @R12
     D=M
     D=D-1
-    @test_assign // jump if R2(jump_flag_t) != 1
+    @test_assign // jump if R12(jump_flag_t) != 1
     D;JNE
-
-    // add_jump_bits
-    @R0
-    A=M
-    D=M
-    @R3
-    M=M+D // R3(sum_t) += *rom_ptr
 
     // TODO: test_assign
 
-    // if not jump/assign, read into op buffer
-
-    // if ";" or "=" set flag stop reading into op buffer
+    // if not jump/assign, read into buffer / convert and add chars into sum
+    // if ";" or "=" set flag, stop reading/converting
 
     @59
     D=A
@@ -674,14 +687,33 @@ M=D // heap_ptr = 16384 (binary output base)
     @set_assignment_flag
     D;JEQ // jump if *rom_ptr == "="
 
+    // convert_char_and_sum
+    @R0
+    A=M
+    D=M
+    @R3
+    M=M+D // R3(sum_t) += *rom_ptr
+
     // continue reading into op buffer
     @R0
     D=M
-    @R4
+    @R6
     A=M
-    M=D // *int_buffer_ptr = *rom_ptr
-    @R4
-    M=M+1 // int_buffer_ptr++
+    M=D // R6(*int_buffer_ptr) = *rom_ptr
+    @R6
+    M=M+1 // R6(int_buffer_ptr)++
+
+    // TODO: dest bits (place me)
+    // "M": 77 = 1
+    // "D": 68 = 2
+    // "MD": 77+68 = 145 = 3
+    // "A": 65 = 4
+    // "AM": 65+77 = 142 = 5
+    // "AD": 65+68 = 133 = 6
+    // "AMD": 65+77+68 = 210 = 7
+    // else: 0 (jump instructions)
+
+    // TODO: comp bits (place me)
 
     @check_m
     0;JMP
@@ -707,14 +739,18 @@ M=D // heap_ptr = 16384 (binary output base)
     0;JMP
 
     (set_jump_flag)
-    @R2
-    M=1 // R2(jump_flag_t) = 1
+    @R12
+    M=1 // R12(jump_flag_t) = 1
+    @R3
+    M=0 // reset R3(sum_t), clear operation value (still in the buffer)
     @inc_instruction
     0;JMP
 
     (set_assignment_flag)
     @R3
     M=1 // R3(assignment_flag_t) = 1
+    @R3
+    M=0 // reset R3(sum_t), clear operation value (still in the buffer)
 
     (inc_instruction)
     @R1
