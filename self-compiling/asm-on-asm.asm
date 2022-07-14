@@ -49,6 +49,7 @@
 // R12 = jump_flag_t
 // R13 = base10_count_t
 // R14 = m_flag
+// R15 = not_flag
 
 // max asm instruction len = 7
 // 16-22 reserved for ASM chars (int_buffer_ptr)
@@ -753,9 +754,18 @@ M=M+1 // R6(int_buffer_ptr)++
 
 // TODO: comp bits (place/finish me) ------------------------------------------------------------------
 
-// absolute blocks
-// "0": 2688, "|": 1344, "&": 0
+// check flags
 
+@R15
+D=M-1
+@comp_not_d
+0;JEQ // jump if R15(not_flag) == "1"
+
+// -----------------------------
+
+// single blocks
+
+// zero
 @R6
 A=M
 D=M // R6(*int_buffer_ptr)
@@ -766,6 +776,7 @@ D=D-A
 
 // -----------------------------
 
+// or
 @R6
 A=M
 D=M // R6(*int_buffer_ptr)
@@ -776,38 +787,85 @@ D=D-A
 
 // -----------------------------
 
+// and
 @R6
 A=M
 D=M // R6(*int_buffer_ptr)
 @38
 D=D-A
-@comp_end // do nothing
+@comp_end // do nothing (000000)
 0;JEQ // jump if R6(*int_buffer_ptr) == "&"
 
-// ----------------------------------------------------------
+// -----------------------------
 
 // not > DAM
-// "!D": 832, "!A": 3136, "!M": 3136
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@33
+D=D-A
+@comp_set_not
+0;JEQ // jump if R6(*int_buffer_ptr) == "!"
+
+// -----------------------------
+
+// TODO: "D": 68, "A": 65, "M": 77, "1": 49
+
+// TODO: negative > DAM1
+// TODO: "-D": 960, "-A": 3264, "-M": 3264, "-1": 3712
 
 // ----------------------------------------------------------
 
-// negative > DAM1
-// "-D": 960, "-A": 3264, "-M": 3264, "-1": 3712
+// TODO: DAM1
+// TODO: "D": 768, "A": 3072, "M":  3072, "1": 4032
 
 // ----------------------------------------------------------
 
-// DAM1
-// "D": 768, "A": 3072, "M":  3072, "1": 4032
+// TODO: DAM1 > + > DAM1
+// TODO: "D+1": 1984, "A+1": 3520, "M+1": 3520, "D+A": 128, "D+M": 128
 
 // ----------------------------------------------------------
 
-// DAM1 > + > DAM1
-// "D+1": 1984, "A+1": 3520, "M+1": 3520, "D+A": 128, "D+M": 128
+// TODO: DAM1 > - > DAM1
+// TODO: "D-1": 896, "A-1": 3200, "M-1": 3200, "D-A": 1216, "D-M": 1216, "A-D": 448, "M-D": 448
 
 // ----------------------------------------------------------
 
-// DAM1 > - > DAM1
-// "D-1": 896, "A-1": 3200, "M-1": 3200, "D-A": 1216, "D-M": 1216, "A-D": 448, "M-D": 448
+(comp_set_not)
+@R15
+M=1 // set R15(not_flag)
+
+@comp_end
+0;JMP
+
+(comp_not_d)
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@68
+D=D-A
+@comp_not_am
+0;JNE // jump if R6(*int_buffer_ptr) != "D"
+
+@832
+D=A
+@R3
+M=M+D // R3(sum_t) += 832 (001101)
+
+@comp_end
+0;JMP
+
+// -----------------------------
+
+(comp_not_am)
+// if "!" and not "!D" must be "!A" or "!M" which are the same comp bits
+@3136
+D=A
+@R3
+M=M+D // R3(sum_t) += 3136 (110001)
+
+@comp_end
+0;JMP
 
 // ----------------------------------------------------------
 
