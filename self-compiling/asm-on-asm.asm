@@ -50,9 +50,10 @@
 // R13 = base10_count_t
 // R14 = m_flag
 // R15 = not_flag
+// R16 = negative_flag
 
 // max asm instruction len = 7
-// 16-22 reserved for ASM chars (int_buffer_ptr)
+// FIXME: 16-22 reserved for ASM chars (int_buffer_ptr)
 
 // heap stored at 50+
 // address labels: len, n-chars, value
@@ -754,7 +755,7 @@ M=M+1 // R6(int_buffer_ptr)++
 
 // TODO: comp bits (place/finish me) ------------------------------------------------------------------
 
-// check flags
+// check flags (if set jump to multi-block processing)
 
 @R15
 D=M-1
@@ -763,7 +764,14 @@ D=M-1
 
 // -----------------------------
 
-// single blocks
+@R16
+D=M-1
+@comp_negative_d
+0;JEQ // jump if R16(negative_flag) == "1"
+
+// ----------------------------------------------------------
+
+// single blocks: zero, or, and (jump straight to add)
 
 // zero
 @R6
@@ -796,9 +804,9 @@ D=D-A
 @comp_end // do nothing (000000)
 0;JEQ // jump if R6(*int_buffer_ptr) == "&"
 
-// -----------------------------
+// ----------------------------------------------------------
 
-// not > DAM
+// not > DAM (initial)
 @R6
 A=M
 D=M // R6(*int_buffer_ptr)
@@ -809,12 +817,18 @@ D=D-A
 
 // -----------------------------
 
-// TODO: "D": 68, "A": 65, "M": 77, "1": 49
-
-// TODO: negative > DAM1
-// TODO: "-D": 960, "-A": 3264, "-M": 3264, "-1": 3712
+// negative > DAM1 (initial)
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@45
+D=D-A
+@comp_set_negative
+0;JEQ // jump if R6(*int_buffer_ptr) == "-"
 
 // ----------------------------------------------------------
+
+// TODO: "D": 68, "A": 65, "M": 77, "1": 49
 
 // TODO: DAM1
 // TODO: "D": 768, "A": 3072, "M":  3072, "1": 4032
@@ -838,6 +852,66 @@ M=1 // set R15(not_flag)
 @comp_end
 0;JMP
 
+// -----------------------------
+
+(comp_set_negative)
+@R16
+M=1 // set R16(negative_flag)
+
+@comp_end
+0;JMP
+
+// ----------------------------------------------------------
+
+(comp_negative_d)
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@68
+D=D-A
+@comp_negative_one
+0;JNE // jump if R6(*int_buffer_ptr) != "D"
+
+@960
+D=A
+@R3
+M=M+D // R3(sum_t) += 960 (001111)
+
+@comp_end
+0;JMP
+
+// -----------------------------
+
+(comp_negative_one)
+@R6
+A=M
+D=M-1 // R6(*int_buffer_ptr) - 1
+@comp_negative_am
+0;JNE // jump if R6(*int_buffer_ptr) != "1"
+
+@3712
+D=A
+@R3
+M=M+D // R3(sum_t) += 3712 (111010)
+
+@comp_end
+0;JMP
+
+// -----------------------------
+
+// if "-" and not "-D" or "-1" must be "!A" or "!M" which are the same comp bits
+
+(comp_negative_am)
+@3264
+D=A
+@R3
+M=M+D // R3(sum_t) += 3264 (110011)
+
+@comp_end
+0;JMP
+
+// ----------------------------------------------------------
+
 (comp_not_d)
 @R6
 A=M
@@ -857,8 +931,9 @@ M=M+D // R3(sum_t) += 832 (001101)
 
 // -----------------------------
 
-(comp_not_am)
 // if "!" and not "!D" must be "!A" or "!M" which are the same comp bits
+
+(comp_not_am)
 @3136
 D=A
 @R3
@@ -878,7 +953,7 @@ M=M+D // R3(sum_t) += 2688 (101010)
 @comp_end
 0;JMP
 
-// -----------------------------
+// ----------------------------------------------------------
 
 (comp_or)
 @1344
@@ -889,7 +964,7 @@ M=M+D // R3(sum_t) += 1344 (010101)
 @comp_end
 0;JMP
 
-// -----------------------------
+// ----------------------------------------------------------
 
 (comp_end)
 
