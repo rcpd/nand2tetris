@@ -20,7 +20,7 @@
 
 // assumptions
     // addresses are correctly padded/limited to 16 bits
-    // code to read in is appended to end of this program in ROM at start_of_data
+    // code to assemble is previously copied into RAM at 8192 // TODO: reduce me
     // code is encoded in the Jack string format
     // assembly is well formed
 
@@ -34,7 +34,9 @@
 //  "ARG": 2, "THIS": 3, "THAT": 4, "BASE": 15
 //  }
 
-// R0 = rom_ptr
+// TODO: mutually exclusive flags (i.e. comp bits) could be rolled into one register
+
+// R0 = data_ptr
 // R1 = next_instruction
 // R2 = base10_t
 // R3 = sum_t
@@ -51,14 +53,13 @@
 // R14 = m_flag
 // R15 = not_flag
 // R16 = negative_flag
+// R17 = dam_one_flag
 
 // max asm instruction len = 7
 // FIXME: 16-22 reserved for ASM chars (int_buffer_ptr)
 
-// heap stored at 50+
+// heap starts at 50+
 // address labels: len, n-chars, value
-
-// binary output stored at 16384+
 
 // ---------------------------------------------------------------------------------------
 
@@ -70,7 +71,7 @@ M=D // initialize R4(heap_ptr) = 50
 @start_of_data // BASE + <len of this program>
 D=A
 @R0
-M=D // initialize R0(rom_ptr) as start_of_data
+M=D // initialize R0(data_ptr) as start_of_data
 
 // ---------------------------------------------------------------------------------------
 
@@ -89,7 +90,7 @@ D=A
 A=M
 D=D-M
 @pre_check_newline
-D;JNE // jump if *rom_ptr != "/"
+D;JNE // jump if *data_ptr != "/"
 
 // comment_found
 @R9
@@ -106,7 +107,7 @@ D=A
 A=M
 D=D-M
 @pre_test_label_comment
-D;JNE // jump if *rom_ptr != "newline"
+D;JNE // jump if *data_ptr != "newline"
 
 // newline_found
 @R9
@@ -172,7 +173,7 @@ D=A
 A=M
 D=D-M
 @pre_new_label
-D;JEQ // jump if *rom_ptr == "("
+D;JEQ // jump if *data_ptr == "("
 
 // non_comment_label
 @R10
@@ -193,7 +194,7 @@ D=A
 A=M
 D=D-M
 @pre_next
-D;JEQ // jump if *rom_ptr == ")"
+D;JEQ // jump if *data_ptr == ")"
 
 // pre_append_label
 @R0
@@ -201,7 +202,7 @@ A=M
 D=M
 @R4
 A=M
-M=D // R4(*heap_ptr) = *rom_ptr
+M=D // R4(*heap_ptr) = *data_ptr
 @R4
 M=M+1 // R4(heap_ptr)++
 @R6
@@ -209,7 +210,7 @@ M=M+1 // R6(len_t)++
 
 (pre_next)
 @R0
-M=M+1 // rom_ptr++
+M=M+1 // data_ptr++
 
 // pre_test_eof
 @32767
@@ -222,10 +223,10 @@ D;JNE // loop until exhausted then fall through
 
 // ---------------------------------------------------------------------------------------
 
-@16384
+@8192
 D=A
 @R4
-M=D // heap_ptr = 16384 (binary output base)
+M=D // heap_ptr = 8192 (binary output base)
 
 // ---------------------------------------------------------------------------------------
 
@@ -251,7 +252,7 @@ D=A
 A=M
 D=D-M
 @check_slash
-D;JNE // jump if *rom_ptr != "("
+D;JNE // jump if *data_ptr != "("
 
 // label_found
 @R5
@@ -268,7 +269,7 @@ D=A
 A=M
 D=D-M
 @check_newline
-D;JNE // jump if *rom_ptr != "/"
+D;JNE // jump if *data_ptr != "/"
 
 // comment_found
 @R9
@@ -285,7 +286,7 @@ D=A
 A=M
 D=D-M
 @check_c_flag
-D;JNE // jump if *rom_ptr != "newline"
+D;JNE // jump if *data_ptr != "newline"
 
 @newline_found
 0;JMP // jump to common handling
@@ -299,7 +300,7 @@ D=A
 A=M
 D=D-M
 @next
-D;JNE // jump if *rom_ptr != "newline"
+D;JNE // jump if *data_ptr != "newline"
 
 (newline_found)
 @R5
@@ -310,7 +311,7 @@ M=0 // reset R9(comment_flag)
 @R0
 D=M
 @R1
-M=D+1 // R1(next_instruction) = R0(rom_ptr)+1
+M=D+1 // R1(next_instruction) = R0(data_ptr)+1
 
 // ---------------------------------------------------------------------------------------
 // TODO: finish processing / flush to sum
@@ -506,10 +507,10 @@ D;JEQ // jump if R11(a_flag_t) == 1
 D=A
 @R0
 A=M
-D=M-D // test *rom_ptr == @
+D=M-D // test *data_ptr == @
 
 @R0
-M=M+1 // rom_ptr++
+M=M+1 // data_ptr++
 
 @set_c_instruction
 D;JNE // jump if instruction[0] != "@"
@@ -527,7 +528,7 @@ D=A
 A=M
 D=M-D
 @nan
-D;JLT // jump if *rom_ptr < 48
+D;JLT // jump if *data_ptr < 48
 
 @57
 D=A
@@ -535,7 +536,7 @@ D=A
 A=M
 D=M-D
 @nan
-D;JGT // jump if *rom_ptr > 57
+D;JGT // jump if *data_ptr > 57
 
 // address = instruction[1:]  # assign if literal
 
@@ -547,9 +548,9 @@ D=A
 A=M
 D=M-D
 @R0
-M=M+1 // rom_ptr++
+M=M+1 // data_ptr++
 @a_check_newline
-D;JNE // jump if *rom_ptr != newline (128)
+D;JNE // jump if *data_ptr != newline (128)
 
 @R2
 M=0 // reset R2(base10_t)
@@ -557,11 +558,11 @@ M=0 // reset R2(base10_t)
 M=0 // reset R13(base10_count_t)
 
 @R0
-M=M-1 // rom_ptr--, back to &newline
+M=M-1 // data_ptr--, back to &newline
 
 (a_rev_read) // loop through digits smallest to largest
 @R0
-M=M-1 // rom_ptr--, next digit
+M=M-1 // data_ptr--, next digit
 
 @64
 D=A
@@ -569,7 +570,7 @@ D=A
 A=M
 D=M-A
 @a_write
-D;JEQ // jump if *rom_ptr == @
+D;JEQ // jump if *data_ptr == @
 
 @R2
 M=M+1 // R2(base10_t)++
@@ -638,9 +639,9 @@ D;JEQ // jump if R2(base10_t) == 5
 // cumulative sum
 @R0
 A=M
-D=M // *rom_ptr
+D=M // *data_ptr
 @R3
-M=M+D // R3(sum_t) += *rom_ptr
+M=M+D // R3(sum_t) += *data_ptr
 
 @R13
 M=M-1 // R13(base10_count_t)--
@@ -653,7 +654,7 @@ D;JNE // jump if R13(base10_count_t) != 0
 
 // ---------------------------------------------------------------------------------------
 
-// else:
+// TODO: else:
     // temp_label = instruction[1:]
     // if temp_label in address_labels:
         // address = address_labels[temp_label]  # if label has an address, assign address
@@ -715,7 +716,7 @@ D=A
 A=M
 D=D-M
 @set_jump_flag
-D;JEQ // jump if *rom_ptr == ";"
+D;JEQ // jump if *data_ptr == ";"
 
 @61
 D=A
@@ -723,7 +724,7 @@ D=A
 A=M
 D=D-M
 @set_assignment_flag
-D;JEQ // jump if *rom_ptr == "="
+D;JEQ // jump if *data_ptr == "="
 
 // -----------------------------
 
@@ -732,14 +733,14 @@ D;JEQ // jump if *rom_ptr == "="
 A=M
 D=M
 @R3
-M=M+D // R3(sum_t) += *rom_ptr
+M=M+D // R3(sum_t) += *data_ptr
 
 // continue reading into op buffer
 @R0
 D=M
 @R6
 A=M
-M=D // R6(*int_buffer_ptr) = *rom_ptr
+M=D // R6(*int_buffer_ptr) = *data_ptr
 @R6
 M=M+1 // R6(int_buffer_ptr)++
 
@@ -760,14 +761,21 @@ M=M+1 // R6(int_buffer_ptr)++
 @R15
 D=M-1
 @comp_not_d
-0;JEQ // jump if R15(not_flag) == "1"
+D;JEQ // jump if R15(not_flag) == "1"
 
 // -----------------------------
 
 @R16
 D=M-1
 @comp_negative_d
-0;JEQ // jump if R16(negative_flag) == "1"
+D;JEQ // jump if R16(negative_flag) == "1"
+
+// -----------------------------
+
+@R17
+D=M
+@comp_dam_one
+D;JGT // jump if R17(dam_one_flag) > "0"
 
 // ----------------------------------------------------------
 
@@ -780,7 +788,7 @@ D=M // R6(*int_buffer_ptr)
 @0
 D=D-A
 @comp_zero
-0;JEQ // jump if R6(*int_buffer_ptr) == 0
+D;JEQ // jump if R6(*int_buffer_ptr) == 0
 
 // -----------------------------
 
@@ -791,7 +799,7 @@ D=M // R6(*int_buffer_ptr)
 @124
 D=D-A
 @comp_or
-0;JEQ // jump if R6(*int_buffer_ptr) == "|"
+D;JEQ // jump if R6(*int_buffer_ptr) == "|"
 
 // -----------------------------
 
@@ -802,7 +810,7 @@ D=M // R6(*int_buffer_ptr)
 @38
 D=D-A
 @comp_end // do nothing (000000)
-0;JEQ // jump if R6(*int_buffer_ptr) == "&"
+D;JEQ // jump if R6(*int_buffer_ptr) == "&"
 
 // ----------------------------------------------------------
 
@@ -813,7 +821,7 @@ D=M // R6(*int_buffer_ptr)
 @33
 D=D-A
 @comp_set_not
-0;JEQ // jump if R6(*int_buffer_ptr) == "!"
+D;JEQ // jump if R6(*int_buffer_ptr) == "!"
 
 // -----------------------------
 
@@ -824,16 +832,51 @@ D=M // R6(*int_buffer_ptr)
 @45
 D=D-A
 @comp_set_negative
-0;JEQ // jump if R6(*int_buffer_ptr) == "-"
+D;JEQ // jump if R6(*int_buffer_ptr) == "-"
+
+// ----------------------------------------------------------
+
+(comp_dam_one)
+
+// D [DAM1] (initial)
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@68
+D=D-A
+@comp_set_d
+D;JEQ // jump if R6(*int_buffer_ptr) == "D"
+
+// A [DAM1] (initial)
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@65
+D=D-A
+@comp_set_a
+D;JEQ // jump if R6(*int_buffer_ptr) == "A"
+
+// M [DAM1] (initial)
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@77
+D=D-A
+@comp_set_m
+D;JEQ // jump if R6(*int_buffer_ptr) == "M"
+
+// 1 [DAM1] (initial)
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@49
+D=D-A
+@comp_set_one
+D;JEQ // jump if R6(*int_buffer_ptr) == "1"
 
 // ----------------------------------------------------------
 
 // TODO: "D": 68, "A": 65, "M": 77, "1": 49
-
-// TODO: DAM1
-// TODO: "D": 768, "A": 3072, "M":  3072, "1": 4032
-
-// ----------------------------------------------------------
 
 // TODO: DAM1 > + > DAM1
 // TODO: "D+1": 1984, "A+1": 3520, "M+1": 3520, "D+A": 128, "D+M": 128
@@ -861,6 +904,48 @@ M=1 // set R16(negative_flag)
 @comp_end
 0;JMP
 
+// -----------------------------
+
+(comp_set_d)
+@R17
+M=1 // set R17(dam_one_flag) = 1
+
+@comp_end
+0;JMP
+
+// -----------------------------
+
+(comp_set_a)
+@2
+D=A
+@R17
+M=D // set R17(dam_one_flag) = 2
+
+@comp_end
+0;JMP
+
+// -----------------------------
+
+(comp_set_m)
+@3
+D=A
+@R17
+M=D // set R17(dam_one_flag) = 3
+
+@comp_end
+0;JMP
+
+// -----------------------------
+
+(comp_set_one)
+@4
+D=A
+@R17
+M=D // set R17(dam_one_flag) = 4
+
+@comp_end
+0;JMP
+
 // ----------------------------------------------------------
 
 (comp_negative_d)
@@ -870,7 +955,7 @@ D=M // R6(*int_buffer_ptr)
 @68
 D=D-A
 @comp_negative_one
-0;JNE // jump if R6(*int_buffer_ptr) != "D"
+D;JNE // jump if R6(*int_buffer_ptr) != "D"
 
 @960
 D=A
@@ -887,7 +972,7 @@ M=M+D // R3(sum_t) += 960 (001111)
 A=M
 D=M-1 // R6(*int_buffer_ptr) - 1
 @comp_negative_am
-0;JNE // jump if R6(*int_buffer_ptr) != "1"
+D;JNE // jump if R6(*int_buffer_ptr) != "1"
 
 @3712
 D=A
@@ -919,7 +1004,7 @@ D=M // R6(*int_buffer_ptr)
 @68
 D=D-A
 @comp_not_am
-0;JNE // jump if R6(*int_buffer_ptr) != "D"
+D;JNE // jump if R6(*int_buffer_ptr) != "D"
 
 @832
 D=A
@@ -979,7 +1064,7 @@ D=A
 A=M
 D=D-M
 @inc_instruction
-D;JNE // jump if *rom_ptr != "M"
+D;JNE // jump if *data_ptr != "M"
 
 // set_m_flag
 @R14
@@ -1016,7 +1101,7 @@ M=M+1
 @R1
 D=M
 @R0
-M=D // R0(rom_ptr) = R1(next_instruction)
+M=D // R0(data_ptr) = R1(next_instruction)
 
 // test eof
 @32767
@@ -1024,7 +1109,7 @@ D=A
 @R0
 D=D-A
 @eof
-D;JEQ // jump if rom_ptr == 32767
+D;JEQ // jump if data_ptr == 32767
 
 @check_comment_flag
 0;JMP // continue
