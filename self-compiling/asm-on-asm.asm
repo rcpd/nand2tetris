@@ -34,8 +34,6 @@
 //  "ARG": 2, "THIS": 3, "THAT": 4, "BASE": 15
 //  }
 
-// TODO: mutually exclusive flags (i.e. comp bits) could be rolled into one register
-
 // R0 = data_ptr
 // R1 = next_instruction
 // R2 = base10_t
@@ -315,7 +313,9 @@ D=M
 M=D+1 // R1(next_instruction) = R0(data_ptr)+1
 
 // ---------------------------------------------------------------------------------------
+
 // TODO: finish processing / flush to sum
+// TODO: "D": 768, "A": 3072, "M": 3072
 
 // test_c_flag
 @R7
@@ -746,6 +746,7 @@ M=D // R6(*int_buffer_ptr) = *data_ptr
 M=M+1 // R6(int_buffer_ptr)++
 
 // TODO: dest bits (place me)
+
 // "M": 77 = 1
 // "D": 68 = 2
 // "MD": 77+68 = 145 = 3
@@ -899,10 +900,6 @@ D;JEQ // jump if R6(*int_buffer_ptr) == "1"
 
 // -----------------------------
 
-// TODO: "D": 768, "A": 3072, "M": 3072,
-// TODO: "D+1": 1984, "A+1": 3520, "M+1": 3520, "D+A": 128, "D+M": 128
-// TODO: "D-1": 896, "A-1": 3200, "M-1": 3200, "D-A": 1216, "D-M": 1216, "A-D": 448, "M-D": 448
-
 // + [DAM1]
 @R6
 A=M
@@ -942,7 +939,7 @@ A=M
 D=M // R6(*int_buffer_ptr)
 @65
 D=D-A
-@comp_plus_a
+@comp_plus_am
 D;JEQ // jump if R6(*int_buffer_ptr) == "A"
 
 // M [+]
@@ -951,7 +948,7 @@ A=M
 D=M // R6(*int_buffer_ptr)
 @77
 D=D-A
-@comp_plus_m
+@comp_plus_am
 D;JEQ // jump if R6(*int_buffer_ptr) == "M"
 
 // 1 [+]
@@ -1190,9 +1187,8 @@ M=M+D // R3(sum_t) += 1344 (010101)
 
 (comp_plus_d)
 
-// no D+D case, M+D/D+M & A+D/D+A are the same
+// cases: 1+D, A/M+D
 
-// comp_am_plus_d
 @R17
 D=M // R17(dam_one_flag)
 @2
@@ -1200,6 +1196,9 @@ D=D-A
 @comp_one_plus_d
 D;JEQ // jump if R17(dam_one_flag) == 4 (one)
 
+// -----------------------------
+
+// comp_am_plus_d
 @128
 D=A
 @R3
@@ -1208,10 +1207,77 @@ M=M+D // R3(sum_t) += 128 (000010)
 @comp_end
 0;JMP
 
-// ----------------------------------------------------------
+// -----------------------------
 
 (comp_one_plus_d)
+@1984
+D=A
+@R3
+M=M+D // R3(sum_t) += 1984 (011111)
 
+@comp_end
+0;JMP
+
+// ----------------------------------------------------------
+
+(comp_plus_am)
+
+// cases: 1+A/M, D+A/M
+
+@R17
+D=M // R17(dam_one_flag)
+@2
+D=D-A
+@comp_one_plus_am
+D;JEQ // jump if R17(dam_one_flag) == 4 (one)
+
+// -----------------------------
+
+// comp_d_plus_am
+@128
+D=A
+@R3
+M=M+D // R3(sum_t) += 128 (000010)
+
+@comp_end
+0;JMP
+
+// -----------------------------
+
+(comp_one_plus_am)
+@3520
+D=A
+@R3
+M=M+D // R3(sum_t) += 3520 (110111)
+
+@comp_end
+0;JMP
+
+// ----------------------------------------------------------
+
+(comp_plus_one)
+
+// cases: D+1, A/M+1
+
+@R17
+D=M-1 // R17(dam_one_flag)
+@comp_d_plus_one
+D;JEQ // jump if R17(dam_one_flag) == 1 (D)
+
+// -----------------------------
+
+// comp_am_plus_one
+@3520
+D=A
+@R3
+M=M+D // R3(sum_t) += 3520 (110111)
+
+@comp_end
+0;JMP
+
+// -----------------------------
+
+(comp_d_plus_one)
 @1984
 D=A
 @R3
@@ -1223,13 +1289,12 @@ M=M+D // R3(sum_t) += 1984 (011111)
 // ----------------------------------------------------------
 
 // TODO:
-    (comp_plus_a)
-    (comp_plus_m)
-    (comp_plus_one)
     (comp_minus_d)
-    (comp_minus_a)
-    (comp_minus_m)
+    (comp_minus_am)
     (comp_minus_one)
+
+// TODO: "D+1": 1984, "A+1": 3520, "M+1": 3520, "D+A": 128, "D+M": 128
+// TODO: "D-1": 896, "A-1": 3200, "M-1": 3200, "D-A": 1216, "D-M": 1216, "A-D": 448, "M-D": 448
 
 // ----------------------------------------------------------
 
