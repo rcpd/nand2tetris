@@ -54,6 +54,7 @@
 // R15 = not_flag
 // R16 = negative_flag
 // R17 = dam_one_flag
+// R18 = dam_one_plus_minus_flag
 
 // max asm instruction len = 7
 // FIXME: 16-22 reserved for ASM chars (int_buffer_ptr)
@@ -814,7 +815,7 @@ D;JEQ // jump if R6(*int_buffer_ptr) == "&"
 
 // ----------------------------------------------------------
 
-// not > DAM (initial)
+// not > DAM
 @R6
 A=M
 D=M // R6(*int_buffer_ptr)
@@ -825,7 +826,7 @@ D;JEQ // jump if R6(*int_buffer_ptr) == "!"
 
 // -----------------------------
 
-// negative > DAM1 (initial)
+// negative > DAM1
 @R6
 A=M
 D=M // R6(*int_buffer_ptr)
@@ -838,7 +839,23 @@ D;JEQ // jump if R6(*int_buffer_ptr) == "-"
 
 (comp_dam_one)
 
-// D [DAM1] (initial)
+@R18
+D=M-1
+@comp_plus
+D;JEQ // jump if R18(dam_one_plus_minus_flag) == "1"
+
+// -----------------------------
+
+@R18
+D=M
+@2
+D=D-A
+@comp_minus
+D;JEQ // jump if R18(dam_one_plus_minus_flag) == "2"
+
+// -----------------------------
+
+// D [DAM1]
 @R6
 A=M
 D=M // R6(*int_buffer_ptr)
@@ -847,7 +864,9 @@ D=D-A
 @comp_set_d
 D;JEQ // jump if R6(*int_buffer_ptr) == "D"
 
-// A [DAM1] (initial)
+// -----------------------------
+
+// A [DAM1]
 @R6
 A=M
 D=M // R6(*int_buffer_ptr)
@@ -856,7 +875,9 @@ D=D-A
 @comp_set_a
 D;JEQ // jump if R6(*int_buffer_ptr) == "A"
 
-// M [DAM1] (initial)
+// -----------------------------
+
+// M [DAM1]
 @R6
 A=M
 D=M // R6(*int_buffer_ptr)
@@ -865,7 +886,9 @@ D=D-A
 @comp_set_m
 D;JEQ // jump if R6(*int_buffer_ptr) == "M"
 
-// 1 [DAM1] (initial)
+// -----------------------------
+
+// 1 [DAM1]
 @R6
 A=M
 D=M // R6(*int_buffer_ptr)
@@ -874,17 +897,111 @@ D=D-A
 @comp_set_one
 D;JEQ // jump if R6(*int_buffer_ptr) == "1"
 
-// ----------------------------------------------------------
+// -----------------------------
 
-// TODO: "D": 68, "A": 65, "M": 77, "1": 49
-
-// TODO: DAM1 > + > DAM1
+// TODO: "D": 768, "A": 3072, "M": 3072,
 // TODO: "D+1": 1984, "A+1": 3520, "M+1": 3520, "D+A": 128, "D+M": 128
+// TODO: "D-1": 896, "A-1": 3200, "M-1": 3200, "D-A": 1216, "D-M": 1216, "A-D": 448, "M-D": 448
+
+// + [DAM1]
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@43
+D=D-A
+@comp_set_dam_one_plus
+D;JEQ // jump if R6(*int_buffer_ptr) == "+"
+
+// -----------------------------
+
+// - [DAM1]
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@45
+D=D-A
+@comp_set_dam_one_minus
+D;JEQ // jump if R6(*int_buffer_ptr) == "-"
 
 // ----------------------------------------------------------
 
-// TODO: DAM1 > - > DAM1
-// TODO: "D-1": 896, "A-1": 3200, "M-1": 3200, "D-A": 1216, "D-M": 1216, "A-D": 448, "M-D": 448
+(comp_plus)
+
+// D [+]
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@68
+D=D-A
+@comp_plus_d
+D;JEQ // jump if R6(*int_buffer_ptr) == "D"
+
+// A [+]
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@65
+D=D-A
+@comp_plus_a
+D;JEQ // jump if R6(*int_buffer_ptr) == "A"
+
+// M [+]
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@77
+D=D-A
+@comp_plus_m
+D;JEQ // jump if R6(*int_buffer_ptr) == "M"
+
+// 1 [+]
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@49
+D=D-A
+@comp_plus_one
+D;JEQ // jump if R6(*int_buffer_ptr) == "1"
+
+// ----------------------------------------------------------
+
+(comp_minus)
+
+// D [-]
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@68
+D=D-A
+@comp_minus_d
+D;JEQ // jump if R6(*int_buffer_ptr) == "D"
+
+// A [-]
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@65
+D=D-A
+@comp_minus_a
+D;JEQ // jump if R6(*int_buffer_ptr) == "A"
+
+// M [-]
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@77
+D=D-A
+@comp_minus_m
+D;JEQ // jump if R6(*int_buffer_ptr) == "M"
+
+// 1 [-]
+@R6
+A=M
+D=M // R6(*int_buffer_ptr)
+@49
+D=D-A
+@comp_minus_one
+D;JEQ // jump if R6(*int_buffer_ptr) == "1"
 
 // ----------------------------------------------------------
 
@@ -942,6 +1059,26 @@ M=D // set R17(dam_one_flag) = 3
 D=A
 @R17
 M=D // set R17(dam_one_flag) = 4
+
+@comp_end
+0;JMP
+
+// -----------------------------
+
+(comp_set_dam_one_plus)
+@R18
+M=1 // set R18(dam_one_plus_minus_flag)
+
+@comp_end
+0;JMP
+
+// -----------------------------
+
+(comp_set_dam_one_minus)
+@2
+D=A
+@R18
+M=D // set R18(dam_one_plus_minus_flag)
 
 @comp_end
 0;JMP
@@ -1048,6 +1185,51 @@ M=M+D // R3(sum_t) += 1344 (010101)
 
 @comp_end
 0;JMP
+
+// ----------------------------------------------------------
+
+(comp_plus_d)
+
+// no D+D case, M+D/D+M & A+D/D+A are the same
+
+// comp_am_plus_d
+@R17
+D=M // R17(dam_one_flag)
+@2
+D=D-A
+@comp_one_plus_d
+D;JEQ // jump if R17(dam_one_flag) == 4 (one)
+
+@128
+D=A
+@R3
+M=M+D // R3(sum_t) += 128 (000010)
+
+@comp_end
+0;JMP
+
+// ----------------------------------------------------------
+
+(comp_one_plus_d)
+
+@1984
+D=A
+@R3
+M=M+D // R3(sum_t) += 1984 (011111)
+
+@comp_end
+0;JMP
+
+// ----------------------------------------------------------
+
+// TODO:
+    (comp_plus_a)
+    (comp_plus_m)
+    (comp_plus_one)
+    (comp_minus_d)
+    (comp_minus_a)
+    (comp_minus_m)
+    (comp_minus_one)
 
 // ----------------------------------------------------------
 
