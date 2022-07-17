@@ -20,7 +20,7 @@
 
 // assumptions
     // addresses are correctly padded/limited to 16 bits
-    // code to assemble is previously copied into RAM at 8192 // TODO: reduce me
+    // code to assemble is previously copied into RAM at 8192
     // code is encoded in the Jack string format
     // assembly is well formed
 
@@ -54,23 +54,24 @@
 // R17 = dam_one_flag
 // R18 = dam_one_plus_minus_flag
 
-// max asm instruction len = 7
-// FIXME: 16-22 reserved for ASM chars (int_buffer_ptr)
-
 // heap starts at 50+
+// max asm instruction len = 7
+// 50-56 reserved for ASM chars (int_buffer_ptr)
 // address labels: len, n-chars, value
 
 // ---------------------------------------------------------------------------------------
 
-@50
+@57
 D=A
 @R4
-M=D // initialize R4(heap_ptr) = 50
+M=D // initialize R4(heap_ptr) = 57
 
-@start_of_data // BASE + <len of this program>
+// assume data is bootstrapped to 8192
+
+@8192
 D=A
 @R0
-M=D // initialize R0(data_ptr) as start_of_data
+M=D // initialize R0(data_ptr) = 8192
 
 // ---------------------------------------------------------------------------------------
 
@@ -221,6 +222,8 @@ D=D-M
 D;JNE // loop until exhausted then fall through
 
 // ---------------------------------------------------------------------------------------
+
+// overwrite code with translation
 
 @8192
 D=A
@@ -447,10 +450,10 @@ M=D
 @57344
 D=A
 @R3
-M=M+D // R3(sum_t) = 1110 0000 0000 0000
+M=M+D // R3(sum_t) = 57344 (1110 0000 0000 0000)
 
 // clear instruction buffer
-@16
+@50
 M=0
 @17
 M=0
@@ -686,10 +689,10 @@ M=M+1 // R4(heap_ptr)++
 (set_c_instruction)
 @R7
 M=1 // R7(c_flag_t) = 1
-@16
+@50
 D=A
 @R6
-M=D // R6(int_buffer_ptr) = 16 (reset)
+M=D // R6(int_buffer_ptr) = 50 (reset)
 
 // -----------------------------
 
@@ -1100,7 +1103,7 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 960 (001111)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // -----------------------------
@@ -1117,7 +1120,7 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 3712 (111010)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // -----------------------------
@@ -1130,7 +1133,7 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 3264 (110011)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // ----------------------------------------------------------
@@ -1149,7 +1152,7 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 832 (001101)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // -----------------------------
@@ -1162,7 +1165,7 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 3136 (110001)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // ----------------------------------------------------------
@@ -1184,7 +1187,7 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 1344 (010101)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // ----------------------------------------------------------
@@ -1208,7 +1211,7 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 128 (000010)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // -----------------------------
@@ -1219,7 +1222,7 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 1984 (011111)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // ----------------------------------------------------------
@@ -1243,7 +1246,7 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 128 (000010)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // -----------------------------
@@ -1254,7 +1257,7 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 3520 (110111)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // ----------------------------------------------------------
@@ -1276,7 +1279,7 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 3520 (110111)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // -----------------------------
@@ -1287,7 +1290,7 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 1984 (011111)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // ----------------------------------------------------------
@@ -1302,7 +1305,7 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 448 (000111)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // ----------------------------------------------------------
@@ -1317,7 +1320,7 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 1216 (010011)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // ----------------------------------------------------------
@@ -1339,7 +1342,7 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 3200 (110010)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // -----------------------------
@@ -1350,10 +1353,14 @@ D=A
 @R3
 M=M+D // R3(sum_t) += 896 (001110)
 
-@comp_end
+@comp_end_reset
 0;JMP
 
 // ----------------------------------------------------------
+
+(comp_end_reset)
+@R17
+M=0 // reset R17(dam_one_flag)
 
 (comp_end)
 
