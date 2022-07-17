@@ -315,7 +315,11 @@ M=D+1 // R1(next_instruction) = R0(data_ptr)+1
 // ---------------------------------------------------------------------------------------
 
 // TODO: finish processing / flush to sum
-// TODO: "D": 768, "A": 3072, "M": 3072
+// TODO: reset sum, a_flag, c_flag, jump_flag, m_flag, not_flag, negative_flag, dam_one_flag, dam_one_plus_minus_flag
+
+// TODO: D 001100 768
+// TODO: A/M 110000 3072
+// TODO: one 111111 4032
 
 // test_c_flag
 @R7
@@ -1288,13 +1292,66 @@ M=M+D // R3(sum_t) += 1984 (011111)
 
 // ----------------------------------------------------------
 
-// TODO:
-    (comp_minus_d)
-    (comp_minus_am)
-    (comp_minus_one)
+(comp_minus_d)
 
-// TODO: "D+1": 1984, "A+1": 3520, "M+1": 3520, "D+A": 128, "D+M": 128
-// TODO: "D-1": 896, "A-1": 3200, "M-1": 3200, "D-A": 1216, "D-M": 1216, "A-D": 448, "M-D": 448
+// cases: A/M-D
+
+// comp_am_minus_d
+@448
+D=A
+@R3
+M=M+D // R3(sum_t) += 448 (000111)
+
+@comp_end
+0;JMP
+
+// ----------------------------------------------------------
+
+(comp_minus_am)
+
+// cases: D-A/M
+
+// comp_d_minus_am
+@1216
+D=A
+@R3
+M=M+D // R3(sum_t) += 1216 (010011)
+
+@comp_end
+0;JMP
+
+// ----------------------------------------------------------
+
+(comp_minus_one)
+
+// cases: D-1, A/M-1
+
+@R17
+D=M-1 // R17(dam_one_flag)
+@comp_d_minus_one
+D;JEQ // jump if R17(dam_one_flag) == 1 (D)
+
+// -----------------------------
+
+// comp_am_minus_one
+@3200
+D=A
+@R3
+M=M+D // R3(sum_t) += 3200 (110010)
+
+@comp_end
+0;JMP
+
+// -----------------------------
+
+(comp_d_minus_one)
+@896
+D=A
+@R3
+M=M+D // R3(sum_t) += 896 (001110)
+
+@comp_end
+0;JMP
 
 // ----------------------------------------------------------
 
