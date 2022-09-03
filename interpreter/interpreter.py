@@ -12,6 +12,10 @@ import tokenizer
 import analyzer
 import compiler
 
+from rich.console import Console
+from rich.table import Table
+console = Console()
+
 
 def dump_call_tree(call_tree, debug_msg):
     if len(call_tree) == 0:
@@ -24,6 +28,7 @@ def dump_call_tree(call_tree, debug_msg):
 
 def run(asm_filepath, static_dict=None, tst_params=None, debug=False):
     debug_log = []
+    gui_log = []
 
     # initialize hardware
     ram = [0] * 32768
@@ -238,34 +243,7 @@ def run(asm_filepath, static_dict=None, tst_params=None, debug=False):
 
         #  format primary debug output
         if debug:
-            # prine line debug cmd
-            debug_msg = "%s %s" % (hw["PC"]-1, debug_cmd.replace("//", "~~"))
-
-            # deref values and show eval / command result
-            if assignment:
-                # ignore pep warnings(s), thats what assignment flag is for
-                debug_msg += " // EVAL: %s=%s (%s)" % (dst, eval_result, raw_eval_cmd)
-            else:
-                # if no assignment must be an A command
-                debug_msg += " // EVAL: A=%s" % hw["A"]
-
-            # show the state of the registers post-execute
-            debug_msg += " // A=%s D=%s M=%s" % (hw["A"], hw["D"], hw["M"])
-
-            # show the state of RAM registers
-            # TODO: map this to address_labels{} not literals
-            debug_msg += " R13=%s" % hw["RAM"][13]
-            debug_msg += " R14=%s" % hw["RAM"][14]
-            debug_msg += " R15=%s" % hw["RAM"][15]
-
-            debug_msg += " // SP: %s" % hw["RAM"][0]
-            debug_msg += " LCL=%s" % hw["RAM"][1]
-            debug_msg += " ARG=%s" % hw["RAM"][2]
-            debug_msg += " THIS=%s" % hw["RAM"][3]
-            debug_msg += " THAT=%s" % hw["RAM"][4]
-            debug_msg += " // TEMP0-7: "
-            for i in range(5, 13):
-                debug_msg += "%s " % hw["RAM"][i]
+            debug_msg = ""
 
             # update & dump the call graph on call/return
             if "// call " in debug_cmd:
@@ -307,9 +285,111 @@ def run(asm_filepath, static_dict=None, tst_params=None, debug=False):
                 for i in range(sp, sp+static_count):
                     debug_msg += "%s " % hw["RAM"][i]
 
-            debug_msg = debug_msg.replace("//", "\n ").replace("~~", "\n  //")
-            print(debug_msg)
-            debug_log.append(debug_msg)
+            if debug_msg:
+                debug_log.append(debug_msg)
+
+            # TODO: debug gui -----------------------------------------------------------------------------
+
+            # queue
+            gui_log.append("[red]%s[/red]" % debug_cmd)
+            if len(gui_log) > 1:
+                gui_log[-2] = gui_log[-2].replace("[red]", "").replace("[/red]", "")
+            if len(gui_log) > 10:
+                gui_log.pop(0)
+
+            # # overwrite values (formatting debug)
+            # i = 0
+            # while i < 16:
+            #     hw["RAM"][i] = 32768
+            #     i += 1
+            # hw["A"] = 32768
+            # hw["D"] = 32768
+            # hw["M"] = 32768
+
+            table = Table(show_header=False)
+            table.add_column(justify="left")
+            table.add_column(justify="left")
+
+            def title(header, size):
+                multi = int((size - len(header)) / 2)
+                return "[bold magenta]%s[/bold magenta]" % ("[" + "-" * multi + header + "-" * multi + "]\n")
+
+            def code(gui_log):
+                _code = ""
+                for cmd in gui_log:
+                    _code += (cmd + "\n")
+                return _code
+
+            row_code = title("Code", 80) + code(gui_log)
+            row_stack = title("Stack", 80) + code(gui_log)
+
+            if debug_cmd.startswith("@") or debug_cmd.startswith("A="):
+                row_reg = title("Registers", 0) +\
+                  "[red]A[/red] [bold yellow]%s[/bold yellow]\n[red]D[/red] %s\n[red]M[/red] %s\n" %\
+                    (hw["A"], hw["D"], hw["M"]) +\
+                  "[red]SP[/red] %s\n[red]LCL[/red] %s\n[red]ARG[/red] %s\n[red]THIS[/red] %s\n[red]THAT[/red] %s\n" %\
+                    (hw["RAM"][0], hw["RAM"][1], hw["RAM"][2], hw["RAM"][3], hw["RAM"][4]) +\
+                  "[red]R5[/red] %s\n[red]R6[/red] %s\n[red]R7[/red] %s\n[red]R8[/red] %s\n[red]R9[/red] %s\n" %\
+                    (hw["RAM"][5], hw["RAM"][6], hw["RAM"][7], hw["RAM"][8], hw["RAM"][9]) +\
+                  "[red]R10[/red] %s\n[red]R11[/red] %s\n[red]R12[/red] %s\n[red]R13[/red] %s\n[red]R14[/red] %s\n" %\
+                    (hw["RAM"][10], hw["RAM"][11], hw["RAM"][12], hw["RAM"][13], hw["RAM"][14]) +\
+                  "[red]R15[/red] %s" % (hw["RAM"][15])
+
+            elif debug_cmd.startswith("D="):
+                row_reg = title("Registers", 0) +\
+                  "[red]A[/red] %s\n[red]D[/red] [bold yellow]%s[/bold yellow]\n[red]M[/red] %s\n" %\
+                    (hw["A"], hw["D"], hw["M"]) +\
+                  "[red]SP[/red] %s\n[red]LCL[/red] %s\n[red]ARG[/red] %s\n[red]THIS[/red] %s\n[red]THAT[/red] %s\n" %\
+                    (hw["RAM"][0], hw["RAM"][1], hw["RAM"][2], hw["RAM"][3], hw["RAM"][4]) +\
+                  "[red]R5[/red] %s\n[red]R6[/red] %s\n[red]R7[/red] %s\n[red]R8[/red] %s\n[red]R9[/red] %s\n" %\
+                    (hw["RAM"][5], hw["RAM"][6], hw["RAM"][7], hw["RAM"][8], hw["RAM"][9]) +\
+                  "[red]R10[/red] %s\n[red]R11[/red] %s\n[red]R12[/red] %s\n[red]R13[/red] %s\n[red]R14[/red] %s\n" %\
+                    (hw["RAM"][10], hw["RAM"][11], hw["RAM"][12], hw["RAM"][13], hw["RAM"][14]) +\
+                  "[red]R15[/red] %s" % (hw["RAM"][15])
+
+            elif debug_cmd.startswith("M="):
+                row_reg = title("Registers", 0) +\
+                  "[red]A[/red] %s\n[red]D[/red] %s\n[red]M[/red] [bold yellow]%s[/bold yellow]\n" %\
+                    (hw["A"], hw["D"], hw["M"]) +\
+                  "[red]SP[/red] %s\n[red]LCL[/red] %s\n[red]ARG[/red] %s\n[red]THIS[/red] %s\n[red]THAT[/red] %s\n" %\
+                    (hw["RAM"][0], hw["RAM"][1], hw["RAM"][2], hw["RAM"][3], hw["RAM"][4]) +\
+                  "[red]R5[/red] %s\n[red]R6[/red] %s\n[red]R7[/red] %s\n[red]R8[/red] %s\n[red]R9[/red] %s\n" %\
+                    (hw["RAM"][5], hw["RAM"][6], hw["RAM"][7], hw["RAM"][8], hw["RAM"][9]) +\
+                  "[red]R10[/red] %s\n[red]R11[/red] %s\n[red]R12[/red] %s\n[red]R13[/red] %s\n[red]R14[/red] %s\n" %\
+                    (hw["RAM"][10], hw["RAM"][11], hw["RAM"][12], hw["RAM"][13], hw["RAM"][14]) +\
+                  "[red]R15[/red] %s" % (hw["RAM"][15])
+
+            elif debug_cmd.startswith("D;"):
+                row_reg = title("Registers", 0) +\
+                  "[red]A[/red] [bold green]%s[/bold green]\n[red]D[/red] [bold cyan]%s[/bold cyan]\n[red]M[/red] %s\n" %\
+                    (hw["A"], hw["D"], hw["M"]) +\
+                  "[red]SP[/red] %s\n[red]LCL[/red] %s\n[red]ARG[/red] %s\n[red]THIS[/red] %s\n[red]THAT[/red] %s\n" %\
+                    (hw["RAM"][0], hw["RAM"][1], hw["RAM"][2], hw["RAM"][3], hw["RAM"][4]) +\
+                  "[red]R5[/red] %s\n[red]R6[/red] %s\n[red]R7[/red] %s\n[red]R8[/red] %s\n[red]R9[/red] %s\n" %\
+                    (hw["RAM"][5], hw["RAM"][6], hw["RAM"][7], hw["RAM"][8], hw["RAM"][9]) +\
+                  "[red]R10[/red] %s\n[red]R11[/red] %s\n[red]R12[/red] %s\n[red]R13[/red] %s\n[red]R14[/red] %s\n" %\
+                    (hw["RAM"][10], hw["RAM"][11], hw["RAM"][12], hw["RAM"][13], hw["RAM"][14]) +\
+                  "[red]R15[/red] %s" % (hw["RAM"][15])
+
+            elif debug_cmd.startswith("0;"):
+                row_reg = title("Registers", 0) +\
+                  "[red]A[/red] [bold green]%s[/bold green]\n[red]D[/red] %s\n[red]M[/red] %s\n" %\
+                    (hw["A"], hw["D"], hw["M"]) +\
+                  "[red]SP[/red] %s\n[red]LCL[/red] %s\n[red]ARG[/red] %s\n[red]THIS[/red] %s\n[red]THAT[/red] %s\n" %\
+                    (hw["RAM"][0], hw["RAM"][1], hw["RAM"][2], hw["RAM"][3], hw["RAM"][4]) +\
+                  "[red]R5[/red] %s\n[red]R6[/red] %s\n[red]R7[/red] %s\n[red]R8[/red] %s\n[red]R9[/red] %s\n" %\
+                    (hw["RAM"][5], hw["RAM"][6], hw["RAM"][7], hw["RAM"][8], hw["RAM"][9]) +\
+                  "[red]R10[/red] %s\n[red]R11[/red] %s\n[red]R12[/red] %s\n[red]R13[/red] %s\n[red]R14[/red] %s\n" %\
+                    (hw["RAM"][10], hw["RAM"][11], hw["RAM"][12], hw["RAM"][13], hw["RAM"][14]) +\
+                  "[red]R15[/red] %s" % (hw["RAM"][15])
+
+            else:
+                raise RuntimeError()
+
+            table.add_row(row_code + row_stack, row_reg)
+            console.print(table)
+
+            # TODO: debug gui -----------------------------------------------------------------------------
 
         cycle += 1  # always advance clock cycle
 
@@ -696,51 +776,51 @@ if __name__ == '__main__':
         # r'..\projects\12\MemoryTest\MemoryDiag.tst'
     ]
 
-    debug_runs = [False]
+    debug_runs = [True]
 
     vm_static_dicts = {}
     for _debug in debug_runs:
-        # compile Jack to VM (course compiler)
-        for jack_dir in jack_dirpaths:
-            result = subprocess.run([r"..\tools\JackCompiler.bat", jack_dir], capture_output=True, text=True)
-            if result.stderr:
-                raise RuntimeError(result.stderr)
-            else:
-                print("Course Compiler: %s" % result.stdout.strip())
-
+        # # compile Jack to VM (course compiler)
+        # for jack_dir in jack_dirpaths:
+        #     result = subprocess.run([r"..\tools\JackCompiler.bat", jack_dir], capture_output=True, text=True)
+        #     if result.stderr:
+        #         raise RuntimeError(result.stderr)
+        #     else:
+        #         print("Course Compiler: %s" % result.stdout.strip())
+        #
         # # tokenize / analyze Jack (not required with course compiler)
         # for _filepath in jack_filepaths:
-        #     tokenizer.main(_filepath, debug=False)
-        #     analyzer.main(_filepath, debug=False)
+        #     tokenizer.main(_filepath, debug=_debug)
+        #     analyzer.main(_filepath, debug=_debug)
         #
         # # compile Jack to VM (match against course compiler)
         # compiler._compile(jack_filepath_lists, jack_matches)
         #
         # # translate VM to ASM
         # for _vm_dir in _vm_dirpaths:
-        #     vm_static_dicts[_vm_dir] = translator.translate(_vm_dir, _vm_bootstrap_paths, debug=False)
+        #     vm_static_dicts[_vm_dir] = translator.translate(_vm_dir, _vm_bootstrap_paths, debug=_debug)
         #
         # # assemble all ASM to HACK and binary match if available
         # _asm_filepaths = vm_asm_filepaths + binary_asm_filepaths
         # for _asm_filepath in _asm_filepaths:
-        #     assembler.assemble(_asm_filepath, debug=False)
+        #     assembler.assemble(_asm_filepath, debug=_debug)
         # warnings.simplefilter("default")  # reset warning filter
-        #
-        # # load & execute modules without test scripts
-        # for _asm_filepath in binary_asm_filepaths:
-        #     try:
-        #         run(_asm_filepath, debug=False)
-        #     except IndexError:
-        #         warnings.warn("Interpreter: Probable memory access violation captured during execution of %s"
-        #                       % _asm_filepath)
-        #         traceback.print_exc()
-        #
+
+        # load & execute modules without test scripts
+        for _asm_filepath in binary_asm_filepaths:
+            try:
+                run(_asm_filepath, debug=_debug)
+            except IndexError:
+                warnings.warn("Interpreter: Probable memory access violation captured during execution of %s"
+                              % _asm_filepath)
+                traceback.print_exc()
+
         # # load & execute modules with test scripts
         # for _asm_filepath in vm_asm_filepaths:
         #     _tst_filepath = _asm_filepath.replace(".asm", ".tst")
         #     _cmp_filepath = _asm_filepath.replace(".asm", ".cmp")
-        #     _tst_params = tester.load_tst(_tst_filepath, debug=False)
-        #     _tst_params["compare"] = tester.load_cmp(_cmp_filepath, debug=False)
+        #     _tst_params = tester.load_tst(_tst_filepath, debug=_debug)
+        #     _tst_params["compare"] = tester.load_cmp(_cmp_filepath, debug=_debug)
         #
         #     # retrieve static_dict from translator run
         #     _static_dict = None
