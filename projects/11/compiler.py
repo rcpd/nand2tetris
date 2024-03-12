@@ -261,16 +261,16 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
         class_dict, while_index = label_index(class_dict, class_name, func_name, "while")
         store_pcode(pcode, "\nlabel WHILE_TEST_%s_%s // while <expression>" % (func_name, while_index))
         pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
-        store_pcode(pcode, "if-goto WHILE_TRUE_%s_%s" % (func_name, while_index))
-        store_pcode(pcode, "goto WHILE_FALSE_%s_%s" % (func_name, while_index))
-        store_pcode(pcode, "label WHILE_TRUE_%s_%s" % (func_name, while_index))
+        store_pcode(pcode, "\nif-goto WHILE_TRUE_%s_%s // enter while" % (func_name, while_index))
+        store_pcode(pcode, "goto WHILE_FALSE_%s_%s // exit while" % (func_name, while_index))
+        store_pcode(pcode, "label WHILE_TRUE_%s_%s // start while" % (func_name, while_index))
     elif input_list[i][1] == "if":
         class_dict, if_index = label_index(class_dict, class_name, func_name, "if")
         store_pcode(pcode, "\n// if <expression>")
         pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
-        store_pcode(pcode, "if-goto IF_TRUE_%s_%s" % (func_name, if_index))
-        store_pcode(pcode, "goto IF_FALSE_%s_%s" % (func_name, if_index))
-        store_pcode(pcode, "label IF_TRUE_%s_%s" % (func_name, if_index))
+        store_pcode(pcode, "\nif-goto IF_%s_%s // enter if" % (func_name, if_index))
+        store_pcode(pcode, "goto ELSE_%s_%s // exit if or enter else" % (func_name, if_index))
+        store_pcode(pcode, "label IF_%s_%s // start if" % (func_name, if_index))
     else:
         raise RuntimeError(input_list[i])
     return pcode, class_dict
@@ -468,22 +468,22 @@ def main(debug=False):
                         child.text = " %s " % input_tuple[1]
 
                     if parent.tag == "ifStatement":
-                        # don't close if } followed by else
-                        if not (input_list[j][0] == "keyword" and input_list[j][1] == "else"):
-                            parent = find_parent(output_root, parent)
+                        # don't close ifStatement if } followed by else
+                        if_index = class_dict[class_name][func_name]["label_dict"]["if"]
+                        if input_list[j][0] == "keyword" and input_list[j][1] == "else":
+                            store_pcode(pcode, "\ngoto IF_END_%s_%s // jump over else" % (func_name, if_index))
+                            store_pcode(pcode, "\nlabel ELSE_%s_%s // else" % (func_name, if_index))
                         else:
-                            store_pcode(pcode, "\n// else")
-                            if_index = class_dict[class_name][func_name]["label_dict"]["if"]
-                            store_pcode(pcode, "label IF_FALSE_%s_%s" % (func_name, if_index))
+                            parent = find_parent(output_root, parent)
+                            store_pcode(pcode, "label IF_END_%s_%s // exit if" % (func_name, if_index))
                             class_dict[class_name][func_name]["label_dict"]["if"] -= 1
 
                     if parent.tag == "whileStatement":
                         # close parent
                         parent = find_parent(output_root, parent)
-                        store_pcode(pcode, "\n// end_while")
                         while_index = class_dict[class_name][func_name]["label_dict"]["while"]
-                        store_pcode(pcode, "goto WHILE_TEST_%s_%s" % (func_name, while_index))
-                        store_pcode(pcode, "label WHILE_FALSE_%s_%s" % (func_name, while_index))
+                        store_pcode(pcode, "\ngoto WHILE_TEST_%s_%s // loop or exit" % (func_name, while_index))
+                        store_pcode(pcode, "label WHILE_FALSE_%s_%s // exit while\n" % (func_name, while_index))
                         class_dict[class_name][func_name]["label_dict"]["while"] -= 1
 
                     if parent.tag == "subroutineBody":
