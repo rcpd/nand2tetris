@@ -4,7 +4,6 @@ by tokenizer/analyzer.
 """
 
 import xml.etree.ElementTree as Et
-import traceback
 
 op_map = {"+": "add", "-": "sub", "*": "call Math.multiply 2", "/": "call Math.divide 2", "&": "and", "|": "or",
           "~": "not", "<": "lt", ">": "gt", "=": "eq"}  # Math.multiply/divide = non-void return (no pop)
@@ -564,18 +563,22 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
 
         elif symbol == ")":
             # process everything up to & including the last expression opening from buffer
-            pcode = pop_buffer(pcode, exp_buffer, stop_at="// (", pop_incl=True)
+            pcode, exp_buffer = pop_buffer(pcode, exp_buffer, stop_at="// (", pop_incl=True)
             pcode = store_pcode(pcode, "// %s" % symbol)
+
+            # pop the call only when all expressions exhausted
+            if exp_buffer and exp_buffer[-1].startswith("call"):
+                pcode = store_pcode(pcode, exp_buffer.pop())
 
         elif symbol == "]":
             # process everything up to & including the last expression opening from buffer
-            pcode = pop_buffer(pcode, exp_buffer, stop_at="// [", pop_incl=True)
+            pcode, exp_buffer = pop_buffer(pcode, exp_buffer, stop_at="// [", pop_incl=True)
             pcode = store_pcode(pcode, "// %s" % symbol)
             pcode = store_pcode(pcode, exp_buffer.pop())  # pop the array var as well
 
         elif symbol == ",":
             # process everything up to but not including the last expression opening from buffer
-            pcode = pop_buffer(pcode, exp_buffer, stop_at="// (")  # i.e. expression was not bracketed
+            pcode, exp_buffer = pop_buffer(pcode, exp_buffer, stop_at="// (")  # i.e. expression was not bracketed
 
     elif identifier:
         # attempt to lookup class/func attributes (2 passes)
@@ -649,7 +652,7 @@ def pop_buffer(pcode, exp_buffer, stop_at=None, pop_incl=False):
     else:
         while exp_buffer:
             store_pcode(pcode, exp_buffer.pop())
-    return pcode
+    return pcode, exp_buffer
 
 
 def main(filepath, file_list):
@@ -1043,7 +1046,7 @@ def main(filepath, file_list):
                                        class_name=class_name, func_name=func_name, symbol=symbol)
 
             elif symbol == ';':
-                pcode = pop_buffer(pcode, exp_buffer)  # empty the buffer
+                pcode, exp_buffer = pop_buffer(pcode, exp_buffer)  # empty the buffer
 
                 if statement == 'return':
                     pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
@@ -1159,6 +1162,7 @@ if __name__ == '__main__':
         r"..\11\ConvertToBin\Main.vm": 114,
         r"..\11\Average\Main.vm": 149,
         r"..\09\Fraction\Main.vm": 18,
+        r"..\09\Fraction\Fraction.vm": 116,
         # wip
     }
 
@@ -1192,6 +1196,3 @@ if __name__ == '__main__':
                     print("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
-
-    # FIXME: 2nd call in expression out of order
-    #  let sum = (numerator * other.getDenominator()) + (other.getNumerator() * denominator);

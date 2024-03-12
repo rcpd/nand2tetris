@@ -53,9 +53,9 @@ push argument 1
 call Fraction.getDenominator 1
 call Math.multiply 2
 push argument 1
+call Fraction.getNumerator 1
 push this 1
 call Math.multiply 2
-call Fraction.getNumerator 1
 add
 pop local 0
 push local 0
