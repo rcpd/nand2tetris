@@ -115,6 +115,7 @@ class Memory {
             // *allocNextPtr = *freeBlock
             let blockPtr[1] = blockPtr + size + 2;
         }
+        // else: consume the whole block (size/flink unchanged)
 
         let blockPtr[0] = 0; // allocBlockSize = 0, flag it as allocated
         return blockPtr + 2; // return &allocBlockData
