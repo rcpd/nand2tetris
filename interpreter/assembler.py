@@ -262,29 +262,29 @@ def assemble(asm_filepath, debug=False):
 
 if __name__ == '__main__':
     _asm_filepaths = [
-        "../04/fill/fill.asm",
-        "../04/mult/mult.asm",
+        "../projects/04/fill/fill.asm",
+        "../projects/04/mult/mult.asm",
 
-        "../06/add/add.asm",
-        "../06/max/max.asm",
-        "../06/max/maxL.asm",
-        "../06/pong/pong.asm",
-        "../06/pong/pongL.asm",
-        "../06/rect/rect.asm",
-        "../06/rect/rectL.asm",
+        "../projects/06/add/add.asm",
+        "../projects/06/max/max.asm",
+        "../projects/06/max/maxL.asm",
+        "../projects/06/pong/pong.asm",
+        "../projects/06/pong/pongL.asm",
+        "../projects/06/rect/rect.asm",
+        "../projects/06/rect/rectL.asm",
 
-        "../07/MemoryAccess/BasicTest/BasicTest.asm",
-        "../07/MemoryAccess/PointerTest/PointerTest.asm",
-        "../07/MemoryAccess/StaticTest/StaticTest.asm",
-        "../07/StackArithmetic/SimpleAdd/SimpleAdd.asm",
-        "../07/StackArithmetic/StackTest/StackTest.asm",
+        "../projects/07/MemoryAccess/BasicTest/BasicTest.asm",
+        "../projects/07/MemoryAccess/PointerTest/PointerTest.asm",
+        "../projects/07/MemoryAccess/StaticTest/StaticTest.asm",
+        "../projects/07/StackArithmetic/SimpleAdd/SimpleAdd.asm",
+        "../projects/07/StackArithmetic/StackTest/StackTest.asm",
 
-        "../08/FunctionCalls/FibonacciElement/FibonacciElement.asm",
-        "../08/FunctionCalls/NestedCall/NestedCall.asm",
-        "../08/FunctionCalls/SimpleFunction/SimpleFunction.asm",
-        "../08/FunctionCalls/StaticsTest/StaticsTest.asm",
-        "../08/ProgramFlow/BasicLoop/BasicLoop.asm",
-        "../08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
+        "../projects/08/FunctionCalls/FibonacciElement/FibonacciElement.asm",
+        "../projects/08/FunctionCalls/NestedCall/NestedCall.asm",
+        "../projects/08/FunctionCalls/SimpleFunction/SimpleFunction.asm",
+        "../projects/08/FunctionCalls/StaticsTest/StaticsTest.asm",
+        "../projects/08/ProgramFlow/BasicLoop/BasicLoop.asm",
+        "../projects/08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
     ]
 
     debug_runs = [True, False]

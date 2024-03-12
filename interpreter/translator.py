@@ -862,22 +862,22 @@ if __name__ == "__main__":
     # regular VM programs
     # TODO: standardise paths
     _vm_dirpaths = [
-        r'..\07\MemoryAccess\BasicTest',
-        r'..\07\MemoryAccess\PointerTest',
-        r'..\07\MemoryAccess\StaticTest',
-        r'..\07\StackArithmetic\SimpleAdd',
-        r'..\07\StackArithmetic\StackTest',
+        r'..\projects\07\MemoryAccess\BasicTest',
+        r'..\projects\07\MemoryAccess\PointerTest',
+        r'..\projects\07\MemoryAccess\StaticTest',
+        r'..\projects\07\StackArithmetic\SimpleAdd',
+        r'..\projects\07\StackArithmetic\StackTest',
 
-        r'..\08\ProgramFlow\BasicLoop',
-        r'..\08\ProgramFlow\FibonacciSeries',
-        r'..\08\FunctionCalls\SimpleFunction',
+        r'..\projects\08\ProgramFlow\BasicLoop',
+        r'..\projects\08\ProgramFlow\FibonacciSeries',
+        r'..\projects\08\FunctionCalls\SimpleFunction',
     ]
 
     # VM programs that require non-spec bootstrap to pass tests
     _vm_bootstrap_paths = [
-        r'..\08\FunctionCalls\FibonacciElement',
-        r'..\08\FunctionCalls\NestedCall',
-        r'..\08\FunctionCalls\StaticsTest'
+        r'..\projects\08\FunctionCalls\FibonacciElement',
+        r'..\projects\08\FunctionCalls\NestedCall',
+        r'..\projects\08\FunctionCalls\StaticsTest'
     ]
 
     _vm_dirpaths = _vm_dirpaths + _vm_bootstrap_paths

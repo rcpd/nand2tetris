@@ -147,7 +147,7 @@
   STATICS: 0 0 0 0 0 0 0 0 0 
 21 @16 
   // pop static 8 
-  // static + src segment offset (..\07\MemoryAccess\StaticTest\StaticTest.vm) 
+  // static + src segment offset (..\projects\07\MemoryAccess\StaticTest\StaticTest.vm) 
   EVAL: A=16 
   A=16 D=888 M=0 R13=0 R14=0 R15=0 
   SP: 259 LCL=0 ARG=0 THIS=0 THAT=0 
@@ -295,7 +295,7 @@
   STATICS: 0 0 0 0 0 0 0 0 888 
 39 @16 
   // pop static 3 
-  // static + src segment offset (..\07\MemoryAccess\StaticTest\StaticTest.vm) 
+  // static + src segment offset (..\projects\07\MemoryAccess\StaticTest\StaticTest.vm) 
   EVAL: A=16 
   A=16 D=888 M=0 R13=0 R14=0 R15=0 
   SP: 258 LCL=0 ARG=0 THIS=0 THAT=0 
@@ -443,7 +443,7 @@
   STATICS: 0 0 0 333 0 0 0 0 888 
 57 @16 
   // pop static 1 
-  // static + src segment offset (..\07\MemoryAccess\StaticTest\StaticTest.vm) 
+  // static + src segment offset (..\projects\07\MemoryAccess\StaticTest\StaticTest.vm) 
   EVAL: A=16 
   A=16 D=333 M=0 R13=0 R14=0 R15=0 
   SP: 257 LCL=0 ARG=0 THIS=0 THAT=0 
@@ -590,7 +590,7 @@
   STATICS: 0 111 0 333 0 0 0 0 888 
 75 @16 
   // push static 3 
-  // static + src segment offset (..\07\MemoryAccess\StaticTest\StaticTest.vm) 
+  // static + src segment offset (..\projects\07\MemoryAccess\StaticTest\StaticTest.vm) 
   EVAL: A=16 
   A=16 D=111 M=0 R13=0 R14=0 R15=0 
   SP: 256 LCL=0 ARG=0 THIS=0 THAT=0 
@@ -654,7 +654,7 @@
   STATICS: 0 111 0 333 0 0 0 0 888 
 85 @16 
   // push static 1 
-  // static + src segment offset (..\07\MemoryAccess\StaticTest\StaticTest.vm) 
+  // static + src segment offset (..\projects\07\MemoryAccess\StaticTest\StaticTest.vm) 
   EVAL: A=16 
   A=16 D=333 M=0 R13=0 R14=0 R15=0 
   SP: 257 LCL=0 ARG=0 THIS=0 THAT=0 
@@ -798,7 +798,7 @@
   STATICS: 0 111 0 333 0 0 0 0 888 
 105 @16 
   // push static 8 
-  // static + src segment offset (..\07\MemoryAccess\StaticTest\StaticTest.vm) 
+  // static + src segment offset (..\projects\07\MemoryAccess\StaticTest\StaticTest.vm) 
   EVAL: A=16 
   A=16 D=111 M=0 R13=0 R14=0 R15=0 
   SP: 257 LCL=0 ARG=0 THIS=0 THAT=0 

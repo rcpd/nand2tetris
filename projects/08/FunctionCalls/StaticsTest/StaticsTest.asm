@@ -389,7 +389,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-44) pop static 0
-@16 // pop static 0 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
+@16 // pop static 0 // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class1.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -421,7 +421,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-48) pop static 1
-@16 // pop static 1 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
+@16 // pop static 1 // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class1.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -515,7 +515,7 @@ A=M // d = [LCL-5] (*LCL)
 (Class1.get) // function Class1.get 0
 
 // (-59) push static 0
-@16 // push static 0 // function Class1.get 0 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
+@16 // push static 0 // function Class1.get 0 // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class1.vm)
 D=A
 @0
 A=D+A
@@ -526,7 +526,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-61) push static 1
-@16 // push static 1 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
+@16 // push static 1 // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class1.vm)
 D=A
 @1
 A=D+A
@@ -626,7 +626,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-74) pop static 0
-@18 // pop static 0 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
+@18 // pop static 0 // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class2.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -658,7 +658,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-78) pop static 1
-@18 // pop static 1 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
+@18 // pop static 1 // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class2.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -752,7 +752,7 @@ A=M // d = [LCL-5] (*LCL)
 (Class2.get) // function Class2.get 0
 
 // (-89) push static 0
-@18 // push static 0 // function Class2.get 0 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
+@18 // push static 0 // function Class2.get 0 // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class2.vm)
 D=A
 @0
 A=D+A
@@ -763,7 +763,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-91) push static 1
-@18 // push static 1 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
+@18 // push static 1 // static + src segment offset (..\projects\08\FunctionCalls\StaticsTest\Class2.vm)
 D=A
 @1
 A=D+A
