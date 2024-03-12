@@ -231,7 +231,8 @@ def assemble(asm_filepath, debug=False):
         with open(asm_filepath.replace(".asm", ".hack"), "w") as output_file:
             with open(asm_filepath.replace(".asm", ".cmp"), "r") as solution_file:
                 # dump the result
-                for i, ((bin_line, sol_line), in_line) in enumerate(zip(zip(binary_file, solution_file), asm_content_stripped)):
+                for i, ((bin_line, sol_line), in_line) in enumerate(
+                        zip(zip(binary_file, solution_file), asm_content_stripped)):
                     if debug:
                         print('%s / %s' % (in_line, bin_line))
                         print('map    : ' + 'ixx a cccccc ddd jjj')
@@ -244,7 +245,7 @@ def assemble(asm_filepath, debug=False):
                             print('target : ' + sol_line[0:3]+" "+sol_line[3]+" "+sol_line[4:10] +
                                   " "+sol_line[10:13]+" "+sol_line[13:])
                         raise Exception('%s: mismatch on line %s' % (asm_filepath, i))
-            print('%s: Complete (no errors / matches solution file)' % asm_filepath)
+            print('Assembler: %s Complete (no errors / matches solution file)' % asm_filepath)
 
     else:
         # no solution file, just write the result
@@ -254,7 +255,7 @@ def assemble(asm_filepath, debug=False):
                 print('map  : ' + 'ixx a cccccc ddd jjj')
                 print('code : ' + bin_line[0:3] + " " + bin_line[3] + " " + bin_line[4:10] +
                       " " + bin_line[10:13] + " " + bin_line[13:])
-        print('%s: Complete (no errors / no solution file = not storing binary)' % asm_filepath)
+        print('Assembler: %s Complete (no errors / no solution file = not storing binary)' % asm_filepath)
 
 
 if __name__ == '__main__':
@@ -280,5 +281,9 @@ if __name__ == '__main__':
         "../08/ProgramFlow/BasicLoop/BasicLoop.asm",
         "../08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
     ]
+
     for _asm_filepath in file_list:
         assemble(_asm_filepath, debug=True)
+
+    for _asm_filepath in file_list:
+        assemble(_asm_filepath, debug=False)
