@@ -400,38 +400,16 @@ def compile_call(pcode, call_class, call_func, num_args, statement, class_name, 
         if statement == 'do' and not exp_buffer:
             # except when call is part of expression
             exp_buffer.append("pop temp 0 // discard return on do call")
-        exp_buffer.append("call %s.%s %s" % (call_class, call_func, num_args))
 
-        # implicit this param on unqualified class method call
-        if not qualified and class_name == call_class:
-            if call_class in sys_func:
-                if sys_func[call_class][call_func]['kind'] == 'method':
-                    exp_buffer.append("push pointer 0 // this")
-            elif call_class in class_dict:
-                if class_dict[call_class][call_func]['kind'] == 'method':
-                    exp_buffer.append("push pointer 0 // this")
-            else:
-                raise RuntimeError("class not found: '%s'" % call_class)
+        if qualified:
+            exp_buffer.append("call %s.%s %s // qualified" % (call_class, call_func, num_args))
+        else:
+            exp_buffer.append("call %s.%s %s // unqualified" % (call_class, call_func, num_args))
 
         return exp_buffer
 
     else:
         raise NotImplementedError
-    #     # implicit this param on unqualified class method call
-    #     if not qualified and class_name == call_class:
-    #         if call_class in sys_func:
-    #             if sys_func[call_class][call_func]['kind'] == 'method':
-    #                 pcode = store_pcode(pcode, "push pointer 0 // this")
-    #         elif call_class in class_dict:
-    #             if class_dict[call_class][call_func]['kind'] == 'method':
-    #                 pcode = store_pcode(pcode, "push pointer 0 // this")
-    #         else:
-    #             raise RuntimeError("class not found: '%s'" % call_class)
-    #
-    #     pcode = store_pcode(pcode, "\ncall %s.%s %s" % (call_class, call_func, num_args))
-    #     if statement == 'do':
-    #         pcode = store_pcode(pcode, "\npop temp 0 // discard return on do call")
-    #     return pcode
 
 
 def compile_return(pcode, class_dict, class_name, func_name):
@@ -564,6 +542,21 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
     if symbol:
         if symbol in ("(", "["):
             pcode = store_pcode(pcode, "// %s" % symbol)
+
+            # on unqualified class method call inject implicit this param before others
+            if exp_buffer and exp_buffer[-1].startswith("call") and exp_buffer[-1].endswith("// unqualified"):
+                call_class, call_func = exp_buffer[-1].split()[1].split('.')
+
+                if call_class in sys_func:
+                    if sys_func[call_class][call_func]['kind'] == 'method':
+                        store_pcode(pcode, "push pointer 0 // this")
+
+                elif call_class in class_dict:
+                    if class_dict[call_class][call_func]['kind'] == 'method':
+                        store_pcode(pcode, "push pointer 0 // this")
+                else:
+                    raise RuntimeError("class not found: '%s'" % call_class)
+
             exp_buffer.append("// %s" % symbol)  # inject expression marker into buffer
 
         elif symbol == ")":
@@ -571,7 +564,7 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
             pcode, exp_buffer = pop_buffer(pcode, exp_buffer, stop_at="// (", pop_incl=True)
             pcode = store_pcode(pcode, "// %s" % symbol)
 
-            # pop the call only when all expressions exhausted
+            # pop the call only when all expressions following it exhausted
             if exp_buffer and exp_buffer[-1].startswith("call"):
                 pcode = store_pcode(pcode, exp_buffer.pop())
 
@@ -1164,7 +1157,7 @@ if __name__ == '__main__':
         # wip
         # [r"..\11\ComplexArrays\Main.jack"],  # FIXME: array in rhs expression
 
-        [r"..\11\Pong\Ball.jack",  # FIXME: order of 'this' in params
+        [r"..\11\Pong\Ball.jack",  # match
          r"..\11\Pong\Bat.jack",  # match
          r"..\11\Pong\Main.jack",  # match
          r"..\11\Pong\PongGame.jack"],  # FIXME: static not this, other unknown issues
