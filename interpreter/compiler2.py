@@ -90,8 +90,10 @@ sys_func = {
 # method: operates on a specific instantiation of a class object
 # function: global to all instantiations of the class (a constructor is a function)
 
+types = ['int', 'boolean', 'char', 'void']
 # FIXME: Fraction is not a built-in, supplementary modules should be added at runtime
-types = ['int', 'boolean', 'char', 'void', 'Array', 'Fraction']
+objects = ['Math', 'Memory', 'String', 'Array', 'Output', 'Screen', 'Keyboard', 'Sys', 'Fraction']
+kinds = ['class', 'constructor', 'method', 'function', 'static', 'field', 'var']
 
 
 def find_parent(tree, node):
@@ -124,6 +126,7 @@ def compile_class(pcode, class_name, class_dict):
     """
     if not class_name:
         raise RuntimeError("illegal class name: '%s'" % class_name)
+
     # define class_name and initialize symbol table
     if class_name not in class_dict:
         class_dict[class_name] = {"args": {}, "index_dict": {}}
@@ -134,11 +137,14 @@ def compile_class(pcode, class_name, class_dict):
     return pcode, class_dict
 
 
+# FIXME: all Fraction functions are constructor as kind
 def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_name):
     """
     update the class_dict during pre-scan, emit pcode when declaration encountered
     """
     if not func_name:
+        raise RuntimeError("illegal function name: '%s'" % func_name)
+    if func_name == class_name:
         raise RuntimeError("illegal function name: '%s'" % func_name)
     if not func_type:
         raise RuntimeError("illegal function type: '%s'" % func_type)
@@ -213,7 +219,7 @@ def compile_statement(pcode=None, statement=None, class_dict=None, class_name=No
 
     if statement == "do":
         pcode = compile_call(pcode=pcode, call_class=call_class, call_func=call_func, num_args=num_args,
-                             statement=statement)
+                             statement=statement, class_dict=class_dict)
         num_args = 0
 
     elif statement == "let":
@@ -362,6 +368,8 @@ def compile_constant(pcode, constant, exp_buffer=None):
     """
     emit pcode when constant encountered
     """
+    if not constant:
+        raise RuntimeError("illegal constant: '%s'" % constant)
 
     if type(exp_buffer) is list:
         exp_buffer.append("push constant %s" % constant)
@@ -372,10 +380,32 @@ def compile_constant(pcode, constant, exp_buffer=None):
         return pcode
 
 
-def compile_call(pcode, call_class, call_func, num_args, statement, exp_buffer=None):
+# TODO: remove num_params, num_args
+def compile_call(pcode, call_class, call_func, num_args, statement, exp_buffer=None, class_dict=None):
     """
     emit pcode when call encountered, discard return on do call
     """
+    if not call_class:
+        raise RuntimeError("illegal class: '%s'" % call_class)
+    if not call_func:
+        raise RuntimeError("illegal callee: '%s'" % call_func)
+
+    if call_class == 'Fraction' and call_func == 'plus':
+        print("debug")
+
+    # count arguments
+    num_args = 0
+    if call_class in sys_func:
+        num_args = sys_func[call_class][call_func]['len']
+
+    elif call_class in class_dict:
+        for arg in class_dict[call_class][call_func]['args']:
+            if class_dict[call_class][call_func]['args'][arg]['kind'] == 'argument':
+                num_args += 1
+
+        if class_dict[call_class][call_func]['type'] == 'method':
+            num_args += 1  # this
+
     if type(exp_buffer) is list:
         if statement == 'do':
             exp_buffer.append("pop temp 0 // discard return on do call")
@@ -396,10 +426,8 @@ def compile_return(pcode, class_dict, class_name, func_name):
 
     if class_dict[class_name][func_name]["type"] == "void":
         pcode = store_pcode(pcode, "push constant 0 // void return")
-    elif class_dict[class_name][func_name]["type"] in types:
-        pass  # FIXME: push expression?
     else:
-        raise RuntimeError("unexpected return type '%s'" % class_dict[class_name][func_name]["type"])
+        pass  # FIXME: push expression?
     pcode = store_pcode(pcode, "\nreturn")
     return pcode
 
@@ -408,6 +436,8 @@ def compile_literal(pcode, code, exp_buffer=None):
     """
     emit pcode when literal encountered
     """
+    if not code:
+        raise RuntimeError("illegal literal: '%s'" % code)
 
     if type(exp_buffer) is list:
         exp_buffer.append(code)
@@ -421,6 +451,8 @@ def compile_boolean(pcode, value, exp_buffer=None):
     """
     store pcode in exp_buffer so its emitted when expression is closed
     """
+    if value not in ('true', 'false'):
+        raise RuntimeError("illegal boolean value '%s'" % value)
 
     if type(exp_buffer) is list:
         if value == "true":
@@ -429,17 +461,14 @@ def compile_boolean(pcode, value, exp_buffer=None):
             exp_buffer.append("push constant 0 // true (1/2)")
         elif value == "false":
             exp_buffer.append("push constant 0 // false")
-        else:
-            raise RuntimeError("unexpected boolean value '%s'" % value)
         return exp_buffer
+
     else:
         if value == "true":
             pcode = store_pcode(pcode, "\npush constant 0 // true (1/2)")
             pcode = store_pcode(pcode, "\nnot // true (2/2)")
         elif value == "false":
             pcode = store_pcode(pcode, "\npush constant 0 // false")
-        else:
-            raise RuntimeError("unexpected boolean value '%s'" % value)
         return pcode
 
 
@@ -457,6 +486,18 @@ def compile_var(pcode, class_dict, class_name, func_name, var_name, var_scope, e
     """
     if var_scope not in ('local', 'member'):
         raise RuntimeError("Unexpected scope '%s'" % var_scope)
+
+    if var_scope == 'local':
+        if not class_dict[class_name][func_name]['args'][var_name]['type']:
+            raise RuntimeError("illegal type '%s'" % class_dict[class_name][func_name]['args'][var_name]['type'])
+        if not class_dict[class_name][func_name]['args'][var_name]['kind']:
+            raise RuntimeError("illegal kind '%s'" % class_dict[class_name][func_name]['args'][var_name]['kind'])
+
+    elif var_scope == 'member':
+        if not class_dict[class_name]['args'][var_name]['type']:
+            raise RuntimeError("illegal type '%s'" % class_dict[class_name]['args'][var_name]['type'])
+        if not class_dict[class_name]['args'][var_name]['kind']:
+            raise RuntimeError("illegal kind '%s'" % class_dict[class_name]['args'][var_name]['kind'])
 
     if type(exp_buffer) is list:
         if var_scope == 'local':
@@ -536,29 +577,28 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
             if identifier in sys_func or identifier in class_dict:
                 parent_obj = identifier
 
+            elif func_name and identifier in class_dict[class_name][func_name]['args']:
+                if class_dict[class_name][func_name]['args'][identifier]['type'] in objects:
+                    parent_obj = class_dict[class_name][func_name]['args'][identifier]['type']
+
         elif not child_func:
             if parent_obj in sys_func:
                 if identifier in sys_func[parent_obj]:
                     child_func = identifier
-                if child_func:
-                    num_params = sys_func[parent_obj][child_func]['len']
             else:
                 if identifier in class_dict[parent_obj]:
                     child_func = identifier
-                    if child_func:
-                        for arg in class_dict[parent_obj][child_func]['args']:
-                            if class_dict[parent_obj][child_func]['args'][arg]['kind'] == 'argument':
-                                num_params += 1
 
         # if parent/child pair found assume call & compile
         if parent_obj and child_func:
-            exp_buffer = compile_call(pcode, parent_obj, child_func, num_params, statement, exp_buffer=exp_buffer)
+            exp_buffer = compile_call(pcode, parent_obj, child_func, num_params, statement, exp_buffer=exp_buffer,
+                                      class_dict=class_dict)
             parent_obj = child_func = ''
 
         # compile unqualified function call
         elif identifier in class_dict[class_name]:
-            # FIXME: wrong args
-            exp_buffer = compile_call(pcode, parent_obj, child_func, num_params, statement, exp_buffer=exp_buffer)
+            exp_buffer = compile_call(pcode, class_name, identifier, num_params, statement, exp_buffer=exp_buffer,
+                                      class_dict=class_dict)
             parent_obj = child_func = ''
 
         # compile as regular var (local)
@@ -614,120 +654,15 @@ def main(filepath, file_list):
     """
     pcode = []
     class_dict = {}
-    try:
-        # persist through loop scope
-        # pre-process tree for class/function/var decs (all related files)
-        for filepath in file_list:
-            class_name = statement = func_name = func_kind = keyword = var_type = func_type = ''
 
-            print("Pre-scan: %s" % filepath)
-            tree = Et.parse(filepath.replace(".jack", "_out.xml"))
+    # persist through loop scope
+    # pre-process tree for class/function/var decs (all related files)
+    for pre_file in file_list:
+        class_name = statement = func_name = func_kind = keyword = var_type = func_type = ''
 
-            for elem in tree.iter():
-                elem.tag = (elem.tag or '').strip()
-                elem.text = (elem.text or '').strip()
-                # skip rootnode
-                if elem.tag == 'class':
-                    continue
+        print("Pre-scan: %s" % pre_file)
+        tree = Et.parse(pre_file.replace(".jack", "_out.xml"))
 
-                if elem:  # has children
-                    keyword = var_type = func_type = ''  # reset tag context on depth change
-
-                if elem.tag == 'keyword':
-                    if not keyword:
-                        keyword = elem.text  # preserved for later
-                    elif not var_type:
-                        var_type = elem.text  # preserved for later
-
-                    if keyword in ('function', 'method', 'constructor'):
-                        if not func_kind:
-                            func_kind = keyword
-                            if not func_kind:
-                                raise RuntimeError("undefined function kind for '%s.%s'" % (class_name, func_name))
-
-                        elif not func_type:
-                            # type could be keyword or identifier
-                            if var_type and var_type in types:
-                                func_type = var_type
-                                continue
-                            # else: type wasn't a keyword
-
-                elif elem.tag == 'identifier':
-                    identifier = elem.text
-
-                    if keyword == 'class':
-                        class_name = identifier  # preserved for later
-                        pcode, class_dict = compile_class(pcode, class_name, class_dict)
-
-                    elif keyword in ('function', 'method', 'constructor'):
-                        # type could be keyword or identifier
-                        if not func_type:
-                            if identifier in types:
-                                func_type = identifier
-                                continue
-                            else:
-                                raise RuntimeError("unexpected type '%s'" % identifier)
-
-                        elif identifier not in types:
-                            func_name = identifier
-                            pcode, class_dict = compile_function(pcode, func_name, func_type, func_kind, class_dict,
-                                                                 class_name)
-                        else:
-                            raise RuntimeError("illegal identifier '%s'" % identifier)
-
-                    elif statement in ('var', 'param', 'class_var'):
-                        if not var_type:
-                            # param in function declaration
-                            if keyword in types:
-                                var_type = keyword
-
-                            # local var passed as param
-                            elif identifier in class_dict[class_name][func_name]['args'] or identifier in \
-                                    class_dict[class_name]['args']:
-                                continue  # already processed
-
-                            # built-in types like 'Array'
-                            elif identifier in types:
-                                var_type = identifier
-                                continue  # process on next loop
-
-                            if not var_type:
-                                raise RuntimeError()
-
-                        if keyword in ('field', 'static'):
-                            pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
-                                compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
-                                                  class_name=class_name, func_name=func_name, var_type=var_type,
-                                                  var_name=identifier, var_kind=keyword, prescan=True)
-                        else:
-                            pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
-                                compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
-                                                  class_name=class_name, func_name=func_name, var_type=var_type,
-                                                  var_name=identifier, prescan=True)
-
-                elif elem.tag == 'classVarDec':
-                    statement = 'class_var'
-                elif elem.tag == 'varDec':
-                    statement = 'var'
-                elif elem.tag == 'parameterList':
-                    statement = 'param'
-                elif elem.tag == 'doStatement':
-                    statement = 'do'
-                elif elem.tag == 'letStatement':
-                    statement = 'let'
-                elif elem.tag == 'returnStatement':
-                    statement = 'return'
-
-        # persist through loop scope
-        exp_buffer = []
-        block = []
-        num_args = while_count = if_count = 0
-        class_name = statement = func_name = keyword = var_type = identifier = ''
-        lhs_var_name = lhs_array = parent_obj = child_func = ''
-
-        # walk AST
-        print("Parsing: %s" % filepath)
-        tree = Et.parse(filepath.replace(".jack", "_out.xml"))
         for elem in tree.iter():
             elem.tag = (elem.tag or '').strip()
             elem.text = (elem.text or '').strip()
@@ -735,269 +670,85 @@ def main(filepath, file_list):
             if elem.tag == 'class':
                 continue
 
-            # has children
-            if elem:
-                # reset select tag contexts on depth change
-                keyword = var_type = identifier = ''
+            if elem:  # has children
+                keyword = var_type = func_type = ''  # reset tag context on depth change
 
-            # set keyword flag (single depth)
             if elem.tag == 'keyword':
-                if elem.text in ('true', 'false'):
-                    exp_buffer = compile_boolean(pcode, elem.text, exp_buffer)
-                elif not keyword:
+                if not keyword:
                     keyword = elem.text  # preserved for later
                 elif not var_type:
                     var_type = elem.text  # preserved for later
-                else:
-                    raise RuntimeError("unexpected keywords '%s' '%s' '%s'" % (keyword, var_type, elem.text))
+
+                if keyword in ('function', 'method', 'constructor'):
+                    if not func_kind:
+                        func_kind = keyword
+                        if not func_kind:
+                            raise RuntimeError("undefined function kind for '%s.%s'" % (class_name, func_name))
+
+                    elif not func_type:
+                        # type could be keyword or identifier
+                        if var_type and (var_type in types or var_type in objects):
+                            func_type = var_type
+                            continue
+                        # else: type wasn't a keyword
 
             elif elem.tag == 'identifier':
-                if keyword or statement:
-                    identifier = elem.text
+                identifier = elem.text
 
-                    # class declaration
-                    if keyword == 'class':
-                        class_name = identifier  # preserved for later
-                        pcode, class_dict = compile_class(pcode, class_name, class_dict)
+                if keyword == 'class':
+                    class_name = identifier  # preserved for later
+                    pcode, class_dict = compile_class(pcode, class_name, class_dict)
 
-                    # function declaration
-                    elif keyword in ('function', 'constructor', 'method'):
-                        func_name = identifier  # preserved for later
-                        func_kind = 'function'  # preserved for later
-                        if not func_kind:
-                            raise RuntimeError("undefined function kind for %s.%s" % (class_name, func_name))
-                        pcode, class_dict = compile_function(pcode, func_name, var_type, func_kind, class_dict,
+                elif keyword in ('function', 'method', 'constructor'):
+                    # type could be keyword or identifier
+                    if not func_type:
+                        if identifier in types or identifier in objects:
+                            func_type = identifier
+                            continue
+                        else:
+                            raise RuntimeError("unexpected type '%s'" % identifier)
+
+                    elif identifier not in types and identifier not in objects:
+                        func_name = identifier
+                        pcode, class_dict = compile_function(pcode, func_name, func_type, func_kind, class_dict,
                                                              class_name)
-
-                    # var declaration (local or function parameter)
-                    elif statement in ('var', 'param', 'class_var'):
-                        # catch param case where type is only keyword (not a vardec so not in pre-scan)
-                        if not var_type:
-                            if func_name and identifier in class_dict[class_name][func_name]['args']:
-                                var_type = class_dict[class_name][func_name]['args'][identifier]['type']
-                            elif identifier in class_dict[class_name]['args']:
-                                var_type = class_dict[class_name]['args'][identifier]['type']
-                            # else: probably an object type and not a var (caught below)
-
-                        if not var_type:
-                            # built-in library types like 'Array'
-                            if identifier in types:
-                                var_type = identifier
-                                continue  # process on next loop
-                            else:
-                                raise RuntimeError("No type found for '%s'" % identifier)
-
-                        if keyword in ('field', 'static'):
-                            pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
-                                compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
-                                                  class_name=class_name, func_name=func_name, var_type=var_type,
-                                                  var_name=identifier, while_count=while_count, if_count=if_count,
-                                                  var_kind=keyword)
-                        else:
-                            pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
-                                compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
-                                                  class_name=class_name, func_name=func_name, var_type=var_type,
-                                                  var_name=identifier, while_count=while_count, if_count=if_count)
-
-                        keyword = var_type = ''
-
-                    # collect class/func for call, compile when paired
-                    elif statement == 'do':
-                        # TODO: move out of expression handler
-                        pcode, exp_buffer, parent_obj, child_func = \
-                                expression_handler(pcode, statement, exp_buffer, class_dict=class_dict,
-                                                   identifier=identifier, class_name=class_name, func_name=func_name,
-                                                   parent_obj=parent_obj, child_func=child_func)
-
-                    # buffer assignee compilation first, then buffer any remaining expressions
-                    elif statement == 'let':
-                        if not lhs_var_name:
-                            # preserved for later
-                            lhs_var_name = identifier
-                            if lhs_var_name in class_dict[class_name][func_name]['args']:
-                                var_scope = 'local'
-                                if class_dict[class_name][func_name]['args'][lhs_var_name]['type'] == 'Array':
-                                    lhs_array = True
-                            elif lhs_var_name in class_dict[class_name]['args']:
-                                var_scope = 'member'
-                                if class_dict[class_name]['args'][lhs_var_name]['type'] == 'Array':
-                                    lhs_array = True
-                            else:
-                                raise RuntimeError("var not found: %s" % lhs_var_name)
-
-                            pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
-                                compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
-                                                  class_name=class_name, func_name=func_name, var_name=identifier,
-                                                  exp_buffer=exp_buffer, while_count=while_count, if_count=if_count,
-                                                  lhs_array=lhs_array, var_scope=var_scope)
-                        else:
-                            pcode, exp_buffer, parent_obj, child_func = \
-                                expression_handler(pcode, statement, exp_buffer, class_dict=class_dict,
-                                                   identifier=identifier, class_name=class_name, func_name=func_name,
-                                                   parent_obj=parent_obj, child_func=child_func)
-
-                    # buffer while/if expressions
-                    elif statement in ('while', 'if', 'return'):
-                        pcode, exp_buffer, parent_obj, child_func = \
-                            expression_handler(pcode, statement, exp_buffer, class_dict=class_dict,
-                                               identifier=identifier, class_name=class_name, func_name=func_name)
                     else:
-                        raise RuntimeError("unexpected keyword/statement '%s'/'%s' for identifier '%s'" %
-                                           (keyword, statement, elem.text))
-                else:
-                    raise RuntimeError("no keyword or statement defined for '%s'" % elem.text)
+                        raise RuntimeError("illegal identifier '%s'" % identifier)
 
-            elif elem.tag == 'symbol':
-                # TODO: compile_symbol
-                symbol = elem.text.strip()
+                elif statement in ('var', 'param', 'class_var'):
+                    if not var_type:
+                        # param in function declaration
+                        if keyword in types or keyword in objects:
+                            var_type = keyword
 
-                if symbol in ".":
-                    pass
-                elif symbol == "=" and find_parent(tree, elem).tag == 'letStatement':
-                    pass  # ignore first '=' in let statement (expressions will have different parent)
-                elif symbol == "{":
-                    if exp_buffer:
-                        raise RuntimeError("unparsed expressions still in buffer: %s" % exp_buffer)
+                        # local var passed as param
+                        elif identifier in class_dict[class_name][func_name]['args'] or identifier in \
+                                class_dict[class_name]['args']:
+                            continue  # already processed
 
-                    elif keyword == 'else':  # no explicit statement type for else
-                        # TODO: compile_else_start
-                        block.append(keyword)
-                        # close the latest if_true block (-1) but don't dec until IF_END
-                        pcode = store_pcode(pcode, "\nlabel IF_FALSE%s // begin if_false_block" % (if_count-1))
+                        # external or built-in types
+                        elif identifier in types or identifier in objects:
+                            var_type = identifier
+                            continue  # process on next loop
 
-                    elif statement == 'if':
-                        # TODO: compile_if_start
-                        block.append(statement)
-                        pcode = store_pcode(pcode, "\nif-goto IF_TRUE%s // end if expression / if_true_jump" % if_count)
-                        pcode = store_pcode(pcode, "\ngoto IF_FALSE%s // if_false_jump" % if_count)
-                        pcode = store_pcode(pcode, "\nlabel IF_TRUE%s // begin if_true_block" % if_count)
-                        if_count += 1  # inc now so any nested if are correct
+                        if not var_type:
+                            raise RuntimeError()
 
-                    elif statement == 'while':
-                        # TODO: compile_while_goto
-                        block.append(statement)
-                        pcode = store_pcode(pcode, "\nnot // end while expression / while_jump (1/2)")
-                        pcode = store_pcode(pcode, "\nif-goto WHILE_END%s // while_jump (2/2) [break loop if not]" %
-                                            while_count)
-                        while_count += 1
-
-                    elif statement == 'param':
-                        pass
-                    elif keyword not in ('class', 'function'):
-                        raise RuntimeError("unexpected '{' (statement '%s', keyword '%s')" % (statement, keyword))
-
-                elif symbol == "}":
-                    if block:
-                        if block[-1] == 'else':
-                            # TODO: compile_else_end
-                            pcode = store_pcode(pcode, "\nlabel IF_END%s // end if_block" % (if_count-1))
-                            block.pop()
-                            # FIXME: how to handle if-without-else ?
-                            if_count -= 1
-
-                        elif block[-1] == 'if':
-                            pcode = store_pcode(pcode, "\ngoto IF_END%s // end if_true_block" % (if_count-1))
-                            block.pop()
-
-                        elif block[-1] == 'while':
-                            # TODO: compile_while_end
-                            pcode = store_pcode(pcode, "\ngoto WHILE_EXP%s // loop to start of while_block" %
-                                                (while_count-1))
-                            pcode = store_pcode(pcode, "\nlabel WHILE_END%s // end while_block" % (while_count-1))
-                            block.pop()
-                            while_count -= 1
-                        else:
-                            raise RuntimeError("unexpected block '%s'" % block[-1])
-
-                elif symbol == "[":
-                    if lhs_var_name:  # collected during let statement
-                        # only compile var to buffer now if var is array
-                        if class_dict[class_name][func_name]['args'][lhs_var_name]['type'] == 'Array':
-                            exp_buffer.append("push %s %s // %s (*array var)" %
-                                              (class_dict[class_name][func_name]['args'][lhs_var_name]['kind'],
-                                               class_dict[class_name][func_name]['args'][lhs_var_name]['index'],
-                                               lhs_var_name))
-                    else:
-                        raise NotImplementedError
-
-                    # mark the start of a new expression
-                    pcode, exp_buffer, parent_obj, child_func = \
-                        expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
-                                           class_name=class_name, func_name=func_name, symbol=symbol)
-
-                elif symbol == "]":
-                    # pop the last buffered expression (including the brackets)
-                    pcode, exp_buffer, parent_obj, child_func = \
-                        expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
-                                           class_name=class_name, func_name=func_name, symbol=symbol)
-
-                    pcode = store_pcode(pcode, "add // *array var + [index]")
-
-                    # if part of an expression deref the array[index] immediately
-                    if not lhs_array:
-                        pcode = store_pcode(pcode, "pop pointer 1 // *that =")
-                        pcode = store_pcode(pcode, "push that 0 // **that (array[index])")
-
-                elif symbol == "(":
-                    # mark the start of a new expression
-                    pcode, exp_buffer, parent_obj, child_func = \
-                        expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
-                                           class_name=class_name, func_name=func_name, symbol=symbol)
-
-                elif symbol == ")":
-                    # pop the last buffered expression (including the brackets)
-                    pcode, exp_buffer, parent_obj, child_func = \
-                        expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
-                                           class_name=class_name, func_name=func_name, symbol=symbol)
-
-                elif symbol == ',':
-                    # pop any buffered expressions up to but not including the next opening bracket
-                    pcode, exp_buffer, parent_obj, child_func = \
-                        expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
-                                           class_name=class_name, func_name=func_name, symbol=symbol)
-
-                elif symbol == ';':
-                    pcode = pop_buffer(pcode, exp_buffer)  # empty the buffer
-
-                    if statement == 'return':
+                    if keyword in ('field', 'static'):
                         pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
-                            compile_statement(pcode=pcode, class_dict=class_dict, class_name=class_name,
-                                              func_name=func_name, statement=statement, while_count=while_count,
-                                              if_count=if_count)
-
-                    if exp_buffer:
-                        raise RuntimeError("unparsed expressions still in buffer: %s" % exp_buffer)
-
-                    lhs_var_name = lhs_array = ''
-
-                elif symbol in op_map:
-                    if symbol == "-" and find_parent(tree, elem).tag == "term":
-                        exp_buffer.append("neg")  # not "sub"
+                            compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
+                                              class_name=class_name, func_name=func_name, var_type=var_type,
+                                              var_name=identifier, var_kind=keyword, prescan=True)
                     else:
-                        exp_buffer.append(op_map[symbol])
+                        pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
+                            compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
+                                              class_name=class_name, func_name=func_name, var_type=var_type,
+                                              var_name=identifier, prescan=True)
 
-                else:
-                    raise RuntimeError("unexpected symbol '%s'" % elem.text)
-
-            elif elem.tag == 'integerConstant':
-                pcode = compile_constant(pcode, elem.text)
-
-            elif elem.tag == 'stringConstant':
-                pcode = compile_string(pcode, elem.text)
-
-            elif elem.tag == 'ifStatement':
-                statement = 'if'
-                # TODO: compile_if_statement
-                pcode = store_pcode(pcode, "\n// begin if expression")
-            elif elem.tag == 'whileStatement':
-                statement = 'while'
-                pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
-                    compile_statement(pcode=pcode, statement=statement, class_dict=class_dict, num_args=num_args,
-                                      while_count=while_count, if_count=if_count, exp_buffer=exp_buffer)
-            elif elem.tag == 'varDec':
-                statement = 'var'
             elif elem.tag == 'classVarDec':
                 statement = 'class_var'
+            elif elem.tag == 'varDec':
+                statement = 'var'
             elif elem.tag == 'parameterList':
                 statement = 'param'
             elif elem.tag == 'doStatement':
@@ -1006,24 +757,321 @@ def main(filepath, file_list):
                 statement = 'let'
             elif elem.tag == 'returnStatement':
                 statement = 'return'
-            elif elem.tag == 'expressionList':
-                if statement == 'do':
-                    children = list(elem)
-                    for c_elem in children:
-                        if c_elem.tag == 'expression':
-                            num_args += 1
 
-            # ignore the tags only used for grouping
-            elif elem.tag in ('subroutineDec', 'subroutineBody', 'statements', 'expression', 'term'):
+    # persist through loop scope
+    exp_buffer = []
+    block = []
+    num_args = while_count = if_count = 0
+    class_name = statement = func_name = func_type = keyword = var_type = var_kind = identifier = ''
+    lhs_var_name = lhs_array = parent_obj = child_func = func_kind = ''
+
+    # walk AST
+    print("Parsing: %s\n" % filepath)
+    tree = Et.parse(filepath.replace(".jack", "_out.xml"))
+    for elem in tree.iter():
+        elem.tag = (elem.tag or '').strip()
+        elem.text = (elem.text or '').strip()
+        # skip rootnode
+        if elem.tag == 'class':
+            continue
+
+        # has children
+        if elem:
+            # reset select tag contexts on depth change
+            keyword = var_type = var_kind = identifier = ''
+
+        # set keyword flag (single depth)
+        if elem.tag == 'keyword':
+            if elem.text in ('true', 'false'):
+                exp_buffer = compile_boolean(pcode, elem.text, exp_buffer)
+            elif not keyword:
+                keyword = elem.text  # preserved for later
+            elif not var_type:
+                var_type = elem.text  # preserved for later
+            else:
+                raise RuntimeError("unexpected keywords '%s' '%s' '%s'" % (keyword, var_type, elem.text))
+
+        elif elem.tag == 'identifier':
+            if keyword or statement:
+                identifier = elem.text
+
+                # class declaration
+                if keyword == 'class':
+                    class_name = identifier  # preserved for later
+                    pcode, class_dict = compile_class(pcode, class_name, class_dict)
+
+                # function declaration
+                elif keyword in ('function', 'constructor', 'method'):
+                    func_kind = 'function'  # preserved for later
+
+                    if identifier in objects or identifier in types:
+                        continue  # identifier was object type not function name
+                    else:
+                        func_name = identifier  # sometimes needs to overwrite the previous function
+
+                    if not func_type:
+                        if keyword == 'constructor':
+                            func_type = class_name
+                        else:
+                            func_type = class_dict[class_name][func_name]['type']
+
+                    pcode, class_dict = compile_function(pcode, func_name, func_type, func_kind, class_dict,
+                                                         class_name)
+
+                # var declaration (local or function parameter)
+                elif statement in ('var', 'param', 'class_var'):
+                    # catch param case where type is only keyword (not a vardec so not in pre-scan)
+                    if not var_type:
+                        if func_name and identifier in class_dict[class_name][func_name]['args']:
+                            var_type = class_dict[class_name][func_name]['args'][identifier]['type']
+                            var_kind = class_dict[class_name][func_name]['args'][identifier]['kind']
+
+                        elif identifier in class_dict[class_name]['args']:
+                            var_type = class_dict[class_name]['args'][identifier]['type']
+                            var_kind = class_dict[class_name]['args'][identifier]['kind']
+                        # else: probably an object type and not a var (caught below)
+
+                    if not var_type:
+                        # built-in or external types
+                        if identifier in types or identifier in objects:
+                            var_type = identifier
+                            continue  # process on next loop
+                        else:
+                            raise RuntimeError("No type found for '%s'" % identifier)
+
+                    if keyword in ('field', 'static'):
+                        pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
+                            compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
+                                              class_name=class_name, func_name=func_name, var_type=var_type,
+                                              var_name=identifier, while_count=while_count, if_count=if_count,
+                                              var_kind=keyword)
+                    else:
+                        if not var_kind and var_type in kinds:
+                            var_kind = var_type
+
+                        pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
+                            compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
+                                              class_name=class_name, func_name=func_name, var_type=var_type,
+                                              var_name=identifier, while_count=while_count, if_count=if_count,
+                                              var_kind=var_kind)
+
+                    keyword = var_type = ''
+
+                # collect class/func for call, compile when paired
+                elif statement == 'do':
+                    # TODO: move out of expression handler
+                    pcode, exp_buffer, parent_obj, child_func = \
+                            expression_handler(pcode, statement, exp_buffer, class_dict=class_dict,
+                                               identifier=identifier, class_name=class_name, func_name=func_name,
+                                               parent_obj=parent_obj, child_func=child_func)
+
+                # buffer assignee compilation first, then buffer any remaining expressions
+                elif statement == 'let':
+                    if not lhs_var_name:
+                        # preserved for later
+                        lhs_var_name = identifier
+                        if lhs_var_name in class_dict[class_name][func_name]['args']:
+                            var_scope = 'local'
+                            if class_dict[class_name][func_name]['args'][lhs_var_name]['type'] == 'Array':
+                                lhs_array = True
+
+                        elif lhs_var_name in class_dict[class_name]['args']:
+                            var_scope = 'member'
+                            if class_dict[class_name]['args'][lhs_var_name]['type'] == 'Array':
+                                lhs_array = True
+                        else:
+                            raise RuntimeError("var not found: %s" % lhs_var_name)
+
+                        pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
+                            compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
+                                              class_name=class_name, func_name=func_name, var_name=identifier,
+                                              exp_buffer=exp_buffer, while_count=while_count, if_count=if_count,
+                                              lhs_array=lhs_array, var_scope=var_scope)
+                    else:
+                        pcode, exp_buffer, parent_obj, child_func = \
+                            expression_handler(pcode, statement, exp_buffer, class_dict=class_dict,
+                                               identifier=identifier, class_name=class_name, func_name=func_name,
+                                               parent_obj=parent_obj, child_func=child_func)
+
+                # buffer while/if expressions
+                elif statement in ('while', 'if', 'return'):
+                    pcode, exp_buffer, parent_obj, child_func = \
+                        expression_handler(pcode, statement, exp_buffer, class_dict=class_dict,
+                                           identifier=identifier, class_name=class_name, func_name=func_name)
+                else:
+                    raise RuntimeError("unexpected keyword/statement '%s'/'%s' for identifier '%s'" %
+                                       (keyword, statement, elem.text))
+            else:
+                raise RuntimeError("no keyword or statement defined for '%s'" % elem.text)
+
+        elif elem.tag == 'symbol':
+            # TODO: compile_symbol
+            symbol = elem.text.strip()
+
+            if symbol in ".":
                 pass
+            elif symbol == "=" and find_parent(tree, elem).tag == 'letStatement':
+                pass  # ignore first '=' in let statement (expressions will have different parent)
+            elif symbol == "{":
+                if exp_buffer:
+                    raise RuntimeError("unparsed expressions still in buffer: %s" % exp_buffer)
+
+                elif keyword == 'else':  # no explicit statement type for else
+                    # TODO: compile_else_start
+                    block.append(keyword)
+                    # close the latest if_true block (-1) but don't dec until IF_END
+                    pcode = store_pcode(pcode, "\nlabel IF_FALSE%s // begin if_false_block" % (if_count-1))
+
+                elif statement == 'if':
+                    # TODO: compile_if_start
+                    block.append(statement)
+                    pcode = store_pcode(pcode, "\nif-goto IF_TRUE%s // end if expression / if_true_jump" % if_count)
+                    pcode = store_pcode(pcode, "\ngoto IF_FALSE%s // if_false_jump" % if_count)
+                    pcode = store_pcode(pcode, "\nlabel IF_TRUE%s // begin if_true_block" % if_count)
+                    if_count += 1  # inc now so any nested if are correct
+
+                elif statement == 'while':
+                    # TODO: compile_while_goto
+                    block.append(statement)
+                    pcode = store_pcode(pcode, "\nnot // end while expression / while_jump (1/2)")
+                    pcode = store_pcode(pcode, "\nif-goto WHILE_END%s // while_jump (2/2) [break loop if not]" %
+                                        while_count)
+                    while_count += 1
+
+                elif statement == 'param':
+                    pass
+                elif keyword not in ('class', 'function'):
+                    raise RuntimeError("unexpected '{' (statement '%s', keyword '%s')" % (statement, keyword))
+
+            elif symbol == "}":
+                if block:
+                    if block[-1] == 'else':
+                        # TODO: compile_else_end
+                        pcode = store_pcode(pcode, "\nlabel IF_END%s // end if_block" % (if_count-1))
+                        block.pop()
+                        # FIXME: how to handle if-without-else ?
+                        if_count -= 1
+
+                    elif block[-1] == 'if':
+                        pcode = store_pcode(pcode, "\ngoto IF_END%s // end if_true_block" % (if_count-1))
+                        block.pop()
+
+                    elif block[-1] == 'while':
+                        # TODO: compile_while_end
+                        pcode = store_pcode(pcode, "\ngoto WHILE_EXP%s // loop to start of while_block" %
+                                            (while_count-1))
+                        pcode = store_pcode(pcode, "\nlabel WHILE_END%s // end while_block" % (while_count-1))
+                        block.pop()
+                        while_count -= 1
+                    else:
+                        raise RuntimeError("unexpected block '%s'" % block[-1])
+
+            elif symbol == "[":
+                if lhs_var_name:  # collected during let statement
+                    # only compile var to buffer now if var is array
+                    if class_dict[class_name][func_name]['args'][lhs_var_name]['type'] == 'Array':
+                        exp_buffer.append("push %s %s // %s (*array var)" %
+                                          (class_dict[class_name][func_name]['args'][lhs_var_name]['kind'],
+                                           class_dict[class_name][func_name]['args'][lhs_var_name]['index'],
+                                           lhs_var_name))
+                else:
+                    raise NotImplementedError
+
+                # mark the start of a new expression
+                pcode, exp_buffer, parent_obj, child_func = \
+                    expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
+                                       class_name=class_name, func_name=func_name, symbol=symbol)
+
+            elif symbol == "]":
+                # pop the last buffered expression (including the brackets)
+                pcode, exp_buffer, parent_obj, child_func = \
+                    expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
+                                       class_name=class_name, func_name=func_name, symbol=symbol)
+
+                pcode = store_pcode(pcode, "add // *array var + [index]")
+
+                # if part of an expression deref the array[index] immediately
+                if not lhs_array:
+                    pcode = store_pcode(pcode, "pop pointer 1 // *that =")
+                    pcode = store_pcode(pcode, "push that 0 // **that (array[index])")
+
+            elif symbol == "(":
+                # mark the start of a new expression
+                pcode, exp_buffer, parent_obj, child_func = \
+                    expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
+                                       class_name=class_name, func_name=func_name, symbol=symbol)
+
+            elif symbol == ")":
+                # pop the last buffered expression (including the brackets)
+                pcode, exp_buffer, parent_obj, child_func = \
+                    expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
+                                       class_name=class_name, func_name=func_name, symbol=symbol)
+
+            elif symbol == ',':
+                # pop any buffered expressions up to but not including the next opening bracket
+                pcode, exp_buffer, parent_obj, child_func = \
+                    expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
+                                       class_name=class_name, func_name=func_name, symbol=symbol)
+
+            elif symbol == ';':
+                pcode = pop_buffer(pcode, exp_buffer)  # empty the buffer
+
+                if statement == 'return':
+                    pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
+                        compile_statement(pcode=pcode, class_dict=class_dict, class_name=class_name,
+                                          func_name=func_name, statement=statement, while_count=while_count,
+                                          if_count=if_count)
+
+                if exp_buffer:
+                    raise RuntimeError("unparsed expressions still in buffer: %s" % exp_buffer)
+
+                lhs_var_name = lhs_array = ''
+
+            elif symbol in op_map:
+                if symbol == "-" and find_parent(tree, elem).tag == "term":
+                    exp_buffer.append("neg")  # not "sub"
+                else:
+                    exp_buffer.append(op_map[symbol])
 
             else:
-                raise RuntimeError("unparsed tag '%s'" % elem.tag)
+                raise RuntimeError("unexpected symbol '%s'" % elem.text)
 
-    except Exception:
-        # capture whatever pcode was processed so far
-        print("\n", traceback.format_exc())
-        return pcode
+        elif elem.tag == 'integerConstant':
+            pcode = compile_constant(pcode, elem.text)
+
+        elif elem.tag == 'stringConstant':
+            pcode = compile_string(pcode, elem.text)
+
+        elif elem.tag == 'ifStatement':
+            statement = 'if'
+            # TODO: compile_if_statement
+            pcode = store_pcode(pcode, "\n// begin if expression")
+        elif elem.tag == 'whileStatement':
+            statement = 'while'
+            pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
+                compile_statement(pcode=pcode, statement=statement, class_dict=class_dict, num_args=num_args,
+                                  while_count=while_count, if_count=if_count, exp_buffer=exp_buffer)
+        elif elem.tag == 'varDec':
+            statement = 'var'
+        elif elem.tag == 'classVarDec':
+            statement = 'class_var'
+        elif elem.tag == 'parameterList':
+            statement = 'param'
+        elif elem.tag == 'doStatement':
+            statement = 'do'
+        elif elem.tag == 'letStatement':
+            statement = 'let'
+        elif elem.tag == 'returnStatement':
+            statement = 'return'
+        elif elem.tag == 'expressionList':
+            pass
+
+        # ignore the tags only used for grouping
+        elif elem.tag in ('subroutineDec', 'subroutineBody', 'statements', 'expression', 'term'):
+            pass
+
+        else:
+            raise RuntimeError("unparsed tag '%s'" % elem.tag)
 
     return pcode
 
@@ -1087,7 +1135,7 @@ if __name__ == '__main__':
 
             # strip debug for result comparison
             with open(_filepath.replace(".jack", "_out.vm"), "w") as f:
-                print("Writing: %s\n" % _filepath)
+                print("\nWriting: %s" % _filepath.replace(".jack", "_out.vm"))
                 for line in pcode:
                     comment = line.find("//")
                     if line.startswith("//"):
@@ -1098,6 +1146,7 @@ if __name__ == '__main__':
                         f.write(line + "\n")
 
     # enforce matching for known samples
+    print("\nFinished parsing, results comparison:")
     for match in strict_matches:
         wip = match.replace(".vm", "_out.vm")
         with open(match) as org_file:
@@ -1111,4 +1160,4 @@ if __name__ == '__main__':
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
 
-    # FIXME: fix var_kind (fraction.denominator)
+    # FIXME: fix num args (Fraction.main), constructor & field compilation (Fraction.Fraction)
