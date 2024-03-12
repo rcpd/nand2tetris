@@ -393,7 +393,8 @@ def compile_call(pcode, call_class, call_func, num_args, statement, class_name, 
             num_args += 1  # this
 
     if type(exp_buffer) is list:
-        if statement == 'do':
+        if statement == 'do' and not exp_buffer:
+            # except when call is part of expression
             exp_buffer.append("pop temp 0 // discard return on do call")
         exp_buffer.append("call %s.%s %s" % (call_class, call_func, num_args))
 
@@ -637,6 +638,9 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
     elif keyword == 'this':
         pcode = store_pcode(pcode, "push pointer 0 // this")
 
+    elif keyword == 'null':
+        pcode = store_pcode(pcode, "push constant 0 // null")
+
     return pcode, exp_buffer, parent_obj, child_func
 
 
@@ -828,7 +832,7 @@ def main(filepath, file_list):
             if elem.text in ('true', 'false'):
                 exp_buffer = compile_boolean(pcode, elem.text, exp_buffer)
                 continue
-            elif elem.text == 'this':
+            elif elem.text in ('this', 'null'):
                 pcode, exp_buffer, parent_obj, child_func = \
                     expression_handler(pcode, statement, exp_buffer, parent_obj=parent_obj, child_func=child_func,
                                        keyword=elem.text)
