@@ -1,8 +1,8 @@
 // class Square
 
 constructor Square.new 0
-push 0 // allocate object + params on heap
-call Memory.alloc 1
+push 0
+call Memory.alloc 1 // allocate object + params on heap
 pop pointer 0 // update 'this' to heap address
 push argument 0 // Ax
 pop this 0 // x =

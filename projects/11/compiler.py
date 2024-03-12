@@ -126,8 +126,8 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
 
         if input_list[j-2][1] == "constructor":
             # allocate space on heap
-            store_pcode(pcode, "push %s // allocate object + params on heap" % num_params)
-            store_pcode(pcode, "call Memory.alloc 1")
+            store_pcode(pcode, "push %s" % num_params)
+            store_pcode(pcode, "call Memory.alloc 1 // allocate object + params on heap")
             store_pcode(pcode, "pop pointer 0 // update 'this' to heap address")
 
         elif input_list[j-2][1] == "method":
@@ -450,6 +450,8 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                 store_pcode(pcode, "neg // true")
             else:
                 store_pcode(pcode, "push constant 0 // false")
+        elif input_list[j][0] == "integerConstant":
+            store_pcode(pcode, "push constant %s" % input_list[j][1])
         else:
             raise RuntimeError(input_list[j])
         j += 1
@@ -787,12 +789,11 @@ if __name__ == '__main__':
         # r"..\10\Square\Square.jack",
         # r"..\10\Square\SquareGame.jack",
 
-        r"..\11\Seven\Main.jack",  # compiled
-        r"..\11\ConvertToBin\Main.jack",  # compiled
-
-        r"..\11\Square\Main.jack",
-        r"..\11\Square\Square.jack",
-        # r"..\11\Square\SquareGame.jack",
+        r"..\11\Seven\Main.jack",  # compiled / tested
+        r"..\11\ConvertToBin\Main.jack",  # compiled / tested
+        r"..\11\Square\Main.jack",  # compiled
+        r"..\11\Square\Square.jack",  # compiled
+        r"..\11\Square\SquareGame.jack",  # compiled
     ]
 
     for _filepath in jack_filepaths:
