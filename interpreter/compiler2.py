@@ -380,7 +380,7 @@ def compile_var(pcode, class_dict, class_name, func_name, var_name, exp_buffer=N
 
 
 def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier=None, class_name=None, func_name=None,
-                       parent_obj=None, child_func=None, var_name=None, symbol=None):
+                       parent_obj=None, child_func=None, symbol=None):
     """
     expressions call the buffered version of compile functions so they are parsed first in, last out
     expressions are found in let (rhs), array indexes, if/while conditions and optionally as return values
@@ -446,7 +446,7 @@ def pop_buffer(pcode, exp_buffer, stop_at=None, pop_incl=False):
     return pcode
 
 
-def main(filepath, debug=False):
+def main(filepath):
     """
     main engine:
         - parse the AST
@@ -462,11 +462,8 @@ def main(filepath, debug=False):
         tree = Et.parse(filepath.replace(".jack", "_out.xml"))
 
         # persist through loop scope
-        exp_buffer = []
         class_dict = {}
-        num_args = 0
-        class_name = func_kind = call_class = call_func = statement = func_name = keyword = var_type = identifier = ''
-        func_type = symbol = lhs_var_name = rhs_parent = rhs_child = ''
+        class_name = statement = func_name = keyword = var_type = ''
 
         # pre-process tree for class/function/var decs
         for elem in tree.iter():
@@ -520,8 +517,8 @@ def main(filepath, debug=False):
         exp_buffer = []
         block = []
         num_args = while_count = if_count = 0
-        class_name = func_kind = call_class = call_func = statement = func_name = keyword = var_type = identifier = ''
-        func_type = symbol = lhs_var_name = rhs_parent = rhs_child = parent_obj = child_func = ''
+        class_name = statement = func_name = keyword = var_type = identifier = ''
+        lhs_var_name = parent_obj = child_func = ''
 
         # walk AST
         for elem in tree.iter():
@@ -534,7 +531,7 @@ def main(filepath, debug=False):
             # has children
             if elem:
                 # reset select tag contexts on depth change
-                keyword = var_type = identifier = func_type = symbol = ''
+                keyword = var_type = identifier = ''
 
             # set keyword flag (single depth)
             if elem.tag == 'keyword':
@@ -704,7 +701,7 @@ def main(filepath, debug=False):
                     if exp_buffer:
                         raise RuntimeError("unparsed expressions still in buffer: %s" % exp_buffer)
 
-                    lhs_var_name = rhs_parent = rhs_child = ''
+                    lhs_var_name = ''
 
                 elif symbol in op_map:
                     if symbol == "-" and find_parent(tree, elem).tag == "term":
@@ -770,16 +767,18 @@ if __name__ == '__main__':
     jack_filepaths = [
         r"..\11\Seven\Main.jack",
         r"..\11\ConvertToBin\Main.jack",
+        r"..\11\Average\Main.jack",
     ]
 
     # matched to course compiler
     strict_matches = {
         r"..\11\Seven\Main.vm": 10,  # all
         r"..\11\ConvertToBin\Main.vm": 114,  # all
+        # r"..\11\Average\Main.jack": 0,  # wip
     }
 
     for _filepath in jack_filepaths:
-        pcode = main(_filepath, debug=False)
+        pcode = main(_filepath)
 
         # strip debug for result comparison
         with open(_filepath.replace(".jack", "_out.vm"), "w") as f:
@@ -806,4 +805,4 @@ if __name__ == '__main__':
                     print("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
-    # TODO: multiple params in function dec
+    # TODO: next test program
