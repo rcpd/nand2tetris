@@ -1277,6 +1277,8 @@ def _compile(jack_filepaths, strict_matches):
 
     if debug:
         print("\nAll compilation results match solution!")
+        for match in strict_matches:
+            print("\t" + match)
 
 
 if __name__ == '__main__':
@@ -1317,6 +1319,8 @@ if __name__ == '__main__':
          r"..\projects\12\ArrayTest\Array.jack"],
         [r"..\projects\12\KeyboardTest\Main.jack",
          r"..\projects\12\KeyboardTest\Keyboard.jack"],
+        [r"..\projects\12\StringTest\Main.jack",
+         r"..\projects\12\StringTest\String.jack"],
     ]
 
     # matched to course compiler
@@ -1345,6 +1349,8 @@ if __name__ == '__main__':
         r"..\projects\12\ArrayTest\Array.vm": 23,
         r"..\projects\12\KeyboardTest\Main.vm": 949,
         r"..\projects\12\KeyboardTest\Keyboard.vm": 102,
+        r"..\projects\12\StringTest\Main.vm": 919,
+        r"..\projects\12\StringTest\String.vm": 393,
 
     }
 

@@ -421,6 +421,8 @@ if __name__ == '__main__':
         r"..\projects\12\ArrayTest\Array.jack",
         r"..\projects\12\KeyboardTest\Main.jack",
         r"..\projects\12\KeyboardTest\Keyboard.jack",
+        r"..\projects\12\StringTest\Main.jack",
+        r"..\projects\12\StringTest\String.jack",
     ]
 
     # compiler
@@ -460,6 +462,8 @@ if __name__ == '__main__':
          r"..\projects\12\ArrayTest\Array.jack"],
         [r"..\projects\12\KeyboardTest\Main.jack",
          r"..\projects\12\KeyboardTest\Keyboard.jack"],
+        [r"..\projects\12\StringTest\Main.jack",
+         r"..\projects\12\StringTest\String.jack"],
     ]
 
     # enforce matching of compiler against course compiler
@@ -490,6 +494,8 @@ if __name__ == '__main__':
         r"..\projects\12\ArrayTest\Array.vm": 23,
         r"..\projects\12\KeyboardTest\Main.vm": 949,
         r"..\projects\12\KeyboardTest\Keyboard.vm": 102,
+        r"..\projects\12\StringTest\Main.vm": 919,
+        r"..\projects\12\StringTest\String.vm": 393,
     }
 
     # VM programs (translator only, interpreted below) # TODO: projects 1-11 accounted for, included in translator
@@ -524,6 +530,7 @@ if __name__ == '__main__':
         r"..\projects\12\SysTest",
         r"..\projects\12\ArrayTest",
         r"..\projects\12\KeyboardTest",
+        r"..\projects\12\StringTest",
     ]
 
     # VM programs # TODO: projects 1-11 accounted for, included in translator
@@ -597,7 +604,8 @@ if __name__ == '__main__':
         # TODO: Project 12
         r"..\projects\12\SysTest\SysTest.asm",
         r"..\projects\12\ArrayTest\ArrayTest.asm",
-        r"..\projects\12\KeyboardTest\KeyboardTest.asm",  # 17 bit addresses
+        r"..\projects\12\KeyboardTest\KeyboardTest.asm",  # 17 bit addresses + access violation
+        r"..\projects\12\StringTest\StringTest.asm",  # 17 bit addresses + access violation
     ]
 
     # HDL tests (HardwareSimulator): project 1-12 accounted for, not included in tester/python_hdl!
@@ -678,6 +686,7 @@ if __name__ == '__main__':
         # interactively tested / no test files
         # r'..\projects\12\SysTest
         # r'..\projects\12\KeyboardTest
+        # r'..\projects\12\StringTest
 
         r'..\projects\12\ArrayTest\ArrayTest.tst',
 
@@ -763,6 +772,42 @@ if __name__ == '__main__':
                             raise RuntimeError("%s mismatch after line %s" % (out_file, index))
                     line += 1
 
+        # run hack tests (CPUEmulator) -- shares CMP and OUT files with VMEmulator
+        cmd = r'..\tools\CPUEmulator.bat'
+        for test in cpu_tst_files:
+            print(r"Running: %s %s" % (cmd, test))
+            result = subprocess.run([cmd, test], capture_output=True, text=True)
+            if 'End of script - Comparison ended successfully\n' != result.stdout and not result.stderr:
+                raise RuntimeError(r"Error when running %s: %s" % (cmd, result.stderr))
+
+            line = 0
+            out_file = test.replace(".tst", ".out")
+            cmp_file = test.replace(".tst", ".cmp")
+            with open(out_file) as out:
+                with open(cmp_file) as cmp:
+                    for index, (solution, current) in enumerate(zip(cmp, out)):
+                        if solution != current:
+                            raise RuntimeError("%s mismatch after line %s" % (out_file, index))
+                    line += 1
+
+        # run VM tests (VMEmulator) -- shares CMP and OUT files with CPUEmulator
+        cmd = r'..\tools\VMEmulator.bat'
+        for test in vm_tst_files:
+            print(r"Running: %s %s" % (cmd, test))
+            result = subprocess.run([cmd, test], capture_output=True, text=True)
+            if 'End of script - Comparison ended successfully\n' != result.stdout and not result.stderr:
+                raise RuntimeError(r"Error when running %s: %s" % (cmd, result.stderr))
+
+            line = 0
+            out_file = test.replace("VME.tst", ".out")
+            cmp_file = test.replace("VME.tst", ".cmp")
+            with open(out_file) as out:
+                with open(cmp_file) as cmp:
+                    for index, (solution, current) in enumerate(zip(cmp, out)):
+                        if solution != current:
+                            raise RuntimeError("%s mismatch after line %s" % (out_file, index))
+                    line += 1
+
     # project
     # TODO: Project 12: Implement the OS libraries in Jack, compile/test (test programs included)
     # TODO: add integration for Project 12 translate/execute/assemble ASM > HACK (integration test)
@@ -778,6 +823,7 @@ if __name__ == '__main__':
     # TODO: non-void without return value
     # TODO: statement without keyword/statement type
     # TODO: non-terminated statement
+    # TODO: // in string strips the string
 
     # interpreter
     # TODO: translator finish stack mapping: other stack manip(stacksize), functions(stackframes)
