@@ -284,9 +284,8 @@ gt
 if-goto IF_TRUE4
 goto IF_FALSE4
 label IF_TRUE4
-push local 0
 push constant 1
-eq
+pop local 0
 label IF_FALSE4
 label IF_END3
 push this 6

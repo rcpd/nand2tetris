@@ -877,6 +877,9 @@ def main(filepath, file_list):
             elif elem.text == 'if':
                 statement = 'if'  # TODO: missing some ifStatement(s) in AST
 
+            elif elem.text == 'let':
+                statement = 'let'
+
             # set on first instance only
             if elem.text in ('function', 'method', 'constructor'):
                 func_kind = elem.text
@@ -1009,7 +1012,7 @@ def main(filepath, file_list):
 
             if symbol in ".":
                 pass
-            elif symbol == "=" and find_parent(tree, elem).tag == 'letStatement':
+            elif symbol == "=" and statement == 'let':
                 pass  # ignore first '=' in let statement (expressions will have different parent)
             elif symbol == "{":
                 if exp_buffer:
