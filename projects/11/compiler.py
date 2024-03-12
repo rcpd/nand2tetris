@@ -1,11 +1,6 @@
 """
 Compile a JACK program into a VM program (pcode) from the token stream initially generated
 by tokenizer/analyzer.
-
-class_dict = {"class_name": {"args": {}, "func_name": {"type": "func", "kind": "void",
-"args": {}}, "index_dict": {"local", 0}}}}
-args: {"var_name": {"type": "int", "kind": "local", "index": 0}}
-
 """
 
 import xml.etree.ElementTree as ET
@@ -52,14 +47,14 @@ def store_pcode(pcode, cmd, write=None, debug=True):
     return pcode
 
 
-def label_index(class_dict, class_name, func_name, type):
+def label_index(class_dict, class_name, func_name, label_type):
     labels = class_dict[class_name][func_name]["label_dict"]
-    if type in labels:
-        labels[type] += 1
+    if label_type in labels:
+        labels[label_type] += 1
     else:
-        labels[type] = 0
+        labels[label_type] = 0
     class_dict[class_name][func_name]["label_dict"] = labels
-    return class_dict, labels[type]
+    return class_dict, labels[label_type]
 
 
 def compile_class(pcode, input_list, i, class_dict, pre=False):
@@ -69,10 +64,10 @@ def compile_class(pcode, input_list, i, class_dict, pre=False):
     """
     # define class_name and initialize symbol table
     class_name = input_list[i][1]
-    if class_name not in class_dict:
-        class_dict[class_name] = {"args": {}, "index_dict": {}}
-
-    if not pre:
+    if pre:
+        if class_name not in class_dict:
+            class_dict[class_name] = {"args": {}, "index_dict": {}}
+    else:
         store_pcode(pcode, "// class %s" % class_name)
 
     return pcode, class_dict, class_name
@@ -84,45 +79,45 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
     # input_list[i][0] == "keyword" and input_list[i][1] in ("function", "method", "constructor")
     # if input_list[j][0] == "keyword" and input_list[j+1][0] == "identifier":
     """
-    # TODO: correct func def for num vars not just args?
     func_name = input_list[i][1]
     j = i
-    # define function symbol
-    if input_list[j-2][1] in ("function", "method"):
-        class_dict[class_name][input_list[j][1]] = {"type": input_list[j-2][1], "kind": input_list[j-1][1],
-                                                    "args": {}, "index_dict": {}, "label_dict": {}}
-        # define function arguments
-        if input_list[j+1][1] == "(":
-            while input_list[j+2][1] != ")":
-                if input_list[j+2][1] == ",":
-                    j += 1
-                    continue
-                if input_list[j+2][0] == "keyword" and input_list[j+3][0] == "identifier":
-                    # update func/arg index
-                    if "argument" not in class_dict[class_name][func_name]["index_dict"]:
-                        class_dict[class_name][func_name]["index_dict"]["argument"] = 0
-                    else:
-                        class_dict[class_name][func_name]["index_dict"]["argument"] += 1
+    if pre:
+        # define function symbol
+        if input_list[j-2][1] in ("function", "method"):
+            if input_list[j][1] not in class_dict[class_name]:
+                class_dict[class_name][input_list[j][1]] = {"kind": input_list[j-2][1], "type": input_list[j-1][1],
+                                                            "args": {}, "index_dict": {}, "label_dict": {}}
+            # define function arguments
+            if input_list[j+1][1] == "(":
+                while input_list[j+2][1] != ")":
+                    if input_list[j+2][1] == ",":
+                        j += 1
+                        continue
+                    if input_list[j+2][0] == "keyword" and input_list[j+3][0] == "identifier":
+                        # update func/arg index
+                        if "argument" not in class_dict[class_name][func_name]["index_dict"]:
+                            class_dict[class_name][func_name]["index_dict"]["argument"] = 0
+                        else:
+                            class_dict[class_name][func_name]["index_dict"]["argument"] += 1
 
-                    class_dict[class_name][func_name]["args"][input_list[j+3][1]] = \
-                        {"type": "argument", "kind": input_list[j+2][1],
-                         "index": class_dict[class_name][func_name]["index_dict"]["argument"]}
-                    j += 2
+                        class_dict[class_name][func_name]["args"][input_list[j+3][1]] = \
+                            {"kind": "argument", "type": input_list[j+2][1],
+                             "index": class_dict[class_name][func_name]["index_dict"]["argument"]}
+                        j += 2
+            else:
+                raise RuntimeError
+
+        elif input_list[i-2][1] == "constructor":
+            pass
         else:
             raise RuntimeError
 
-    elif input_list[i-2][1] == "constructor":
-        pass
-    # elif input_list[i-1][1] == ".":
-    #     if func_name not in class_dict[class_name]:
-    #         class_dict[class_name][func_name] = {"type": "", "kind": "", "args": {},
-    #         "index_dict": {}, "label_dict": {}}
-    else:
-        raise RuntimeError
-
     if not pre:
-        store_pcode(pcode, "\n%s %s.%s %s" % (input_list[i-2][1], class_name, input_list[i][1],
-                                              len(class_dict[class_name][input_list[i][1]]["args"])))
+        if "local" in class_dict[class_name][input_list[i][1]]["index_dict"]:
+            store_pcode(pcode, "\n%s %s.%s %s" % (input_list[i-2][1], class_name, input_list[i][1],
+                                                  class_dict[class_name][input_list[i][1]]["index_dict"]["local"]+1))
+        else:
+            store_pcode(pcode, "\n%s %s.%s %s" % (input_list[i-2][1], class_name, input_list[i][1], 0))
     return pcode, class_dict, func_name
 
 
@@ -130,7 +125,7 @@ def compile_classvardec(pcode, input_list, i, class_dict):
     return pcode, class_dict
 
 
-def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name):
+def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=False):
     """
     input_list[i][0] == "keyword" and input_list[i][1] == "var":
     """
@@ -145,18 +140,21 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name):
                 continue
 
             # update func/local index
-            if "local" not in class_dict[class_name][func_name]["index_dict"]:
-                class_dict[class_name][func_name]["index_dict"]["local"] = 0
-            else:
-                class_dict[class_name][func_name]["index_dict"]["local"] += 1
-    
-            store_pcode(pcode, "// var %s %s (local %s)" % (input_list[i+1][1], input_list[j+2][1],
-                                                            class_dict[class_name][func_name]["index_dict"]["local"]))
-    
-            # add var to func_dict
-            class_dict[class_name][func_name]["args"][input_list[j+2][1]] = \
-                {"type": "local", "kind": input_list[j+1][1],
-                 "index": class_dict[class_name][func_name]["index_dict"]["local"]}
+            if pre:
+                if "local" not in class_dict[class_name][func_name]["index_dict"]:
+                    class_dict[class_name][func_name]["index_dict"]["local"] = 0
+                else:
+                    class_dict[class_name][func_name]["index_dict"]["local"] += 1
+
+                # add var to func/args
+                class_dict[class_name][func_name]["args"][input_list[j+2][1]] = \
+                    {"kind": "local", "type": input_list[i+1][1],
+                     "index": class_dict[class_name][func_name]["index_dict"]["local"]}
+
+            if not pre:
+                store_pcode(pcode, "// var %s %s (local %s)" %
+                            (input_list[i+1][1], input_list[j+2][1],
+                             class_dict[class_name][func_name]["args"][input_list[j+2][1]]["index"]))
 
             j += 1
 
@@ -190,7 +188,7 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
             k += 1
         elif input_list[i][0] == "identifier":
             var = class_dict[class_name][func_name]["args"][input_list[i][1]]
-            store_pcode(pcode, "push %s %s // %s" % (var["type"], var["index"], input_list[i][1]))
+            store_pcode(pcode, "push %s %s // %s" % (var["kind"], var["index"], input_list[i][1]))
             proc.append(i)
             k += 1
         elif input_list[i][1] in operators:
@@ -200,7 +198,7 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
                 k += 1
             elif input_list[i+1][0] == "identifier":
                 var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
-                store_pcode(pcode, "push %s %s // %s" % (var["type"], var["index"], input_list[i+1][1]))
+                store_pcode(pcode, "push %s %s // %s" % (var["kind"], var["index"], input_list[i+1][1]))
                 proc.append(i+1)
                 k += 1
 
@@ -249,7 +247,7 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
             if input_list[i+1][0] == "identifier":
                 # pop result into destination segment
                 var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
-                store_pcode(pcode, "pop %s %s // %s" % (var["type"], var["index"], input_list[i+1][1]))
+                store_pcode(pcode, "pop %s %s // %s" % (var["kind"], var["index"], input_list[i+1][1]))
             else:
                 raise RuntimeError(input_list[i+1])
         else:
@@ -360,16 +358,16 @@ def main(debug=False):
         # TODO: look these up programatically
         class_dict = {
             "Output": {"args": {}, "index_dict": {},
-                       "printInt": {"type": "function", "kind": "void",
+                       "printInt": {"kind": "function", "type": "void",
                                     "args": {"i": {"type": "int", "kind": "argument", "index": 0}},
                                     "index_dict": {"argument": 0},
                                     }
                        },
             "Memory": {"args": {}, "index_dict": {},
-                       "peek": {"type": "function", "kind": "void",
+                       "peek": {"kind": "function", "type": "void",
                                 "args": {"i": {"type": "int", "kind": "argument", "index": 0}},
                                 "index_dict": {"argument": 0}},
-                       "poke": {"type": "function", "kind": "void",
+                       "poke": {"kind": "function", "type": "void",
                                 "args": {"address": {"type": "int", "kind": "argument", "index": 0},
                                          "value": {"type": "int", "kind": "argument", "index": 1}},
                                 "index_dict": {"argument": 1},
@@ -386,6 +384,9 @@ def main(debug=False):
                 elif token[1] in ("function", "method") and input_list[i+2][0] == "identifier":
                     pcode, class_dict, func_name = \
                         compile_function(pcode, input_list, i+2, class_dict, class_name, pre=True)
+                    store_pcode(pcode, "", write=filepath)
+                elif token[1] == "var" and input_list[i+1][0] == "keyword":
+                    pcode, class_dict = compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=True)
                     store_pcode(pcode, "", write=filepath)
 
         for i, input_tuple in enumerate(input_list):

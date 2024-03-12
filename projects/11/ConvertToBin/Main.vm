@@ -1,6 +1,6 @@
 // class Main
 
-function Main.main 0
+function Main.main 1
 // var int value (local 0)
 push constant 8000
 push constant 1
@@ -18,7 +18,7 @@ push local 0 // value
 call Main.convert 1
 return
 
-function Main.convert 1
+function Main.convert 3
 // var int mask (local 0)
 // var int position (local 1)
 // var boolean loop (local 2)
@@ -81,7 +81,7 @@ pop local 2 // loop
 label WHILE_END_convert_0
 return
 
-function Main.nextMask 1
+function Main.nextMask 0
 
 // if <expression>
 push argument 0 // mask
@@ -100,7 +100,7 @@ push constant 2
 call Math.multiply 2
 return
 
-function Main.fillMemory 3
+function Main.fillMemory 0
 
 // while <expression>
 push argument 1 // length
