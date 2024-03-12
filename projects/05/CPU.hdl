@@ -39,5 +39,88 @@ CHIP CPU {
         pc[15];          // address of next instruction
 
     PARTS:
-    // Put your code here:
+	// Debug var
+	Not(in=instruction[15],out=notOpcode);
+	Not(in=notOpcode,out=opcode);
+	
+	// Determine whether instruction is A or C type
+	XNor(a=instruction[15],b=false,out=aType);
+	
+	// Solve whether writeM is false (A inst) or variable (C inst)
+	XNor(a=aType,b=false,out=aTypeXNor);
+	And(a=aTypeXNor,b=instruction[3],out=writeM);
+	//
+	
+	Mux16(a=ALUout,b=instruction,sel=notOpcode,out=mux1out);
+	
+	// Solve whether aRegisterLoad is true (A inst) or variable (C inst)
+	Or(a=aType,b=instruction[5],out=aRegisterLoad);
+	
+	// Solve whether dRegisterLoad is false (A inst) or variable (C inst)
+	And(a=aTypeXNor,b=instruction[4],out=dRegisterLoad);
+		
+	ARegister(in=mux1out,load=aRegisterLoad,out=aRegisterOut,out[0..14]=addressM);
+	DRegister(in=ALUout,load=dRegisterLoad,out=dRegisterOut);
+	Mux16(a=aRegisterOut,b=inM,sel=instruction[12],out=mux2out);
+	
+	// evaluate jump code
+	// block 1: evaluate jmp bits for 111 or other
+	XNor(a=instruction[2],b=instruction[1],out=xnor1out); 
+	XNor(a=instruction[1],b=instruction[0],out=xnor2out); 
+	XNor(a=instruction[0],b=true,out=xnor3out); 
+	And(a=xnor1out,b=xnor2out,out=allSame);
+	Not(in=allSame,out=neither);
+	And(a=allSame,b=xnor3out,out=allOne);
+	
+	// block 2: evaluate zr/ng bits
+	DMux4Way3(in=instruction[0..2],
+	sel[0]=ngOut,sel[1]=zrOut,
+	a[0]=aOut0,a[1]=aOut1,a[2]=aOut2,
+	b[0]=bOut0,b[1]=bOut1,b[2]=bOut2,
+	c[0]=cOut0,c[1]=cOut1,c[2]=cOut2,
+	d[0]=dOut0,d[1]=dOut1,d[2]=dOut2);
+	
+	// block 2-1: evaluate 011/001/101 jump bits
+	And(a=true,b=aOut0,out=LSB21);
+	And(a=aOut1,b=true,out=MidB21);
+	And(a=aOut2,b=true,out=MSB21);
+	Nand(a=MidB21,b=MSB21,out=Test1121);
+	And(a=LSB21,b=Test1121,out=out21);
+	
+	// block 2-2: evaluate 100/101 jump bits
+	Nand(a=true,b=bOut1,out=MidB22);
+	And(a=bOut2,b=true,out=MSB22);
+	And(a=MidB22,b=MSB22,out=out22);
+	
+	// block 2-3: evaluate 010/011 jump bits
+	And(a=true,b=cOut1,out=MidB23);
+	Nand(a=cOut2,b=true,out=MSB23);
+	And(a=MidB23,b=MSB23,out=out23);
+	
+	// block 2-4: evaluate 110 jump bits
+	Nand(a=true,b=dOut0,out=LSB24);
+	And(a=dOut2,b=true,out=MSB24);
+	And(a=dOut1,b=true,out=MidB24);
+	And(a=LSB24,b=MidB24,out=LSMidB24);
+	And(a=MidB24,b=MSB24,out=MSMidB24);
+	And(a=LSMidB24,b=MSMidB24,out=out24);
+	
+	// block 3: evaluating block 1/2 outputs
+	And(a=allOne,b=true,out=allOneTest);
+	And(a=neither,b=true,out=neitherTest);
+	Or(a=out21,b=out22,out=out2122);
+	Or(a=out23,b=out24,out=out2324);
+	Or(a=out2122,b=out2324,out=out2124);
+	And(a=neitherTest,b=out2124,out=neither2124Test);
+	Or(a=allOneTest,b=neither2124Test,out=jumpOut);
+		
+	// Solve whether jumpOut is false (A inst) or variable (C inst)
+	And(a=aTypeXNor,b=jumpOut,out=jumpOutFinal);
+	//
+	
+	Not(in=jumpOutFinal,out=notJumpOutFinal);
+	
+	// back to CPU code
+	PC(in=aRegisterOut,load=jumpOutFinal,inc=notJumpOutFinal,reset=reset,out[0..14]=pc);
+	ALU(x=dRegisterOut,y=mux2out,zx=instruction[11],nx=instruction[10],zy=instruction[9],ny=instruction[8],f=instruction[7],no=instruction[6],out=outM,out=ALUout,zr=zrOut,ng=ngOut);
 }
