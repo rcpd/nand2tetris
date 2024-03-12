@@ -40,7 +40,7 @@ def main(filepath, debug=False):
     for input_child in input_root:
         if input_child.tag == "tokens":
             continue
-        element = input_child.text.strip()  # FIXME
+        element = input_child.text[1:-1]  # strip the outermost padding
         input_list.append((input_child.tag, element))
 
     # process the token stream
