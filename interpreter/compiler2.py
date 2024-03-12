@@ -185,7 +185,7 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
 # TODO: return args are not optional / this seems unnecessary
 def compile_statement(pcode=None, statement=None, class_dict=None, class_name=None, func_name=None, call_class=None,
                       call_func=None, var_type=None, var_name=None, num_args=0, exp_buffer=[],
-                      if_count=0, while_count=0, prescan=False):
+                      if_count=0, while_count=0, lhs_array=False, prescan=False):
     """
     provides a common interface to the statement compilers
     must passthrough at least statement + return args + inner call args i.e.
@@ -199,7 +199,7 @@ def compile_statement(pcode=None, statement=None, class_dict=None, class_name=No
 
     elif statement == "let":
         exp_buffer = compile_assignment(class_dict=class_dict, class_name=class_name, func_name=func_name,
-                                        var_name=var_name, exp_buffer=exp_buffer)
+                                        var_name=var_name, exp_buffer=exp_buffer, lhs_array=lhs_array)
 
     elif statement == "return":
         # looks up func type (affects return behaviour)
@@ -228,15 +228,31 @@ def compile_statement(pcode=None, statement=None, class_dict=None, class_name=No
     return pcode, class_dict, num_args, while_count, if_count, exp_buffer
 
 
-def compile_assignment(class_dict, class_name, func_name, var_name, exp_buffer):
+def compile_assignment(class_dict, class_name, func_name, var_name, exp_buffer, lhs_array):
     """
     compile the assignment component of a statement
     store pcode in exp_buffer so its emitted when expression is closed
     """
 
-    exp_buffer.append("pop %s %s // = %s" % (class_dict[class_name][func_name]['args'][var_name]['kind'],
-                                             class_dict[class_name][func_name]['args'][var_name]['index'],
-                                             var_name))
+    if not lhs_array:
+        # typical assignment
+        exp_buffer.append("pop %s %s // = %s" % (class_dict[class_name][func_name]['args'][var_name]['kind'],
+                                                 class_dict[class_name][func_name]['args'][var_name]['index'],
+                                                 var_name))
+
+    elif not class_dict[class_name][func_name]['args'][var_name]['initialized']:
+        # array constructor
+        exp_buffer.append("pop %s %s // = %s" % (class_dict[class_name][func_name]['args'][var_name]['kind'],
+                                                 class_dict[class_name][func_name]['args'][var_name]['index'],
+                                                 var_name))
+    else:
+        # array[offset] assignment
+        exp_buffer.append("pop that 0 // **array[index] = result")
+        exp_buffer.append("push temp 0 // restore result")
+        exp_buffer.append("pop pointer 1 // that = *array[index]")
+        exp_buffer.append("pop temp 0 // save result (rhs/call/expression)")
+
+    class_dict[class_name][func_name]['args'][var_name]['initialized'] = True
     return exp_buffer
 
 
@@ -252,7 +268,8 @@ def compile_vardec(pcode, class_dict, class_name, func_name, var_kind, var_type,
         else:
             index = class_dict[class_name][func_name]['index_dict'][var_kind] + 1
 
-        class_dict[class_name][func_name]['args'][var_name] = {'kind': var_kind, 'type': var_type, 'index': index}
+        class_dict[class_name][func_name]['args'][var_name] = {'kind': var_kind, 'type': var_type, 'index': index,
+                                                               'initialized': False}
         class_dict[class_name][func_name]['index_dict'][var_kind] = index
 
     elif not prescan:
@@ -565,7 +582,7 @@ def main(filepath):
         block = []
         num_args = while_count = if_count = 0
         class_name = statement = func_name = keyword = var_type = identifier = ''
-        lhs_var_name = parent_obj = child_func = ''
+        lhs_var_name = lhs_array = parent_obj = child_func = ''
 
         # walk AST
         for elem in tree.iter():
@@ -646,11 +663,16 @@ def main(filepath):
                     # buffer assignee compilation first, then buffer any remaining expressions
                     elif statement == 'let':
                         if not lhs_var_name:
-                            lhs_var_name = identifier  # preserved for later
+                            # preserved for later
+                            lhs_var_name = identifier
+                            if class_dict[class_name][func_name]['args'][lhs_var_name]['type'] == 'Array':
+                                lhs_array = True
+
                             pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
                                 compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
                                                   class_name=class_name, func_name=func_name, var_name=identifier,
-                                                  exp_buffer=exp_buffer, while_count=while_count, if_count=if_count)
+                                                  exp_buffer=exp_buffer, while_count=while_count, if_count=if_count,
+                                                  lhs_array=lhs_array)
                         else:
                             pcode, exp_buffer, parent_obj, child_func = \
                                 expression_handler(pcode, statement, exp_buffer, class_dict=class_dict,
@@ -735,7 +757,7 @@ def main(filepath):
 
                 elif symbol == "[":
                     if lhs_var_name:  # collected during let statement
-                        exp_buffer.append("push %s %s // %s (array var)" %
+                        exp_buffer.append("push %s %s // %s (*array var)" %
                                           (class_dict[class_name][func_name]['args'][lhs_var_name]['kind'],
                                            class_dict[class_name][func_name]['args'][lhs_var_name]['index'],
                                            lhs_var_name))
@@ -753,7 +775,7 @@ def main(filepath):
                         expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
                                            class_name=class_name, func_name=func_name, symbol=symbol)
 
-                    store_pcode(pcode, "add // array var + offset")
+                    store_pcode(pcode, "add // *array var + [offset]")
 
                 elif symbol == "(":
                     # mark the start of a new expression
@@ -785,7 +807,7 @@ def main(filepath):
                     if exp_buffer:
                         raise RuntimeError("unparsed expressions still in buffer: %s" % exp_buffer)
 
-                    lhs_var_name = ''
+                    lhs_var_name = lhs_array = ''
 
                 elif symbol in op_map:
                     if symbol == "-" and find_parent(tree, elem).tag == "term":
@@ -861,7 +883,7 @@ if __name__ == '__main__':
     strict_matches = {
         r"..\11\Seven\Main.vm": 10,  # all
         r"..\11\ConvertToBin\Main.vm": 114,  # all
-        # r"..\11\Average\Main.jack": 0,  # wip
+        r"..\11\Average\Main.vm": 96,  # wip
     }
 
     for _filepath in jack_filepaths:
@@ -892,4 +914,5 @@ if __name__ == '__main__':
                     print("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
-    # TODO: assignment to an array (average)
+
+    # TODO: deref an array within an expression (average)
