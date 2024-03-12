@@ -1,7 +1,8 @@
 // class Square
 
-function Square.new 0
-call Memory.alloc 0 // allocate object + params on heap
+function Square.new 6
+push constant 6
+call Memory.alloc 1 // allocate object + params on heap
 pop pointer 0 // update 'this' to heap address
 push argument 0 // Ax
 pop this 0 // x =
@@ -9,7 +10,7 @@ push argument 1 // Ay
 pop this 1 // y =
 push argument 2 // Asize
 pop this 2 // size =
-call Square.draw 0
+call Square.draw 1
 push pointer 0 // this
 return
 
@@ -81,12 +82,12 @@ and
 if-goto IF_incSize_0 // enter if
 goto ELSE_incSize_0 // exit if or enter else
 label IF_incSize_0 // start if
-call Square.erase 0
+call Square.erase 1
 push this 2 // size
 push constant 2
 add
 pop this 2 // size =
-call Square.draw 0
+call Square.draw 1
 
 label ELSE_incSize_0 // else
 label IF_END_incSize_0 // exit if
@@ -105,13 +106,13 @@ gt
 if-goto IF_decSize_0 // enter if
 goto ELSE_decSize_0 // exit if or enter else
 label IF_decSize_0 // start if
-call Square.erase 0
+call Square.erase 1
 push this 2 // size
 push constant 2
 neg
 add
 pop this 2 // size =
-call Square.draw 0
+call Square.draw 1
 
 label ELSE_decSize_0 // else
 label IF_END_decSize_0 // exit if
