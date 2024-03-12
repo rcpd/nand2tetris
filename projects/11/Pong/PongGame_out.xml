@@ -666,22 +666,6 @@
                         </letStatement>
                       </statements>
                       <symbol> } </symbol>
-                      <keyword> else </keyword>
-                      <symbol> { </symbol>
-                      <statements>
-                        <letStatement>
-                          <keyword> let </keyword>
-                          <identifier> exit </identifier>
-                          <symbol> = </symbol>
-                          <expression>
-                            <term>
-                              <identifier> exit </identifier>
-                            </term>
-                          </expression>
-                          <symbol> ; </symbol>
-                        </letStatement>
-                      </statements>
-                      <symbol> } </symbol>
                     </ifStatement>
                   </statements>
                   <symbol> } </symbol>
@@ -845,22 +829,6 @@
               <symbol> ) </symbol>
               <symbol> ; </symbol>
             </doStatement>
-          </statements>
-          <symbol> } </symbol>
-          <keyword> else </keyword>
-          <symbol> { </symbol>
-          <statements>
-            <letStatement>
-              <keyword> let </keyword>
-              <identifier> exit </identifier>
-              <symbol> = </symbol>
-              <expression>
-                <term>
-                  <identifier> exit </identifier>
-                </term>
-              </expression>
-              <symbol> ; </symbol>
-            </letStatement>
           </statements>
           <symbol> } </symbol>
         </ifStatement>
@@ -1200,22 +1168,6 @@
                         </letStatement>
                       </statements>
                       <symbol> } </symbol>
-                      <keyword> else </keyword>
-                      <symbol> { </symbol>
-                      <statements>
-                        <letStatement>
-                          <keyword> let </keyword>
-                          <identifier> exit </identifier>
-                          <symbol> = </symbol>
-                          <expression>
-                            <term>
-                              <identifier> exit </identifier>
-                            </term>
-                          </expression>
-                          <symbol> ; </symbol>
-                        </letStatement>
-                      </statements>
-                      <symbol> } </symbol>
                     </ifStatement>
                   </statements>
                   <symbol> } </symbol>
@@ -1306,39 +1258,7 @@
                 </doStatement>
               </statements>
               <symbol> } </symbol>
-              <keyword> else </keyword>
-              <symbol> { </symbol>
-              <statements>
-                <letStatement>
-                  <keyword> let </keyword>
-                  <identifier> exit </identifier>
-                  <symbol> = </symbol>
-                  <expression>
-                    <term>
-                      <identifier> exit </identifier>
-                    </term>
-                  </expression>
-                  <symbol> ; </symbol>
-                </letStatement>
-              </statements>
-              <symbol> } </symbol>
             </ifStatement>
-          </statements>
-          <symbol> } </symbol>
-          <keyword> else </keyword>
-          <symbol> { </symbol>
-          <statements>
-            <letStatement>
-              <keyword> let </keyword>
-              <identifier> exit </identifier>
-              <symbol> = </symbol>
-              <expression>
-                <term>
-                  <identifier> exit </identifier>
-                </term>
-              </expression>
-              <symbol> ; </symbol>
-            </letStatement>
           </statements>
           <symbol> } </symbol>
         </ifStatement>
@@ -1363,29 +1283,9 @@
     </subroutineBody>
   </subroutineDec>
   <classVarDec>
-    <keyword> else </keyword>
-    <symbol> { </symbol>
-    <statements>
-      <letStatement>
-        <keyword> let </keyword>
-        <identifier> exit </identifier>
-        <symbol> = </symbol>
-        <expression>
-          <term>
-            <identifier> exit </identifier>
-          </term>
-        </expression>
-        <symbol> ; </symbol>
-      </letStatement>
-    </statements>
-    <symbol> } </symbol>
-    <statements>
-      <returnStatement>
-        <keyword> return </keyword>
-        <symbol> ; </symbol>
-      </returnStatement>
-    </statements>
-    <symbol> } </symbol>
-    <symbol> } </symbol>
+    <keyword> return </keyword>
+    <symbol> ; </symbol>
   </classVarDec>
+  <symbol> } </symbol>
+  <symbol> } </symbol>
 </class>

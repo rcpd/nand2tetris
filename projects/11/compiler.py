@@ -1149,7 +1149,7 @@ def main(filepath, debug=False):
 
 if __name__ == '__main__':
     jack_filepaths = [
-        # TODO: integration test (untested?)
+        # TODO: integration test (untested)
         # r"..\09\Average\Main.jack",
         # r"..\09\Fraction\Main.jack",
         # r"..\09\Fraction\Fraction.jack",
@@ -1173,9 +1173,9 @@ if __name__ == '__main__':
         r"..\11\Average\Main.jack",
 
         # TODO: compiled / tested but non-fatal Index Count Mismatch
-        # r"..\11\Square\Main.jack",
-        # r"..\11\Square\Square.jack",
-        # r"..\11\Square\SquareGame.jack",
+        r"..\11\Square\Main.jack",
+        r"..\11\Square\Square.jack",
+        r"..\11\Square\SquareGame.jack",
 
         # TODO: stable compilation but untested or incorrect result/behaviour
         r"..\11\ComplexArrays\Main.jack",

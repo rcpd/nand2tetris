@@ -345,14 +345,6 @@
 <identifier> width </identifier>
 <symbol> ; </symbol>
 <symbol> } </symbol>
-<keyword> else </keyword>
-<symbol> { </symbol>
-<keyword> let </keyword>
-<identifier> x </identifier>
-<symbol> = </symbol>
-<identifier> x </identifier>
-<symbol> ; </symbol>
-<symbol> } </symbol>
 <keyword> do </keyword>
 <identifier> Screen </identifier>
 <symbol> . </symbol>

@@ -1111,22 +1111,6 @@
             </letStatement>
           </statements>
           <symbol> } </symbol>
-          <keyword> else </keyword>
-          <symbol> { </symbol>
-          <statements>
-            <letStatement>
-              <keyword> let </keyword>
-              <identifier> wall </identifier>
-              <symbol> = </symbol>
-              <expression>
-                <term>
-                  <identifier> wall </identifier>
-                </term>
-              </expression>
-              <symbol> ; </symbol>
-            </letStatement>
-          </statements>
-          <symbol> } </symbol>
         </ifStatement>
         <ifStatement>
           <keyword> if </keyword>
@@ -1172,22 +1156,6 @@
               <expression>
                 <term>
                   <identifier> rightWall </identifier>
-                </term>
-              </expression>
-              <symbol> ; </symbol>
-            </letStatement>
-          </statements>
-          <symbol> } </symbol>
-          <keyword> else </keyword>
-          <symbol> { </symbol>
-          <statements>
-            <letStatement>
-              <keyword> let </keyword>
-              <identifier> wall </identifier>
-              <symbol> = </symbol>
-              <expression>
-                <term>
-                  <identifier> wall </identifier>
                 </term>
               </expression>
               <symbol> ; </symbol>
@@ -1245,22 +1213,6 @@
             </letStatement>
           </statements>
           <symbol> } </symbol>
-          <keyword> else </keyword>
-          <symbol> { </symbol>
-          <statements>
-            <letStatement>
-              <keyword> let </keyword>
-              <identifier> wall </identifier>
-              <symbol> = </symbol>
-              <expression>
-                <term>
-                  <identifier> wall </identifier>
-                </term>
-              </expression>
-              <symbol> ; </symbol>
-            </letStatement>
-          </statements>
-          <symbol> } </symbol>
         </ifStatement>
         <ifStatement>
           <keyword> if </keyword>
@@ -1306,22 +1258,6 @@
               <expression>
                 <term>
                   <identifier> bottomWall </identifier>
-                </term>
-              </expression>
-              <symbol> ; </symbol>
-            </letStatement>
-          </statements>
-          <symbol> } </symbol>
-          <keyword> else </keyword>
-          <symbol> { </symbol>
-          <statements>
-            <letStatement>
-              <keyword> let </keyword>
-              <identifier> wall </identifier>
-              <symbol> = </symbol>
-              <expression>
-                <term>
-                  <identifier> wall </identifier>
                 </term>
               </expression>
               <symbol> ; </symbol>
