@@ -3,7 +3,7 @@ Compile a JACK program into a VM program (pcode) from the token stream initially
 by tokenizer/analyzer.
 """
 
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as ET  # FIXME: pep
 
 op_map = {"+": "add", "-": "sub", "*": "call Math.multiply 2", "/": "call Math.divide 2", "&": "and", "|": "or",
           "~": "not", "<": "lt", ">": "gt", "=": "eq"}  # Math.multiply/divide = non-void return (no pop)
@@ -24,6 +24,9 @@ char_map = {
 
 
 def store_pcode(pcode, cmd, write=None, strip=False, debug=True):
+    """
+    TODO: docstring
+    """
     if debug:
         if cmd.strip() != "":
             print("PCODE: %s" % cmd.strip())
@@ -45,6 +48,7 @@ def store_pcode(pcode, cmd, write=None, strip=False, debug=True):
 
 def compile_class(pcode, class_name, class_dict):
     """
+    TODO: docstring
     """
     # define class_name and initialize symbol table
     if class_name not in class_dict:
@@ -56,7 +60,9 @@ def compile_class(pcode, class_name, class_dict):
 
 def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_name):
     """
+    TODO: docstring
     """
+    # FIXME: num_vars is wrong
     # define function symbol
     if func_kind in ("function", "method", "constructor"):
         if func_name not in class_dict[class_name]:
@@ -109,6 +115,38 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
     return pcode, class_dict
 
 
+def compile_statement(pcode, statement, class_dict, class_name, func_name, call_class, call_func,
+                      var_type, var_name, num_args):
+    """
+    TODO: docstring
+    """
+    if statement == "do":
+        pcode = compile_call(pcode, call_class, call_func, num_args, statement)
+        num_args = 0
+
+    elif statement == "let":
+        raise NotImplementedError
+
+    elif statement == "return":
+        # looks up func type (affects return behaviour)
+        pcode = compile_return(pcode, class_dict, class_name, func_name)
+
+    elif statement == "while":
+        raise NotImplementedError
+
+    elif statement == "if":
+        raise NotImplementedError
+
+    elif statement == "var":
+        # update class/func dict
+        pcode, class_dict = compile_vardec(pcode, class_dict, class_name, func_name, var_type, var_name)
+
+    else:
+        raise RuntimeError("Unexpected statement type: %s" % statement)
+
+    return pcode, class_dict, num_args
+
+
 def compile_vardec(pcode, class_dict, class_name, func_name, var_type, var_name):
     """
     add var to the class dict, print a comment in pcode
@@ -126,11 +164,17 @@ def compile_vardec(pcode, class_dict, class_name, func_name, var_type, var_name)
 
 
 def compile_constant(pcode, constant):
+    """
+    TODO: docstring
+    """
     store_pcode(pcode, "\npush %s" % constant)
     return pcode
 
 
 def compile_call(pcode, call_class, call_func, num_args, statement):
+    """
+    TODO: docstring
+    """
     store_pcode(pcode, "\ncall %s.%s %s" % (call_class, call_func, num_args))
     if statement == 'do':
         store_pcode(pcode, "\npop temp 0 // discard return on do call")
@@ -138,6 +182,9 @@ def compile_call(pcode, call_class, call_func, num_args, statement):
 
 
 def compile_return(pcode, class_dict, class_name, func_name):
+    """
+    TODO: docstring
+    """
     if class_dict[class_name][func_name]["type"] == "void":
         store_pcode(pcode, "push constant 0 // void return")
     else:
@@ -147,11 +194,17 @@ def compile_return(pcode, class_dict, class_name, func_name):
 
 
 def compile_literal(pcode, code):
+    """
+    TODO: docstring
+    """
     store_pcode(pcode, "\n%s" % code)
     return pcode
 
 
 def main(filepath, debug=False):
+    """
+    TODO: docstring
+    """
     print("Parsing: %s" % filepath)
     tree = ET.parse(filepath.replace(".jack", "_out.xml"))
 
@@ -195,30 +248,35 @@ def main(filepath, debug=False):
             if keyword:
                 identifier = elem.text
                 if keyword == 'class':
-                    class_name = identifier
+                    class_name = identifier  # preserved for later
                     func_kind = 'method'
                     pcode, class_dict = compile_class(pcode, class_name, class_dict)
 
                 elif keyword == 'function':
-                    func_type = _type
-                    func_name = identifier
+                    func_name = identifier  # preserved for later
                     if not func_kind:
                         raise RuntimeError("undefined function kind for %s.%s" % (class_name, func_name))
-                    pcode, class_dict = compile_function(pcode, func_name, func_type, func_kind, class_dict, class_name)
+                    pcode, class_dict = compile_function(pcode, func_name, _type, func_kind, class_dict, class_name)
 
                 elif keyword == 'var':
-                    var_type = _type
-                    var_name = identifier
-                    pcode, class_dict = compile_vardec(pcode, class_dict, class_name, func_name, var_type, var_name)
+                    pcode, class_dict, num_args = compile_statement(pcode, statement, class_dict, class_name, func_name,
+                                                                    None, None, _type, identifier, num_args)
 
                 elif keyword == 'do':
+                    # "do" compilation is deferred until ";"
                     if not call_class:
-                        call_class = identifier
+                        call_class = identifier  # preserved for later
                     else:
-                        call_func = identifier
+                        call_func = identifier  # preserved for later
+
+                elif keyword == 'let':
+                    pcode, class_dict, num_args = compile_statement(pcode, statement, class_dict, class_name, func_name,
+                                                                    call_class, call_func, _type, identifier, num_args)
+
                 else:
                     raise RuntimeError("unexpected keyword %s for identifier %s" % (keyword, elem.text))
-            else:
+
+            elif statement != "let":
                 raise RuntimeError("no keyword defined for %s" % elem.text)
 
         elif elem.tag == 'symbol':
@@ -239,22 +297,25 @@ def main(filepath, debug=False):
             elif symbol == ',':
                 pass
             elif symbol == ';':
-                # process the original statement
                 if statement == 'do':
-                    pcode = compile_call(pcode, call_class, call_func, num_args, 'do')  # TODO: num_args
-                    num_args = 0
+                    pcode, class_dict, num_args = compile_statement(pcode, statement, class_dict, None, None,
+                                                                    call_class, call_func, None, None, num_args)
+                    call_class = call_func = ''
                 elif statement == 'return':
-                    pcode = compile_return(pcode, class_dict, class_name, func_name)
-                else:
-                    RuntimeError("unexpected statement type %s" % statement)
+                    pcode, class_dict, num_args = compile_statement(pcode, statement, class_dict, class_name, func_name,
+                                                                    None, None, None, None, num_args)
             else:
                 raise RuntimeError("unexpected symbol %s" % elem.text)
 
         elif elem.tag == 'integerConstant':
             pcode = compile_constant(pcode, elem.text)
 
+        elif elem.tag == 'varDec':
+            statement = 'var'
         elif elem.tag == 'doStatement':
             statement = 'do'
+        elif elem.tag == 'letStatement':
+            statement = 'let'
         elif elem.tag == 'returnStatement':
             statement = 'return'
         elif elem.tag == 'expressionList':
@@ -264,8 +325,8 @@ def main(filepath, debug=False):
                     if c_elem.tag == 'expression':
                         num_args += 1
 
-        elif elem.tag in ('subroutineDec', 'subroutineBody', 'parameterList', 'statements', 'expression', 'term',
-                          'varDec'):
+        # ignore the tags only used for grouping
+        elif elem.tag in ('subroutineDec', 'subroutineBody', 'parameterList', 'statements', 'expression', 'term'):
             pass
 
         else:
@@ -274,8 +335,8 @@ def main(filepath, debug=False):
 
 if __name__ == '__main__':
     jack_filepaths = [
-        # r"..\11\Seven\Main.jack",  # matched to course compiler
-        r"..\11\ConvertToBin\Main.jack",
+        r"..\11\Seven\Main.jack",  # matched to course compiler
+        r"..\11\ConvertToBin\Main.jack",  # matches up to let (nyi) + num_vars for main
     ]
 
     for _filepath in jack_filepaths:
