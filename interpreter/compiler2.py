@@ -1193,9 +1193,11 @@ if __name__ == '__main__':
         # wip
         # [r"..\11\ComplexArrays\Main.jack"],  # FIXME: array in rhs expression
 
-        # [r"..\10\ExpressionLessSquare\Main.jack",  # TODO: doesn't compile on course compiler
-        #  r"..\10\ExpressionLessSquare\Square.jack",  # constructor must return 'this'
-        #  r"..\10\ExpressionLessSquare\SquareGame.jack"],  # constructor this, run type confusion
+        # TODO: add Project 12 test programs
+
+        [r"..\10\ExpressionLessSquare\Main.jack",  # static compilation testing only  # FIXME: var assignment to array
+         r"..\10\ExpressionLessSquare\Square.jack",  # nonsense code that doesn't / shouldn't compile or run
+         r"..\10\ExpressionLessSquare\SquareGame.jack"],  # nonsense code that doesn't / shouldn't compile or run
     ]
 
     # matched to course compiler

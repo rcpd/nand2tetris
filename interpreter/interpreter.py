@@ -366,8 +366,9 @@ if __name__ == '__main__':
     Project 11:   Compiler, updated tokenizer/analyzer
     Project 12:   Implement the OS libraries in Jack
     '''
-    # TODO: when compiler is stable, add Project 9-11 Jack/VM/ASM/XML files to interpreter chain (integration test only)
-    # TODO: if OS ever completed, add Project 12 Jack/VM/ASM/XML files to interpreter chain (integration test only)
+
+    # TODO: when compiler is stable, add Project 9-11 Jack/VM/ASM/XML files (integration test)
+    # TODO: add Project 12 Jack/VM/ASM/XML files (test programs + libraries) (integration test)
 
     # compile jack programs
     jack_dirpaths = [
@@ -377,7 +378,7 @@ if __name__ == '__main__':
         r"D:\dev\nand2tetris\projects\09\List",
         r"D:\dev\nand2tetris\projects\09\Square",
         r"D:\dev\nand2tetris\projects\10\ArrayTest",
-        # r"D:\dev\nand2tetris\projects\10\ExpressionLessSquare",  # does not compile on course compiler
+        # r"D:\dev\nand2tetris\projects\10\ExpressionLessSquare",  # nonsense code that shouldn't compile
         r"D:\dev\nand2tetris\projects\10\Square",
         r"D:\dev\nand2tetris\projects\11\ConvertToBin",
         r"D:\dev\nand2tetris\projects\11\Average",
@@ -398,9 +399,9 @@ if __name__ == '__main__':
         r"..\projects\09\Square\Square.jack",
         r"..\projects\09\Square\SquareGame.jack",
         r"..\projects\10\ArrayTest\Main.jack",
-        r"..\projects\10\ExpressionLessSquare\Main.jack",
-        r"..\projects\10\ExpressionLessSquare\Square.jack",
-        r"..\projects\10\ExpressionLessSquare\SquareGame.jack",
+        r"..\10\ExpressionLessSquare\Main.jack",  # static compilation testing only
+        r"..\10\ExpressionLessSquare\Square.jack",  # nonsense code that doesn't / shouldn't compile or run
+        r"..\10\ExpressionLessSquare\SquareGame.jack",  # nonsense code that doesn't / shouldn't compile or run
         r"..\projects\10\Square\Main.jack",
         r"..\projects\10\Square\Square.jack",
         r"..\projects\10\Square\SquareGame.jack",
@@ -477,7 +478,7 @@ if __name__ == '__main__':
         r"../projects/11/Seven/Seven.asm",
         r"../projects/11/Square/Square.asm",
 
-        # r"../projects/10/ExpressionLessSquare/ExpressionLessSquare.asm",  # does not compile on course compiler
+        # r"../projects/10/ExpressionLessSquare/ExpressionLessSquare.asm",  # nonsense code that doesn't compile / run
         # r"../projects/11/ComplexArrays/ComplexArrays.asm",  # too large, generates 17 bit addresses
         # r"../projects/11/Pong/Pong.asm",  # too large, generates 17 bit addresses
     ]
