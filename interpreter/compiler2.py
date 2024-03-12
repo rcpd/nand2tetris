@@ -292,7 +292,7 @@ def compile_assignment(class_dict, class_name, func_name, var_name, exp_buffer, 
         # assignment to an array var (constructor or overwriting the pointer)
         # this is speculative and will be reversed if next symbol is [
         # (i.e. assignment was intended for array content not array itself)
-        exp_buffer.append("pop %s %s // %s = (array var)"
+        exp_buffer.append("pop %s %s // %s = (*array var)"
                           % (class_dict[class_name][func_name]['args'][var_name]['kind'],
                              class_dict[class_name][func_name]['args'][var_name]['index'], var_name))
 
@@ -484,7 +484,7 @@ def compile_while(pcode, while_count):
     return pcode, while_count
 
 
-def compile_var(pcode, class_dict, class_name, func_name, var_name, var_scope, exp_buffer=None):
+def compile_var(pcode, class_dict, class_name, func_name, var_name, var_scope, exp_buffer=None, array=False):
     """
     emit pcode when while encountered
     """
@@ -508,7 +508,9 @@ def compile_var(pcode, class_dict, class_name, func_name, var_name, var_scope, e
             exp_buffer.append("push %s %s // %s" %
                               (class_dict[class_name][func_name]['args'][var_name]['kind'],
                                class_dict[class_name][func_name]['args'][var_name]['index'], var_name))
-
+            if array:
+                exp_buffer[-1] = exp_buffer[-1] + " (*array var)"
+                
             return exp_buffer
 
         elif var_scope == 'member':
@@ -522,6 +524,9 @@ def compile_var(pcode, class_dict, class_name, func_name, var_name, var_scope, e
             else:
                 raise RuntimeError("unexpected kind: '%s'" % class_dict[class_name]['args'][var_name]['kind'])
 
+            if array:
+                exp_buffer[-1] = exp_buffer[-1] + " (*array var)"
+                
             return exp_buffer
 
     else:
@@ -529,6 +534,9 @@ def compile_var(pcode, class_dict, class_name, func_name, var_name, var_scope, e
             pcode = store_pcode(pcode, "\npush %s %s // %s" %
                                 (class_dict[class_name][func_name]['args'][var_name]['kind'],
                                  class_dict[class_name][func_name]['args'][var_name]['index'], var_name))
+            if array:
+                pcode[-1].append(" (*array var)")
+                
             return pcode
 
         elif var_scope == 'member':
@@ -542,6 +550,9 @@ def compile_var(pcode, class_dict, class_name, func_name, var_name, var_scope, e
             else:
                 raise RuntimeError("unexpected kind: '%s'" % class_dict[class_name]['args'][var_name]['kind'])
 
+            if array:
+                pcode[-1].append(" (*array var)")
+            
             return pcode
 
 
@@ -655,7 +666,7 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
             if array:
                 # if var is array compile to buffer
                 exp_buffer = compile_var(pcode, class_dict, class_name, func_name, identifier, 'local',
-                                         exp_buffer=exp_buffer)
+                                         exp_buffer=exp_buffer, array=array)
             else:
                 # otherwise if var found compile directly (not buffer)
                 pcode = compile_var(pcode, class_dict, class_name, func_name, identifier, 'local')
@@ -665,7 +676,7 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
             if array:
                 # if var is array compile to buffer
                 exp_buffer = compile_var(pcode, class_dict, class_name, func_name, identifier, 'member',
-                                         exp_buffer=exp_buffer)
+                                         exp_buffer=exp_buffer, array=array)
             else:
                 # otherwise if var found compile directly (not buffer)
                 pcode = compile_var(pcode, class_dict, class_name, func_name, identifier, 'member')
@@ -688,8 +699,12 @@ def pop_buffer(pcode, exp_buffer, stop_at=None, pop_incl=False):
     selectively or entirely process the expression buffer
     """
     if stop_at and exp_buffer:
+        if stop_at not in exp_buffer:
+            raise RuntimeError("stop_value '%s' was not found in exp_buffer")
+
         while exp_buffer[-1] != stop_at:
             pcode = store_pcode(pcode, exp_buffer.pop())
+
         if pop_incl:
             exp_buffer.pop()  # already printed
     else:
@@ -836,8 +851,14 @@ def main(filepath, file_list):
             continue
 
         if lhs_array:
-            if not elem.tag == 'symbol' and not elem.text == '[':
+            if not elem.text == '[':
                 lhs_array = None  # None signifies lhs_array was true but now compiled/consumed
+
+        # if stand-alone var array buffered in a non-assignment statement process it now
+        # TODO: this is probably a bit fragile
+        if exp_buffer and statement != 'let' and elem.text not in ('[', ')', ',') and \
+                exp_buffer[-1].endswith("(*array var)"):
+            pcode = store_pcode(pcode, exp_buffer.pop())
 
         if end_block:
             if block:
@@ -1208,9 +1229,7 @@ if __name__ == '__main__':
          r"..\11\Pong\Bat.jack",
          r"..\11\Pong\Main.jack",
          r"..\11\Pong\PongGame.jack"],
-
-        # wip
-        [r"..\11\ComplexArrays\Main.jack"],  # FIXME: array in lhs array / rhs expression
+        [r"..\11\ComplexArrays\Main.jack"],
 
         # TODO: add Project 12 test programs
 
@@ -1238,6 +1257,7 @@ if __name__ == '__main__':
         r"..\11\Pong\Ball.vm": 444,
         r"..\11\Pong\Main.vm": 13,
         r"..\11\Pong\PongGame.vm": 318,
+        r"..\11\ComplexArrays\Main.vm": 702,
     }
 
     for file_list in jack_filepaths:
