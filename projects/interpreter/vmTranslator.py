@@ -766,71 +766,73 @@ def parse_asm(test_file, asm=""):
     src = test_file.split('\\')[-1].split('.vm')[0]
 
     with open(test_file) as vm_file:
-        for cmd in vm_file:
-            # cleanup test file
-            cmd = cmd.strip()
-            if cmd.startswith(r'//'):
-                continue
-            elif cmd == "":
-                continue
+        vm_contents = vm_file.readlines()
 
-            # parse command
-            parsed_cmd = cmd.split(" ")
-            if len(parsed_cmd) >= 3:
-                vm_segment = parsed_cmd[1]
-                value = parsed_cmd[2]
+    for cmd in vm_contents:
+        # cleanup test file
+        cmd = cmd.strip()
+        if cmd.startswith(r'//'):
+            continue
+        elif cmd == "":
+            continue
 
-            # map asm to HACK globals
-            if vm_segment == "local":
-                asm_segment = "LCL"
-            elif vm_segment == "constant":
-                asm_segment = value
-            elif vm_segment == "this":
-                asm_segment = "THIS"
-            elif vm_segment == "that":
-                asm_segment = "THAT"
-            elif vm_segment == "argument":
-                asm_segment = "ARG"
-            elif vm_segment == "temp":
-                asm_segment = "TEMP"
+        # parse command
+        parsed_cmd = cmd.split(" ")
+        if len(parsed_cmd) >= 3:
+            vm_segment = parsed_cmd[1]
+            value = parsed_cmd[2]
 
-            # print(cmd)
+        # map asm to HACK globals
+        if vm_segment == "local":
+            asm_segment = "LCL"
+        elif vm_segment == "constant":
+            asm_segment = value
+        elif vm_segment == "this":
+            asm_segment = "THIS"
+        elif vm_segment == "that":
+            asm_segment = "THAT"
+        elif vm_segment == "argument":
+            asm_segment = "ARG"
+        elif vm_segment == "temp":
+            asm_segment = "TEMP"
 
-            # parse commands
-            if cmd.startswith("push"):
-                asm += push(cmd, vm_segment, asm_segment, value)
-            elif cmd.startswith("pop"):
-                asm += pop(cmd, vm_segment, asm_segment, value)
-            elif cmd.startswith("add"):
-                asm += add(cmd)
-            elif cmd.startswith("sub"):
-                asm += sub(cmd)
-            elif cmd.startswith("eq"):
-                asm += eq(cmd)
-            elif cmd.startswith("lt"):
-                asm += lt(cmd)
-            elif cmd.startswith("gt"):
-                asm += gt(cmd)
-            elif cmd.startswith("and"):
-                asm += _and(cmd)
-            elif cmd.startswith("or"):
-                asm += _or(cmd)
-            elif cmd.startswith("not"):
-                asm += _not(cmd)
-            elif cmd.startswith("neg"):
-                asm += neg(cmd)
-            elif cmd.startswith("label"):
-                asm += label(cmd, src)
-            elif cmd.startswith("goto"):
-                asm += goto(cmd, src)
-            elif cmd.startswith("if-goto"):
-                asm += if_goto(cmd, src)
-            elif cmd.startswith("function"):
-                asm += function(cmd, src)
-            elif cmd.startswith("return"):
-                asm += _return(cmd, src)
-            elif cmd.startswith("call"):
-                asm += call(cmd, src)
+        # print(cmd)
+
+        # parse commands
+        if cmd.startswith("push"):
+            asm += push(cmd, vm_segment, asm_segment, value)
+        elif cmd.startswith("pop"):
+            asm += pop(cmd, vm_segment, asm_segment, value)
+        elif cmd.startswith("add"):
+            asm += add(cmd)
+        elif cmd.startswith("sub"):
+            asm += sub(cmd)
+        elif cmd.startswith("eq"):
+            asm += eq(cmd)
+        elif cmd.startswith("lt"):
+            asm += lt(cmd)
+        elif cmd.startswith("gt"):
+            asm += gt(cmd)
+        elif cmd.startswith("and"):
+            asm += _and(cmd)
+        elif cmd.startswith("or"):
+            asm += _or(cmd)
+        elif cmd.startswith("not"):
+            asm += _not(cmd)
+        elif cmd.startswith("neg"):
+            asm += neg(cmd)
+        elif cmd.startswith("label"):
+            asm += label(cmd, src)
+        elif cmd.startswith("goto"):
+            asm += goto(cmd, src)
+        elif cmd.startswith("if-goto"):
+            asm += if_goto(cmd, src)
+        elif cmd.startswith("function"):
+            asm += function(cmd, src)
+        elif cmd.startswith("return"):
+            asm += _return(cmd, src)
+        elif cmd.startswith("call"):
+            asm += call(cmd, src)
 
     return asm
 
@@ -842,50 +844,52 @@ def parse_static(test_file):
     global offset_list
 
     with open(test_file) as vm_file:
-        for cmd in vm_file:
-            # cleanup test file
-            cmd = cmd.strip()
-            if cmd.startswith(r'//'):
-                continue
-            elif cmd == "":
-                continue
+        vm_content = vm_file.readlines()
 
-            # parse command
-            parsed_cmd = cmd.split(" ")
-            if len(parsed_cmd) >= 3:
-                vm_segment = parsed_cmd[1]
-                try:
-                    value = int(parsed_cmd[2])
-                except ValueError:
-                    print("Warning: Value not parsed: %s" % cmd)
+    for cmd in vm_content:
+        # cleanup test file
+        cmd = cmd.strip()
+        if cmd.startswith(r'//'):
+            continue
+        elif cmd == "":
+            continue
 
-            # TODO: this could have been parsed from the function definiton
-            # update local dictionary
-            if cmd.startswith("function"):
-                current_function = cmd.split(" ")[1]
-            if cmd.startswith("pop local") or cmd.startswith("push local"):
-                if current_function in local_dict:
-                    if value > local_dict[current_function]:
-                        # if new max > max, update max
-                        local_dict[current_function] = value
-                else:
-                    # if first occurrence add to dict
+        # parse command
+        parsed_cmd = cmd.split(" ")
+        if len(parsed_cmd) >= 3:
+            vm_segment = parsed_cmd[1]
+            try:
+                value = int(parsed_cmd[2])
+            except ValueError:
+                print("Warning: Value not parsed: %s" % cmd)
+
+        # TODO: this could have been parsed from the function definiton
+        # update local dictionary
+        if cmd.startswith("function"):
+            current_function = cmd.split(" ")[1]
+        if cmd.startswith("pop local") or cmd.startswith("push local"):
+            if current_function in local_dict:
+                if value > local_dict[current_function]:
+                    # if new max > max, update max
                     local_dict[current_function] = value
+            else:
+                # if first occurrence add to dict
+                local_dict[current_function] = value
 
-            # update static dictionary
-            if cmd.startswith("pop static") or cmd.startswith("push static"):
-                if test_file in static_dict:
-                    if value > static_dict[test_file][1]:
-                        # if new max > max, update max
-                        static_dict[test_file][1] = value
-                else:
-                    # if first occurrence add to dict
-                    static_dict[test_file] = [len(static_dict), value]
+        # update static dictionary
+        if cmd.startswith("pop static") or cmd.startswith("push static"):
+            if test_file in static_dict:
+                if value > static_dict[test_file][1]:
+                    # if new max > max, update max
+                    static_dict[test_file][1] = value
+            else:
+                # if first occurrence add to dict
+                static_dict[test_file] = [len(static_dict), value]
 
-        for func in local_dict:
-            local_dict[func] += 1  # inc by 1 as it starts at zero
-        if test_file in static_dict:
-            static_dict[test_file][1] += 1  # inc by 1 as it starts at zero
+    for func in local_dict:
+        local_dict[func] += 1  # inc by 1 as it starts at zero
+    if test_file in static_dict:
+        static_dict[test_file][1] += 1  # inc by 1 as it starts at zero
 
 def main():
     """
@@ -897,15 +901,15 @@ def main():
     global test_file
 
     test_files = [
-        r'ProgramFlow\BasicLoop\BasicLoop.vm',
-        r'ProgramFlow\FibonacciSeries\FibonacciSeries.vm',
-        r'FunctionCalls\SimpleFunction\SimpleFunction.vm',
+        r'..\08\ProgramFlow\BasicLoop\BasicLoop.vm',
+        r'..\08\ProgramFlow\FibonacciSeries\FibonacciSeries.vm',
+        r'..\08\FunctionCalls\SimpleFunction\SimpleFunction.vm',
     ]
 
     test_dirs = [
-        r'FunctionCalls\FibonacciElement',
-        r'FunctionCalls\NestedCall',
-        r'FunctionCalls\StaticsTest'
+        r'..\08\FunctionCalls\FibonacciElement',
+        r'..\08\FunctionCalls\NestedCall',
+        r'..\08\FunctionCalls\StaticsTest'
     ]
 
     # parse the regular tests
