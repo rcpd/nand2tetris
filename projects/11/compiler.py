@@ -146,49 +146,45 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name):
 
 
 def compile_expression(pcode, input_list, i, class_dict, class_name, func_name):
-    j = i  # i = opening symbol, j = closing symbol
-    while input_list[j][1] != ";":
+    j = i
+    while input_list[j][1] not in (";", "{"):
         # recurse until all brackets unpacked
         if input_list[j][1] == "(" and input_list[j+1][1] != ")":
-            pcode, compile_expression(pcode, input_list, j+1, class_dict, class_name, func_name)
+            if i != j:  # avoid double tapping expression
+                pcode, compile_expression(pcode, input_list, j+1, class_dict, class_name, func_name)
         j += 1
-    
+
     # process expression
-    # TODO: remove duplication of single vs multi term parse
-    while input_list[i][1] not in ("(", ")", ";"):
-        j = 0
+    while input_list[i][1] not in ("(", ")", ";", "{"):
+        k = 0
         # parse x <op> y expressions
         if input_list[i][0] == "integerConstant":
             store_pcode(pcode, "push constant %s" % input_list[i][1])
-            j += 1
+            k += 1
         elif input_list[i][0] == "identifier":
             var = class_dict[class_name][func_name]["args"][input_list[i][1]]
             store_pcode(pcode, "push %s %s // %s" % (var["type"], var["index"], input_list[i][1]))
-            j += 1
+            k += 1
         elif input_list[i][1] in operators:
             if input_list[i+1][0] == "integerConstant":
                 store_pcode(pcode, "push constant %s" % input_list[i+1][1])
-                j += 1
+                k += 1
             elif input_list[i+1][0] == "identifier":
                 var = class_dict[class_name][func_name]["args"][input_list[i][1]]
                 store_pcode(pcode, "push %s %s // %s" % (var["type"], var["index"], input_list[i][1]))
-                j += 1
-            elif input_list[i+1][1] == "(":
-                pass
-            else:
-                raise RuntimeError(input_list[i+1])
+                k += 1
 
             if input_list[i][1] == "-":
-                store_pcode(pcode, "neg")
-                j += 1
+                store_pcode(pcode, "neg")  # comes after the value being neg'd
+                k += 1
 
             store_pcode(pcode, "%s" % op_map[input_list[i][1]])  # parse op
-            j += 1
+            k += 1
         elif input_list[i][1] == ",":  # TODO: check push order
-            j += 1
+            k += 1
         else:
             raise RuntimeError(input_list[i])
-        i += j
+        i += k
     return pcode
 
 
@@ -216,14 +212,17 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
     elif input_list[i][1] == "return":
         store_pcode(pcode, "return")
     elif input_list[i][1] == "while":
-        store_pcode(pcode, "// while <expression>")
+        store_pcode(pcode, "\n// while <expression>")
         pcode, compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
         store_pcode(pcode, "if-goto WHILE_START_%s" % func_name)  # TODO: label_dict
         store_pcode(pcode, "goto WHILE_END_%s" % func_name)
         store_pcode(pcode, "label WHILE_START_%s" % func_name)
-        # ...
-        # store_pcode(pcode, "label WHILE_END_%s" % func_name)
-
+    elif input_list[i][1] == "if":
+        store_pcode(pcode, "\n// if <expression>")
+        pcode, compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
+        store_pcode(pcode, "if-goto IF_TRUE_%s" % func_name)  # TODO: label_dict
+        store_pcode(pcode, "goto IF_FALSE_%s" % func_name)
+        store_pcode(pcode, "label IF_TRUE_%s" % func_name)
     else:
         raise RuntimeError(input_list[i])
     return pcode, class_dict
@@ -410,10 +409,12 @@ def main(debug=False):
                         # don't close if } followed by else
                         if not (input_list[j][0] == "keyword" and input_list[j][1] == "else"):
                             parent = find_parent(output_root, parent)
+                            store_pcode(pcode, "label IF_FALSE_%s" % func_name)  # TODO: label_dict
 
                     if parent.tag == "whileStatement":
                         # close parent
                         parent = find_parent(output_root, parent)
+                        store_pcode(pcode, "label WHILE_END_%s" % func_name)  # TODO: label_dict
 
                     if parent.tag == "subroutineBody":
                         # close parent(s)
