@@ -9,7 +9,7 @@ call SquareGame.dispose 1
 pop temp 0
 push constant 0
 return
-function Main.test 4
+function Main.more 4
 push constant 0
 if-goto IF_TRUE0
 goto IF_FALSE0
@@ -55,8 +55,12 @@ add
 push constant 2
 push local 3
 add
-push local 3
-pop local 3
+pop pointer 1
+push that 0
+pop temp 0
+pop pointer 1
+push temp 0
+pop that 0
 goto IF_END0
 label IF_FALSE0
 push local 0
