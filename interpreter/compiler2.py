@@ -22,6 +22,11 @@ char_map = {
         "f3": 143, "f4": 144, "f5": 145, "f6": 146, "f7": 147, "f8": 148, "f9": 149, "f10": 150, "f11": 151, "f12": 152
     }
 
+# compiled library functions
+sys_func = {
+    "Memory": {"peek": 1, "poke": 2, "alloc": 1, "dealloc": 1}
+}
+
 
 def store_pcode(pcode, cmd, debug=True):
     """
@@ -45,7 +50,9 @@ def compile_class(pcode, class_name, class_dict):
     # define class_name and initialize symbol table
     if class_name not in class_dict:
         class_dict[class_name] = {"args": {}, "index_dict": {}}
-    # store_pcode(pcode, "// class %s" % class_name)
+    else:
+        # don't emit pcode on pre-scan
+        store_pcode(pcode, "// class %s" % class_name)
 
     return pcode, class_dict
 
@@ -56,10 +63,12 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
     """
     # FIXME: num_vars is wrong
     # define function symbol
+    prescan = False
     if func_kind in ("function", "method", "constructor"):
         if func_name not in class_dict[class_name]:
             class_dict[class_name][func_name] = {"kind": func_kind, "type": func_type,
                                                  "args": {}, "index_dict": {}, "label_dict": {}}
+            prescan = True
         if func_kind == "method":
             # assign space for the implicit "this" argument for class methods
             class_dict[class_name][func_name]["index_dict"]["argument"] = 0
@@ -90,20 +99,23 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
     else:
         raise RuntimeError(func_kind)
 
-    store_pcode(pcode, "\nfunction %s.%s %s" % (class_name, func_name, num_vars))
+    # don't emit pcode on pre-scan
+    if not prescan:
+        store_pcode(pcode, "\nfunction %s.%s %s" % (class_name, func_name, num_vars))
 
-    if func_kind == "constructor":
-        # allocate space on heap
-        store_pcode(pcode, "push constant %s" % num_vars)
-        store_pcode(pcode, "call Memory.alloc 1 // allocate object + params on heap")  # non-void return (no pop)
-        store_pcode(pcode, "pop pointer 0 // update 'this' to heap address")
+        if func_kind == "constructor":
+            # allocate space on heap
+            store_pcode(pcode, "push constant %s" % num_vars)
+            store_pcode(pcode, "call Memory.alloc 1 // allocate object + params on heap")  # non-void return (no pop)
+            store_pcode(pcode, "pop pointer 0 // update 'this' to heap address")
 
-    elif func_kind == "method":
-        # move pointer to current object (implicit "this" argument)
-        # TODO: doesn't seem to be used?
-        # store_pcode(pcode, "push argument 0")
-        # store_pcode(pcode, "pop pointer 0 // update 'this' to object for method call")
-        pass
+        elif func_kind == "method":
+            # move pointer to current object (implicit "this" argument)
+            # TODO: doesn't seem to be used?
+            # store_pcode(pcode, "push argument 0")
+            # store_pcode(pcode, "pop pointer 0 // update 'this' to object for method call")
+            pass
+
     return pcode, class_dict
 
 
@@ -134,7 +146,7 @@ def compile_statement(pcode, statement, class_dict, class_name, func_name, call_
         pcode, class_dict = compile_vardec(pcode, class_dict, class_name, func_name, var_type, var_name)
 
     else:
-        raise RuntimeError("Unexpected statement type: %s" % statement)
+        raise RuntimeError("Unexpected statement type '%s'" % statement)
 
     return pcode, class_dict, num_args, exp_buffer
 
@@ -149,14 +161,18 @@ def compile_vardec(pcode, class_dict, class_name, func_name, var_type, var_name)
     """
     add var to the class dict, print a comment in pcode
     """
-    if "local" not in class_dict[class_name][func_name]['index_dict']:
-        index = 0
-    else:
-        index = class_dict[class_name][func_name]['index_dict']['local'] + 1
+    # don't emit pcode during pre-scan
+    if var_name not in class_dict[class_name][func_name]['args']:
+        if "local" not in class_dict[class_name][func_name]['index_dict']:
+            index = 0
+        else:
+            index = class_dict[class_name][func_name]['index_dict']['local'] + 1
 
-    class_dict[class_name][func_name]['args'][var_name] = {'kind': 'local', 'type': var_type, 'index': index}
-    class_dict[class_name][func_name]['index_dict']['local'] = index
-    store_pcode(pcode, "// var %s %s (local %s)" % (var_type, var_name, index))
+        class_dict[class_name][func_name]['args'][var_name] = {'kind': 'local', 'type': var_type, 'index': index}
+        class_dict[class_name][func_name]['index_dict']['local'] = index
+    else:
+        store_pcode(pcode, "// var %s %s (local %s)" %
+                    (var_type, var_name,  class_dict[class_name][func_name]['args'][var_name]['index']))
 
     return pcode, class_dict
 
@@ -205,13 +221,56 @@ def main(filepath, debug=False):
     """
     pcode = []
     try:
-        print("Parsing: %s" % filepath)
+        print("\nParsing: %s" % filepath)
         tree = Et.parse(filepath.replace(".jack", "_out.xml"))
 
         # persist through loop scope
         parent = 'class'
         exp_buffer = []
         class_dict = {}
+        num_args = 0
+        class_name = func_kind = call_class = call_func = statement = func_name = keyword = _type = identifier = ''
+        func_type = symbol = lhs_var_name = rhs_parent = rhs_child = ''
+
+        # pre-process tree for function vars
+        for elem in tree.iter():
+            elem.tag = (elem.tag or '').strip()
+            elem.text = (elem.text or '').strip()
+            # skip rootnode
+            if elem.tag == 'class':
+                continue
+
+            if elem:  # has children
+                parent = elem.tag
+                keyword = _type = ''  # reset tag context on depth change
+
+            if elem.tag == 'keyword':
+                if not keyword:
+                    keyword = elem.text  # preserved for later
+                elif not _type:
+                    _type = elem.text  # preserved for later
+
+            if elem.tag == 'identifier':
+                identifier = elem.text
+                if keyword == 'class':
+                    class_name = identifier  # preserved for later
+                    func_kind = 'method'  # preserved for later
+                    pcode, class_dict = compile_class(pcode, class_name, class_dict)
+
+                elif keyword == 'function':
+                    func_name = identifier  # preserved for later
+                    if not func_kind:
+                        raise RuntimeError("undefined function kind for '%s.%s'" % (class_name, func_name))
+                    pcode, class_dict = compile_function(pcode, func_name, _type, func_kind, class_dict, class_name)
+
+                elif keyword == 'var':
+                    pcode, class_dict, num_args, exp_buffer = \
+                        compile_statement(pcode, 'var', class_dict, class_name, func_name,
+                                          None, None, _type, identifier, num_args, exp_buffer)
+
+        # persist through loop scope
+        parent = 'class'
+        exp_buffer = []
         num_args = 0
         class_name = func_kind = call_class = call_func = statement = func_name = keyword = _type = identifier = ''
         func_type = symbol = lhs_var_name = rhs_parent = rhs_child = ''
@@ -231,24 +290,24 @@ def main(filepath, debug=False):
 
             if elem:  # has children
                 parent = elem.tag
-                # reset tag context on depth change (possibly this can be controlled by function scoping?)
+                # reset tag context on depth change
                 # exlcusion: class_name, func_kind, call_class, call_func, statement, func_name, lhs_var_name
                 keyword = _type = identifier = func_type = symbol = ''
 
             if elem.tag == 'keyword':
                 if not keyword:
-                    keyword = elem.text
+                    keyword = elem.text  # preserved for later
                 elif not _type:
-                    _type = elem.text
+                    _type = elem.text  # preserved for later
                 else:
-                    raise RuntimeError("unexpected keywords %s %s %s" % (keyword, _type, elem.text))
+                    raise RuntimeError("unexpected keywords '%s' '%s' '%s'" % (keyword, _type, elem.text))
 
             elif elem.tag == 'identifier':
-                if keyword:
+                if keyword or statement:
                     identifier = elem.text
                     if keyword == 'class':
                         class_name = identifier  # preserved for later
-                        func_kind = 'method'
+                        func_kind = 'method'  # preserved for later
                         pcode, class_dict = compile_class(pcode, class_name, class_dict)
 
                     elif keyword == 'function':
@@ -269,54 +328,63 @@ def main(filepath, debug=False):
                         else:
                             call_func = identifier  # preserved for later
 
-                    elif keyword == 'let':
+                    elif statement == 'let':
                         if not lhs_var_name:
-                            lhs_var_name = identifier
+                            lhs_var_name = identifier  # preserved for later
+                            pcode, class_dict, num_args, exp_buffer = \
+                                compile_statement(pcode, statement, class_dict, class_name, func_name,
+                                                  call_class, call_func, _type, identifier, num_args, exp_buffer)
                         elif not rhs_parent:
                             rhs_parent = identifier  # preserved for later
                         else:
                             rhs_child = identifier  # preserved for later
 
-                        if lhs_var_name:
-                            pcode, class_dict, num_args, exp_buffer = \
-                                compile_statement(pcode, statement, class_dict, class_name, func_name,
-                                                  call_class, call_func, _type, identifier, num_args, exp_buffer)
-
                     else:
-                        raise RuntimeError("unexpected keyword %s for identifier %s" % (keyword, elem.text))
+                        raise RuntimeError("unexpected keyword '%s' for identifier '%s'" % (keyword, elem.text))
 
-                elif statement != "let":
-                    raise RuntimeError("no keyword defined for %s" % elem.text)
-
-        elif elem.tag == 'symbol':
-            symbol = elem.text
-            if symbol in "{}.":
-                pass
-            elif symbol == "(":
-                # TODO: call expression handler
-                pass
-            elif symbol == ")":
-                if exp_buffer:
-                    pcode = compile_literal(pcode, exp_buffer.pop())
-            elif symbol in op_map:
-                if symbol == "-" and parent == "term":
-                    exp_buffer.append("neg")  # not "sub"
                 else:
-                    exp_buffer.append(op_map[symbol])
-            elif symbol == ',':
-                pass
-            elif symbol == ';':
-                if statement == 'do':
-                    pcode, class_dict, num_args, exp_buffer = \
-                        compile_statement(pcode, statement, class_dict, None, None,
-                                          call_class, call_func, None, None, num_args, exp_buffer)
-                    call_class = call_func = ''
-                elif statement == 'return':
-                    pcode, class_dict, num_args, exp_buffer = \
-                        compile_statement(pcode, statement, class_dict, class_name, func_name,
-                                          None, None, None, None, num_args, exp_buffer)
-            else:
-                raise RuntimeError("unexpected symbol %s" % elem.text)
+                    raise RuntimeError("no keyword defined for '%s'" % elem.text)
+
+            elif elem.tag == 'symbol':
+                symbol = elem.text
+                if symbol in "{}.=,":
+                    pass
+                elif symbol == "(":
+                    # compile call
+                    if statement == "let" and rhs_parent and rhs_child:
+                        num_params = None
+                        if rhs_parent in sys_func:
+                            if rhs_child in sys_func[rhs_parent]:
+                                num_params = sys_func[rhs_parent][rhs_child]
+                        if not num_params:
+                            raise NotImplementedError
+
+                        exp_buffer.append("call %s.%s %s" % (rhs_parent, rhs_child, num_params))
+                        rhs_parent = rhs_child = ''
+                elif symbol == ")":
+                    if exp_buffer:
+                        pcode = compile_literal(pcode, exp_buffer.pop())
+                elif symbol in op_map:
+                    if symbol == "-" and parent == "term":
+                        exp_buffer.append("neg")  # not "sub"
+                    else:
+                        exp_buffer.append(op_map[symbol])
+                elif symbol == ';':
+                    if statement == 'do':
+                        pcode, class_dict, num_args, exp_buffer = \
+                            compile_statement(pcode, statement, class_dict, None, None,
+                                              call_class, call_func, None, None, num_args, exp_buffer)
+                        call_class = call_func = ''
+                    elif statement == 'return':
+                        pcode, class_dict, num_args, exp_buffer = \
+                            compile_statement(pcode, statement, class_dict, class_name, func_name,
+                                              None, None, None, None, num_args, exp_buffer)
+
+                    while exp_buffer:
+                        pcode = store_pcode(pcode, exp_buffer.pop())
+
+                else:
+                    raise RuntimeError("unexpected symbol '%s'" % elem.text)
 
             elif elem.tag == 'integerConstant':
                 pcode = compile_constant(pcode, elem.text)
@@ -341,7 +409,7 @@ def main(filepath, debug=False):
                 pass
 
             else:
-                raise RuntimeError("unparsed tag %s" % elem.tag)
+                raise RuntimeError("unparsed tag '%s'" % elem.tag)
 
     except Exception:
         # capture whatever pcode was processed so far
@@ -367,7 +435,7 @@ if __name__ == '__main__':
         pcode = main(_filepath, debug=False)
 
         # strip debug for result comparison
-        with open(_filepath.replace(".jack", "_.vm"), "w") as f:
+        with open(_filepath.replace(".jack", "_out.vm"), "w") as f:
             print("Writing: %s" % _filepath)
             for line in pcode:
                 comment = line.find("//")
@@ -381,8 +449,9 @@ if __name__ == '__main__':
     # enforce matching for known samples
     for match in strict_matches:
         with open(match) as org_file:
-            with open(match.replace(".vm", "_.vm")) as cur_file:
+            with open(match.replace(".vm", "_out.vm")) as cur_file:
                 if org_file.read() != cur_file.read():
                     raise RuntimeError("Strict file did not match: %s" % match)
 
-    # TODO: implement rhs expression handler (queue the call in 'let value = Memory.peek(8000);')
+    # TODO: not compiling call in do Main.convert(value);
+    # TODO: do keyword lost during depth change (not sure how this is different)
