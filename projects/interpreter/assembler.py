@@ -1,5 +1,5 @@
 """
-Nand2Tetris Week 6: HACK Assembler
+Nand2Tetris HACK Assembler
 """
 
 import os
@@ -226,7 +226,6 @@ def assemble(asm_filepath, debug=False):
     solution_filepath = asm_filepath.replace(".asm", ".cmp")
 
     # write the output: if solution exists, check as written
-    # TODO: differentiate between other classes of cmp files
     # 06 = HACK binary comparison
     if os.path.exists(solution_filepath) and "/06/" in asm_filepath:
         with open(asm_filepath.replace(".asm", ".hack"), "w") as output_file:
@@ -267,11 +266,13 @@ if __name__ == '__main__':
         "../06/pong/pongL.asm",
         "../06/rect/rect.asm",
         "../06/rect/rectL.asm",
+
         "../07/MemoryAccess/BasicTest/BasicTest.asm",
         "../07/MemoryAccess/PointerTest/PointerTest.asm",
         "../07/MemoryAccess/StaticTest/StaticTest.asm",
         "../07/StackArithmetic/SimpleAdd/SimpleAdd.asm",
         "../07/StackArithmetic/StackTest/StackTest.asm",
+
         "../08/FunctionCalls/FibonacciElement/FibonacciElement.asm",
         "../08/FunctionCalls/NestedCall/NestedCall.asm",
         "../08/FunctionCalls/SimpleFunction/SimpleFunction.asm",

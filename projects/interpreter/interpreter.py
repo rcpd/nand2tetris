@@ -1,11 +1,15 @@
-
+""""
+Python bindings & test framework for Nand2Tetris HACK Assembly language
+"""
 import assembler
+
 
 def run(input_file, debug=False):
     global hw
     # TODO: (week 6) all files parsed
-    # TODO: (week 7-8) asm parsed
-    # TODO: (week 7-8) integrate VM translator >> parse the tst/out/cmp scripts
+    # TODO: (week 7-8) asm/tst parsed
+    # TODO: (week 7-8) integrate tester (cmp/tst) >> generate out & compare cmp
+    # TODO: (week 7-8) integrate VM translator
     # TODO: (future) write a HDL module for interpreter?
 
     # initialize hardware
@@ -17,6 +21,7 @@ def run(input_file, debug=False):
         "D": 200,
         "M": 300,
         "PC": 0,
+        "MAX": 1000,
     }
 
     if debug:
@@ -97,8 +102,7 @@ def run(input_file, debug=False):
 
     # runtime parsing
     cycle = 0
-    max_cycles = 100
-    while cycle < max_cycles and hw["PC"] < len(hw["ROM"]["raw"]):
+    while cycle < hw["MAX"] and hw["PC"] < len(hw["ROM"]["raw"]):
         raw_cmd = hw["ROM"]["raw"][hw["PC"]]
         debug_cmd = hw["ROM"]["debug"][hw["PC"]]
 
@@ -203,7 +207,7 @@ def run(input_file, debug=False):
     if hw["PC"] == len(hw["ROM"]["raw"]):
         if debug:
             print("EOF reached: %s" % input_file)
-    elif cycle == max_cycles:
+    elif cycle == hw["MAX"]:
         if debug:
             print("Cycle limit reached: %s" % input_file)
     else:
@@ -219,11 +223,13 @@ if __name__ == '__main__':
         "../06/pong/pongL.asm",
         "../06/rect/rect.asm",
         "../06/rect/rectL.asm",
+
         "../07/MemoryAccess/BasicTest/BasicTest.asm",
         "../07/MemoryAccess/PointerTest/PointerTest.asm",
         "../07/MemoryAccess/StaticTest/StaticTest.asm",
         "../07/StackArithmetic/SimpleAdd/SimpleAdd.asm",
         "../07/StackArithmetic/StackTest/StackTest.asm",
+
         "../08/FunctionCalls/FibonacciElement/FibonacciElement.asm",
         "../08/FunctionCalls/NestedCall/NestedCall.asm",
         "../08/FunctionCalls/SimpleFunction/SimpleFunction.asm",
@@ -231,8 +237,8 @@ if __name__ == '__main__':
         "../08/ProgramFlow/BasicLoop/BasicLoop.asm",
         "../08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
     ]
-    for input_file in file_list:
-        assembler.assemble(input_file, debug=True)
-        run(input_file, debug=True)
-        assembler.assemble(input_file, debug=False)
-        run(input_file, debug=False)
+    for _input_file in file_list:
+        assembler.assemble(_input_file, debug=True)
+        run(_input_file, debug=True)
+        assembler.assemble(_input_file, debug=False)
+        run(_input_file, debug=False)
