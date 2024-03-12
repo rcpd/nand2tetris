@@ -27429,7 +27429,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-2338) pop static 1
-@16 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // pop static 1 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -27525,7 +27525,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-2345) pop static 0
-@16 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // pop static 0 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -27554,7 +27554,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2349) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @0
 A=D+A
@@ -27802,7 +27802,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2389) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @0
 A=D+A
@@ -27859,7 +27859,7 @@ M=M-D
 M=M+1
 
 // (-2399) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @0
 A=D+A
@@ -27948,7 +27948,7 @@ M=M-D
 M=M+1
 
 // (-2413) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @0
 A=D+A
@@ -29118,7 +29118,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2594) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @0
 A=D+A
@@ -29348,7 +29348,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2634) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @0
 A=D+A
@@ -30142,7 +30142,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2769) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @1
 A=D+A
@@ -30547,7 +30547,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2819) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @1
 A=D+A
@@ -30648,7 +30648,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2835) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @1
 A=D+A
@@ -30851,7 +30851,7 @@ M=D+M
 M=M+1
 
 // (-2871) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @1
 A=D+A
@@ -30887,7 +30887,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2877) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @1
 A=D+A
@@ -30955,7 +30955,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2887) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @1
 A=D+A
@@ -31128,7 +31128,7 @@ M=D+M
 M=M+1
 
 // (-2911) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @1
 A=D+A
@@ -31495,7 +31495,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-2986) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @1
 A=D+A
@@ -31690,7 +31690,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-3022) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @0
 A=D+A
@@ -31802,7 +31802,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-3038) push static 1
-@16 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @1
 A=D+A
@@ -32422,7 +32422,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-3145) push static 0
-@16 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Math.vm)
+@16 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Math.vm)
 D=A
 @0
 A=D+A
@@ -33375,7 +33375,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-3302) pop static 0
-@18 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Memory.vm)
+@18 // pop static 0 // static + src segment offset (..\projects\11\ComplexArrays\Memory.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -33404,7 +33404,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-3306) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Memory.vm)
 D=A
 @0
 A=D+A
@@ -33518,7 +33518,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-3322) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Memory.vm)
 D=A
 @0
 A=D+A
@@ -33708,7 +33708,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-3347) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Memory.vm)
 D=A
 @0
 A=D+A
@@ -33840,7 +33840,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-3364) push static 0
-@18 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Memory.vm)
+@18 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Memory.vm)
 D=A
 @0
 A=D+A
@@ -37265,7 +37265,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-3915) pop static 4
-@19 // pop static 4 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 4 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @4 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -37302,7 +37302,7 @@ M=!M
 M=M+1
 
 // (-3921) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -37331,7 +37331,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-3925) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -37360,7 +37360,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-3929) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -37456,7 +37456,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-3936) pop static 3
-@19 // pop static 3 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 3 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @3 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -37853,7 +37853,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-3974) pop static 5
-@19 // pop static 5 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 5 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @5 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -57638,7 +57638,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-6970) push static 5
-@19 // push static 5 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 5 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @5
 A=D+A
@@ -59182,7 +59182,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-7174) pop static 6
-@19 // pop static 6 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 6 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @6 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -59321,7 +59321,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7198) push static 5
-@19 // push static 5 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 5 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @5
 A=D+A
@@ -59505,7 +59505,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7217) push static 6
-@19 // push static 6 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 6 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @6
 A=D+A
@@ -60489,7 +60489,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE0) // label IF_FALSE0
 
 // (-7387) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @2
 A=D+A
@@ -60539,7 +60539,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7398) push static 5
-@19 // push static 5 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 5 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @5
 A=D+A
@@ -60634,7 +60634,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7415) push static 6
-@19 // push static 6 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 6 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @6
 A=D+A
@@ -60897,7 +60897,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-7446) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @1
 A=D+A
@@ -61007,7 +61007,7 @@ D=M-D // d = [val1] - [val2] // leave esp here (pop equivalent)
 D;JNE // jump if not zero
 
 // (-7466) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @2
 A=D+A
@@ -61057,7 +61057,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7477) push static 4
-@19 // push static 4 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 4 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @4
 A=D+A
@@ -61181,7 +61181,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7500) push static 4
-@19 // push static 4 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 4 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @4
 A=D+A
@@ -61293,7 +61293,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7519) push static 4
-@19 // push static 4 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 4 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @4
 A=D+A
@@ -62144,7 +62144,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-7649) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -62318,7 +62318,7 @@ M=D+M
 M=M+1
 
 // (-7672) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @0
 A=D+A
@@ -62342,7 +62342,7 @@ M=D+M
 M=M+1
 
 // (-7676) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -62374,7 +62374,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7680) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @0
 A=D+A
@@ -62534,7 +62534,7 @@ M=D // [esp] = eq result
 M=M+1 // *esp++
 
 // (-7702) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -63382,7 +63382,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-7805) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @2
 A=D+A
@@ -63428,7 +63428,7 @@ D;JNE // jump if not zero
 (Output.IF_TRUE2) // label IF_TRUE2
 
 // (-7816) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @0
 A=D+A
@@ -63461,7 +63461,7 @@ M=D+M
 M=M+1
 
 // (-7822) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -63481,7 +63481,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-7824) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @1
 A=D+A
@@ -63514,7 +63514,7 @@ M=D+M
 M=M+1
 
 // (-7830) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -63537,7 +63537,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE2) // label IF_FALSE2
 
 // (-7835) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @0
 A=D+A
@@ -63714,7 +63714,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE3) // label IF_FALSE3
 
 // (-7863) push static 2
-@19 // push static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 2 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @2
 A=D+A
@@ -63734,7 +63734,7 @@ M=!M
 M=M+1
 
 // (-7867) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -64328,7 +64328,7 @@ A=M // d = [LCL-5] (*LCL)
 (Output.printInt) // function Output.printInt 0
 
 // (-7944) push static 3
-@19 // push static 3 // function Output.printInt 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 3 // function Output.printInt 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @3
 A=D+A
@@ -64474,7 +64474,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-7961) push static 3
-@19 // push static 3 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 3 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @3
 A=D+A
@@ -64665,7 +64665,7 @@ A=M // d = [LCL-5] (*LCL)
 (Output.println) // function Output.println 0
 
 // (-7981) push static 1
-@19 // push static 1 // function Output.println 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 1 // function Output.println 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @1
 A=D+A
@@ -64697,7 +64697,7 @@ M=D+M
 M=M+1
 
 // (-7987) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @0
 A=D+A
@@ -64721,7 +64721,7 @@ M=M-D
 M=M+1
 
 // (-7991) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -64750,7 +64750,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-7995) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -64787,7 +64787,7 @@ M=!M
 M=M+1
 
 // (-8001) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -64807,7 +64807,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-8003) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @1
 A=D+A
@@ -64890,7 +64890,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8021) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -64987,7 +64987,7 @@ A=M // d = [LCL-5] (*LCL)
 (Output.backSpace) // function Output.backSpace 0
 
 // (-8035) push static 2
-@19 // push static 2 // function Output.backSpace 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 2 // function Output.backSpace 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @2
 A=D+A
@@ -65024,7 +65024,7 @@ D;JNE // jump if not zero
 (Output.IF_TRUE0) // label IF_TRUE0
 
 // (-8044) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @0
 A=D+A
@@ -65098,7 +65098,7 @@ D;JNE // jump if not zero
 (Output.IF_TRUE1) // label IF_TRUE1
 
 // (-8060) push static 0
-@19 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @0
 A=D+A
@@ -65131,7 +65131,7 @@ M=M-D
 M=M+1
 
 // (-8066) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -65151,7 +65151,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-8068) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @1
 A=D+A
@@ -65184,7 +65184,7 @@ M=M-D
 M=M+1
 
 // (-8074) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -65220,7 +65220,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8083) pop static 0
-@19 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 0 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -65240,7 +65240,7 @@ M=D // [dst] = [src] (pop)
 M=M-1 // *esp-- (*src) // stacksize--
 
 // (-8085) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @1
 A=D+A
@@ -65323,7 +65323,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8103) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -65346,7 +65346,7 @@ M=M-1 // *esp-- (*src) // stacksize--
 (Output.IF_FALSE2) // label IF_FALSE2
 
 // (-8108) push static 1
-@19 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @1
 A=D+A
@@ -65379,7 +65379,7 @@ M=M-D
 M=M+1
 
 // (-8114) pop static 1
-@19 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 1 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -65411,7 +65411,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8121) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -65455,7 +65455,7 @@ M=!M
 M=M+1
 
 // (-8132) pop static 2
-@19 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Output.vm)
+@19 // pop static 2 // static + src segment offset (..\projects\11\ComplexArrays\Output.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -65692,7 +65692,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-8163) pop static 1
-@26 // pop static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // pop static 1 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -65729,7 +65729,7 @@ M=!M
 M=M+1
 
 // (-8169) pop static 2
-@26 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // pop static 2 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -65825,7 +65825,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-8176) pop static 0
-@26 // pop static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // pop static 0 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -65854,7 +65854,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8180) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @0
 A=D+A
@@ -66102,7 +66102,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8220) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @0
 A=D+A
@@ -66159,7 +66159,7 @@ M=M-D
 M=M+1
 
 // (-8230) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @0
 A=D+A
@@ -66248,7 +66248,7 @@ M=M-D
 M=M+1
 
 // (-8244) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @0
 A=D+A
@@ -66558,7 +66558,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8294) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @1
 A=D+A
@@ -66797,7 +66797,7 @@ A=M // d = [LCL-5] (*LCL)
 (Screen.updateLocation) // function Screen.updateLocation 0
 
 // (-8330) push static 2
-@26 // push static 2 // function Screen.updateLocation 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // push static 2 // function Screen.updateLocation 0 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @2
 A=D+A
@@ -66846,7 +66846,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8341) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @1
 A=D+A
@@ -66882,7 +66882,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8347) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @1
 A=D+A
@@ -67053,7 +67053,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8374) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @1
 A=D+A
@@ -67089,7 +67089,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8380) push static 1
-@26 // push static 1 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // push static 1 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @1
 A=D+A
@@ -67337,7 +67337,7 @@ M=D
 @SP
 M=M+1 // stacksize++
 // (-8416) pop static 2
-@26 // pop static 2 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // pop static 2 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
 D=D+A // d = [asm_segment+offset] (*dst)
@@ -68305,7 +68305,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-8553) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @0
 A=D+A
@@ -72907,7 +72907,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-9223) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @0
 A=D+A
@@ -73045,7 +73045,7 @@ M=D+M
 M=M+1
 
 // (-9245) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @0
 A=D+A
@@ -75843,7 +75843,7 @@ M=D
 M=M+1 // stacksize++
 
 // (-9624) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @0
 A=D+A
@@ -75981,7 +75981,7 @@ M=D+M
 M=M+1
 
 // (-9646) push static 0
-@26 // push static 0 // static + src segment offset (D:\dev\nand2tetris\projects\11\ComplexArrays\Screen.vm)
+@26 // push static 0 // static + src segment offset (..\projects\11\ComplexArrays\Screen.vm)
 D=A
 @0
 A=D+A

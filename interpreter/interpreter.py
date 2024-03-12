@@ -285,7 +285,7 @@ def run(asm_filepath, static_dict=None, tst_params=None, debug=False):
                     call_tree.pop()
                 except IndexError:
                     # SimpleFunction does not contain a call so will always break the index on return
-                    if asm_filepath != '../projects/08/FunctionCalls/SimpleFunction/SimpleFunction.asm':
+                    if asm_filepath != r'..\projects\08\FunctionCalls\SimpleFunction\SimpleFunction.asm':
                         raise
 
                 debug_msg = dump_call_tree(call_tree, debug_msg)
@@ -372,20 +372,20 @@ if __name__ == '__main__':
 
     # compile jack programs
     jack_dirpaths = [
-        r"D:\dev\nand2tetris\projects\09\Average",
-        r"D:\dev\nand2tetris\projects\09\Fraction",
-        r"D:\dev\nand2tetris\projects\09\HelloWorld",
-        r"D:\dev\nand2tetris\projects\09\List",
-        r"D:\dev\nand2tetris\projects\09\Square",
-        r"D:\dev\nand2tetris\projects\10\ArrayTest",
-        # r"D:\dev\nand2tetris\projects\10\ExpressionLessSquare",  # nonsense code that shouldn't compile or run
-        r"D:\dev\nand2tetris\projects\10\Square",
-        r"D:\dev\nand2tetris\projects\11\ConvertToBin",
-        r"D:\dev\nand2tetris\projects\11\Average",
-        r"D:\dev\nand2tetris\projects\11\ComplexArrays",
-        r"D:\dev\nand2tetris\projects\11\Pong",
-        r"D:\dev\nand2tetris\projects\11\Seven",
-        r"D:\dev\nand2tetris\projects\11\Square",
+        r"..\projects\09\Average",
+        r"..\projects\09\Fraction",
+        r"..\projects\09\HelloWorld",
+        r"..\projects\09\List",
+        r"..\projects\09\Square",
+        r"..\projects\10\ArrayTest",
+        # r"..\projects\10\ExpressionLessSquare",  # nonsense code that shouldn't compile or run
+        r"..\projects\10\Square",
+        r"..\projects\11\ConvertToBin",
+        r"..\projects\11\Average",
+        r"..\projects\11\ComplexArrays",
+        r"..\projects\11\Pong",
+        r"..\projects\11\Seven",
+        r"..\projects\11\Square",
     ]
 
     jack_filepaths = [
@@ -418,8 +418,7 @@ if __name__ == '__main__':
         r"..\projects\11\Square\SquareGame.jack",
     ]
 
-    # regular VM programs
-    # TODO: standardise paths
+    # VM programs
     _vm_dirpaths = [
         r'..\projects\07\MemoryAccess\BasicTest',
         r'..\projects\07\MemoryAccess\PointerTest',
@@ -440,47 +439,47 @@ if __name__ == '__main__':
 
     _vm_dirpaths = _vm_dirpaths + _vm_bootstrap_paths + jack_dirpaths
 
+    # VM test scripts
     vm_asm_filepaths = [
-        # test scripts
-        "../projects/07/MemoryAccess/BasicTest/BasicTest.asm",
-        "../projects/07/MemoryAccess/PointerTest/PointerTest.asm",
-        "../projects/07/MemoryAccess/StaticTest/StaticTest.asm",
-        "../projects/07/StackArithmetic/SimpleAdd/SimpleAdd.asm",
-        "../projects/07/StackArithmetic/StackTest/StackTest.asm",
-        "../projects/08/FunctionCalls/FibonacciElement/FibonacciElement.asm",
-        "../projects/08/FunctionCalls/NestedCall/NestedCall.asm",
-        "../projects/08/FunctionCalls/SimpleFunction/SimpleFunction.asm",
-        "../projects/08/FunctionCalls/StaticsTest/StaticsTest.asm",
-        "../projects/08/ProgramFlow/BasicLoop/BasicLoop.asm",
-        "../projects/08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
+        r"..\projects\07\MemoryAccess\BasicTest\BasicTest.asm",
+        r"..\projects\07\MemoryAccess\PointerTest\PointerTest.asm",
+        r"..\projects\07\MemoryAccess\StaticTest\StaticTest.asm",
+        r"..\projects\07\StackArithmetic\SimpleAdd\SimpleAdd.asm",
+        r"..\projects\07\StackArithmetic\StackTest\StackTest.asm",
+        r"..\projects\08\FunctionCalls\FibonacciElement\FibonacciElement.asm",
+        r"..\projects\08\FunctionCalls\NestedCall\NestedCall.asm",
+        r"..\projects\08\FunctionCalls\SimpleFunction\SimpleFunction.asm",
+        r"..\projects\08\FunctionCalls\StaticsTest\StaticsTest.asm",
+        r"..\projects\08\ProgramFlow\BasicLoop\BasicLoop.asm",
+        r"..\projects\08\ProgramFlow\FibonacciSeries\FibonacciSeries.asm",
     ]
 
+    # assembled & binary match to solution (where available)
     binary_asm_filepaths = [
-        # assembled & binary match to solution (where available)
-        "../projects/04/fill/fill.asm",
-        "../projects/04/mult/mult.asm",
-        "../projects/06/add/add.asm",
-        "../projects/06/max/max.asm",
-        "../projects/06/max/maxL.asm",
-        "../projects/06/pong/pong.asm",
-        "../projects/06/pong/pongL.asm",
-        "../projects/06/rect/rect.asm",
-        "../projects/06/rect/rectL.asm",
-        r"../projects/09/Average/Average.asm",
-        r"../projects/09/Fraction/Fraction.asm",
-        r"../projects/09/HelloWorld/HelloWorld.asm",
-        r"../projects/09/List/List.asm",
-        r"../projects/09/Square/Square.asm",
-        r"../projects/10/ArrayTest/ArrayTest.asm",
-        r"../projects/10/Square/Square.asm",
-        r"../projects/11/ConvertToBin/ConvertToBin.asm",
-        r"../projects/11/Average/Average.asm",
-        r"../projects/11/Seven/Seven.asm",
-        r"../projects/11/Square/Square.asm",
+        r"..\projects\04\fill\fill.asm",
+        r"..\projects\04\mult\mult.asm",
+        r"..\projects\06\add\add.asm",
+        r"..\projects\06\max\max.asm",
+        r"..\projects\06\max\maxL.asm",
+        r"..\projects\06\pong\pong.asm",
+        r"..\projects\06\pong\pongL.asm",
+        r"..\projects\06\rect\rect.asm",
+        r"..\projects\06\rect\rectL.asm",
+        r"..\projects\09\Average\Average.asm",
+        r"..\projects\09\Fraction\Fraction.asm",
+        r"..\projects\09\HelloWorld\HelloWorld.asm",
+        r"..\projects\09\List\List.asm",
+        r"..\projects\09\Square\Square.asm",
+        r"..\projects\10\ArrayTest\ArrayTest.asm",
+        r"..\projects\10\Square\Square.asm",
+        r"..\projects\11\ConvertToBin\ConvertToBin.asm",
+        r"..\projects\11\Average\Average.asm",
+        r"..\projects\11\Seven\Seven.asm",
+        r"..\projects\11\Square\Square.asm",
 
-        # r"../projects/10/ExpressionLessSquare/ExpressionLessSquare.asm",  # nonsense code that shouldn't compile/run
-        # r"../projects/11/ComplexArrays/ComplexArrays.asm",  # too large, generates 17 bit addresses
-        # r"../projects/11/Pong/Pong.asm",  # too large, generates 17 bit addresses
+        # r"..\projects\10\ExpressionLessSquare\ExpressionLessSquare.asm",  # nonsense code that shouldn't compile/run
+        # r"..\projects\11\ComplexArrays\ComplexArrays.asm",  # too large, generates 17 bit addresses
+        # r"..\projects\11\Pong\Pong.asm",  # too large, generates 17 bit addresses
     ]
 
     debug_runs = [False]
@@ -494,7 +493,7 @@ if __name__ == '__main__':
 
         # compile Jack to VM
         for jack_dir in jack_dirpaths:
-            subprocess.run([r"D:\dev\nand2tetris\tools\JackCompiler.bat", jack_dir])
+            subprocess.run([r"..\tools\JackCompiler.bat", jack_dir])
 
         # translate VM to ASM
         for _vm_dir in _vm_dirpaths:
@@ -519,8 +518,7 @@ if __name__ == '__main__':
             # retrieve static_dict from translator run
             _static_dict = None
             for _vm_dir in _vm_dirpaths:
-                # TODO: standardise paths
-                if _vm_dir.replace("\\", "/") in _asm_filepath:
+                if _vm_dir in _asm_filepath:
                     _static_dict = vm_static_dicts[_vm_dir]
 
             # execute
