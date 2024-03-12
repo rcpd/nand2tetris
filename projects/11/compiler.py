@@ -65,27 +65,28 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
     # if input_list[j][0] == "keyword" and input_list[j+1][0] == "identifier":
     """
     func_name = input_list[i][1]
+    j = i
     # define function symbol
-    if input_list[i-2][1] in ("function", "method"):
-        class_dict[class_name][input_list[i][1]] = {"type": input_list[i-2][1], "kind": input_list[i-1][1],
+    if input_list[j-2][1] in ("function", "method"):
+        class_dict[class_name][input_list[j][1]] = {"type": input_list[j-2][1], "kind": input_list[j-1][1],
                                                     "args": {}, "index_dict": {}}
         # define function arguments
-        if input_list[i+1][1] == "(":
-            while input_list[i+2][1] != ")":
-                if input_list[i+2][1] == ",":
-                    i += 1
+        if input_list[j+1][1] == "(":
+            while input_list[j+2][1] != ")":
+                if input_list[j+2][1] == ",":
+                    j += 1
                     continue
-                if input_list[i+2][0] == "keyword" and input_list[i+3][0] == "identifier":
+                if input_list[j+2][0] == "keyword" and input_list[j+3][0] == "identifier":
                     # update func/arg index
                     if "argument" not in class_dict[class_name][func_name]["index_dict"]:
                         class_dict[class_name][func_name]["index_dict"]["argument"] = 0
                     else:
                         class_dict[class_name][func_name]["index_dict"]["argument"] += 1
 
-                    class_dict[class_name][func_name]["args"][input_list[i+3][1]] = \
-                        {"type": "argument", "kind": input_list[i+2][1],
+                    class_dict[class_name][func_name]["args"][input_list[j+3][1]] = \
+                        {"type": "argument", "kind": input_list[j+2][1],
                          "index": class_dict[class_name][func_name]["index_dict"]["argument"]}
-                    i += 2
+                    j += 2
         else:
             raise RuntimeError
 
@@ -98,7 +99,7 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
         raise RuntimeError
 
     if not pre:
-        store_pcode(pcode, "%s %s.%s %s" % (input_list[i-2][1], class_name, input_list[i][1],
+        store_pcode(pcode, "\n%s %s.%s %s" % (input_list[i-2][1], class_name, input_list[i][1],
                                             len(class_dict[class_name][input_list[i][1]]["args"])))
     return pcode, class_dict, func_name
 
@@ -113,19 +114,30 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name):
     input_list[i][0] == "keyword" and input_list[i][1] == "var":
     """
     if input_list[i+1][0] == "keyword" and input_list[i+2][0] == "identifier":
-        # var <type> <name>
-        store_pcode(pcode, "// var %s %s (local)" % (input_list[i+1][1], input_list[i+2][1]))
+        j = i
+        while input_list[j+2][1] != ";":
+            # var <type> <name> // var <type> <name>, <name>, ...
 
-        # update func/kind index
-        if input_list[i+1][1] not in class_dict[class_name][func_name]["index_dict"]:
-            class_dict[class_name][func_name]["index_dict"]["local"] = 0
-        else:
-            class_dict[class_name][func_name]["index_dict"]["local"] += 1
+            # skip to next var
+            if input_list[j+2][1] == ",":
+                j += 1
+                continue
 
-        # add var to func_dict
-        class_dict[class_name][func_name]["args"][input_list[i+2][1]] = \
-            {"type": "local", "kind": input_list[i+1][1],
-             "index": class_dict[class_name][func_name]["index_dict"]["local"]}
+            # update func/local index
+            if "local" not in class_dict[class_name][func_name]["index_dict"]:
+                class_dict[class_name][func_name]["index_dict"]["local"] = 0
+            else:
+                class_dict[class_name][func_name]["index_dict"]["local"] += 1
+    
+            store_pcode(pcode, "// var %s %s (local %s)" % (input_list[i+1][1], input_list[j+2][1],
+                                                            class_dict[class_name][func_name]["index_dict"]["local"]))
+    
+            # add var to func_dict
+            class_dict[class_name][func_name]["args"][input_list[j+2][1]] = \
+                {"type": "local", "kind": input_list[j+1][1],
+                 "index": class_dict[class_name][func_name]["index_dict"]["local"]}
+
+            j += 1
 
     else:
         raise RuntimeError(input_list[i+1])
