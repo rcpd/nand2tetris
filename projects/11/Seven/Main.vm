@@ -1,7 +1,7 @@
 // class Main
 
 function Main.main 0
-// static call Output.printInt 
+// external call Output.printInt
 push constant 1
 push constant 2
 push constant 3
