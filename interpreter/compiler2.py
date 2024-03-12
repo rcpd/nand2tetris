@@ -384,6 +384,23 @@ def compile_var(pcode, class_dict, class_name, func_name, var_name, exp_buffer=N
         return pcode
 
 
+def compile_string(pcode, string):
+    store_pcode(pcode, "push constant %s // strlen" % (len(string) + 1))
+    store_pcode(pcode, "call String.new 1 // \"%s\"" % string)
+    for c, char in enumerate(string):
+        pcode = compile_char(pcode, char)
+        store_pcode(pcode, "call String.appendChar 2")
+    compile_char(pcode, " ")  # pad with space
+    store_pcode(pcode, "call String.appendChar 2 // padding space\n")
+    return pcode
+
+
+def compile_char(pcode, char):
+    global char_map
+    store_pcode(pcode, "push constant %s // '%s' (char)" % (char_map[char], char))
+    return pcode
+
+
 def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier=None, class_name=None, func_name=None,
                        parent_obj=None, child_func=None, symbol=None):
     """
@@ -750,6 +767,9 @@ def main(filepath):
 
             elif elem.tag == 'integerConstant':
                 pcode = compile_constant(pcode, elem.text)
+
+            elif elem.tag == 'stringConstant':
+                pcode = compile_string(pcode, elem.text)
 
             elif elem.tag == 'ifStatement':
                 statement = 'if'
