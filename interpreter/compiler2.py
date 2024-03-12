@@ -760,6 +760,7 @@ def main(filepath, file_list):
                     if not var_type:
                         raise RuntimeError()
 
+                    # no if_count, while_count, exp_buffer during pre_scan
                     if keyword in ('field', 'static'):
                         pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
                             compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
@@ -787,6 +788,8 @@ def main(filepath, file_list):
     # persist through loop scope
     exp_buffer = []
     block = []
+    if_list = []
+    while_list = []
     end_block = False
     num_args = while_count = if_count = 0
     class_name = statement = func_name = func_type = keyword = var_type = var_kind = identifier = ''
@@ -807,26 +810,26 @@ def main(filepath, file_list):
                 # TODO: compile_end_block
                 # if-without-else
                 if elem.tag != 'keyword' and elem.text != 'else' and block[-1] == 'if':
-                    pcode = store_pcode(pcode, "\nlabel IF_FALSE%s // end if_block" % (if_count - 1))
+                    pcode = store_pcode(pcode, "\nlabel IF_FALSE%s // end if_block" % (if_list[-1]))
                     block.pop()
-                    if_count -= 1
+                    if_list.pop()
 
                 # other statement blocks
                 elif block[-1] == 'else':
-                    pcode = store_pcode(pcode, "\nlabel IF_END%s // end if_block" % (if_count - 1))
+                    pcode = store_pcode(pcode, "\nlabel IF_END%s // end if_block" % (if_list[-1]))
                     block.pop()
-                    if_count -= 1
+                    if_list.pop()
 
                 elif block[-1] == 'if':
-                    pcode = store_pcode(pcode, "\ngoto IF_END%s // end if_true_block" % (if_count - 1))
+                    pcode = store_pcode(pcode, "\ngoto IF_END%s // end if_true_block" % (if_list[-1]))
                     block.pop()
 
                 elif block[-1] == 'while':
                     pcode = store_pcode(pcode, "\ngoto WHILE_EXP%s // loop to start of while_block" %
-                                        (while_count - 1))
-                    pcode = store_pcode(pcode, "\nlabel WHILE_END%s // end while_block" % (while_count - 1))
+                                        (while_list[-1]))
+                    pcode = store_pcode(pcode, "\nlabel WHILE_END%s // end while_block" % (while_list[-1]))
                     block.pop()
-                    while_count -= 1
+                    while_list.pop()
 
                 else:
                     raise RuntimeError("unexpected block '%s'" % block[-1])
@@ -852,6 +855,9 @@ def main(filepath, file_list):
             # set on first instance only
             if elem.text in ('function', 'method', 'constructor'):
                 func_kind = elem.text
+                while_count = if_count = 0
+                if while_list or if_list:
+                    raise RuntimeError("while (%s) or if (%s) list was not empty" % (while_list, if_list))
 
             if not keyword:
                 keyword = elem.text  # preserved for later
@@ -987,18 +993,20 @@ def main(filepath, file_list):
                 # TODO: compile_start_block
                 elif keyword == 'else':  # no explicit statement type for else
                     block.append(keyword)
-                    # close the latest if_true block (-1) but don't dec until IF_END
-                    pcode = store_pcode(pcode, "\nlabel IF_FALSE%s // begin if_false_block" % (if_count-1))
+                    # close the latest if_true block but don't dec/pop until IF_END
+                    pcode = store_pcode(pcode, "\nlabel IF_FALSE%s // begin if_false_block" % (if_list[-1]))
 
                 elif statement == 'if':
                     block.append(statement)
+                    if_list.append(if_count)
                     pcode = store_pcode(pcode, "\nif-goto IF_TRUE%s // end if expression / if_true_jump" % if_count)
                     pcode = store_pcode(pcode, "\ngoto IF_FALSE%s // if_false_jump" % if_count)
                     pcode = store_pcode(pcode, "\nlabel IF_TRUE%s // begin if_true_block" % if_count)
-                    if_count += 1  # inc now so any nested if are correct
+                    if_count += 1
 
                 elif statement == 'while':
                     block.append(statement)
+                    while_list.append(while_count)
                     pcode = store_pcode(pcode, "\nnot // end while expression / while_jump (1/2)")
                     pcode = store_pcode(pcode, "\nif-goto WHILE_END%s // while_jump (2/2) [break loop if not]" %
                                         while_count)
@@ -1146,7 +1154,7 @@ if __name__ == '__main__':
         # wip
         [r"..\09\Square\Main.jack",
          r"..\09\Square\Square.jack",
-         r"..\09\Square\SquareGame.jack"],  # FIXME: constructor count, labels
+         r"..\09\Square\SquareGame.jack"],  # FIXME: constructor count
         [r"..\10\Square\Main.jack",
          r"..\10\Square\Square.jack",
          r"..\10\Square\SquareGame.jack"],
