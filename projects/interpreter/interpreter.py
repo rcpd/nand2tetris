@@ -4,7 +4,7 @@ import assembler
 def run(input_file, debug=False):
     global hw
     # TODO: (week 6) all files parsed
-    # TODO: (week 7-8) asm parsed, week 8 asm todo
+    # TODO: (week 7-8) asm parsed
     # TODO: (week 7-8) integrate VM translator >> parse the tst/out/cmp scripts
     # TODO: (future) write a HDL module for interpreter?
 
@@ -224,8 +224,15 @@ if __name__ == '__main__':
         "../07/MemoryAccess/StaticTest/StaticTest.asm",
         "../07/StackArithmetic/SimpleAdd/SimpleAdd.asm",
         "../07/StackArithmetic/StackTest/StackTest.asm",
-        # TODO: parse remaining week 8 asm files
+        "../08/FunctionCalls/FibonacciElement/FibonacciElement.asm",
+        "../08/FunctionCalls/NestedCall/NestedCall.asm",
+        "../08/FunctionCalls/SimpleFunction/SimpleFunction.asm",
+        "../08/FunctionCalls/StaticsTest/StaticsTest.asm",
+        "../08/ProgramFlow/BasicLoop/BasicLoop.asm",
+        "../08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
     ]
     for input_file in file_list:
+        assembler.assemble(input_file, debug=True)
+        run(input_file, debug=True)
         assembler.assemble(input_file, debug=False)
         run(input_file, debug=False)

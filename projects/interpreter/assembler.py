@@ -272,6 +272,12 @@ if __name__ == '__main__':
         "../07/MemoryAccess/StaticTest/StaticTest.asm",
         "../07/StackArithmetic/SimpleAdd/SimpleAdd.asm",
         "../07/StackArithmetic/StackTest/StackTest.asm",
+        "../08/FunctionCalls/FibonacciElement/FibonacciElement.asm",
+        "../08/FunctionCalls/NestedCall/NestedCall.asm",
+        "../08/FunctionCalls/SimpleFunction/SimpleFunction.asm",
+        "../08/FunctionCalls/StaticsTest/StaticsTest.asm",
+        "../08/ProgramFlow/BasicLoop/BasicLoop.asm",
+        "../08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
     ]
     for _asm_filepath in file_list:
         assemble(_asm_filepath, debug=True)

@@ -381,7 +381,7 @@ def _and(cmd):
     asm += "@SP\n"  # *esp // *val2
     asm += "M=M-1\n"  # *esp-- // *val1
     asm += "A=M\n"  # [esp] // [val1]
-    asm += "M=M&D\n"  # [esp] = [val1] & [val2]
+    asm += "M=D&M\n"  # [esp] = [val1] & [val2]
     asm += "@SP\n"  # *esp
     asm += "M=M+1\n"  # *esp++
 
