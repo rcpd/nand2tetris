@@ -357,16 +357,17 @@ def run(asm_filepath, static_dict=None, tst_params=None, debug=False):
 
 if __name__ == '__main__':
     '''
-    Projects 1-5: HDL, see python_hdl project for hardware emulation validation
-    Project 6:    Assembler, binary hack files are matched against cmp solution binary
-    Project 7-8:  VM > ASM transpile, orchestrated with tst script, tested against cmp solution machine state
-                  Resulting asm files also assembled to hack (integration test only)
-    Project 9-10: Jack files are tokenized/analyzed, also compiled (integration test only)
-                  Note: Project 9 does not have solution files (tested manually)
-    Project 11:   Compiler, updated tokenizer/analyzer
+    Projects 1-5: HDL (python_hdl) TST orchestration (HardwareSimulator/CPUEmulator), OUT matches CMP truth table 
+    Project 6:    ASM > HACK (assembler), HACK files are matched against CMP binary
+    Project 7-8:  VM > ASM (translator), TST file (CPUEmulator/VMEmulator), both tested against CMP machine state
+                  Integration test: ASM > HACK (no functional testing)
+    Project 9-11: JACK > T_XML (CST) > XML (AST) > VM (tokenizer > analyzer > compiler)
+                  Integration test: VM > ASM > HACK (no functional testing)
+                  Note: Project 9 does not have solution files for CST/AST
     Project 12:   Implement the OS libraries in Jack
     '''
 
+    # TODO: confirm what functional testing is already done Interpreter/Tester (ASM)
     # TODO: when compiler is stable, add Project 9-11 Jack/VM/ASM/XML files (integration test)
     # TODO: add Project 12 Jack/VM/ASM/XML files (test programs + libraries) (integration test)
 
@@ -482,6 +483,85 @@ if __name__ == '__main__':
         # r"..\projects\11\Pong\Pong.asm",  # too large, generates 17 bit addresses
     ]
 
+    # week 1-5 HDL test files (HardwareSimulator)
+    hw_tst_files = [
+        r'..\projects\01\And.tst',
+        r'..\projects\01\And16.tst',
+        r'..\projects\01\DMux.tst',
+        r'..\projects\01\DMux4Way.tst',
+        r'..\projects\01\DMux8Way.tst',
+        r'..\projects\01\Mux.tst',
+        r'..\projects\01\Mux16.tst',
+        r'..\projects\01\Mux4Way16.tst',
+        r'..\projects\01\Mux8Way16.tst',
+        r'..\projects\01\Not.tst',
+        r'..\projects\01\Not16.tst',
+        r'..\projects\01\Or.tst',
+        r'..\projects\01\Or16.tst',
+        r'..\projects\01\Or8Way.tst',
+        r'..\projects\01\Xor.tst',
+        r'..\projects\02\Add16.tst',
+        r'..\projects\02\ALU-nostat.tst',
+        r'..\projects\02\ALU.tst',
+        r'..\projects\02\FullAdder.tst',
+        r'..\projects\02\HalfAdder.tst',
+        r'..\projects\02\Inc16.tst',
+        r'..\projects\03\a\Bit.tst',
+        r'..\projects\03\a\PC.tst',
+        r'..\projects\03\a\RAM64.tst',
+        r'..\projects\03\a\RAM8.tst',
+        r'..\projects\03\a\Register.tst',
+        r'..\projects\03\b\RAM16K.tst',
+        r'..\projects\03\b\RAM4K.tst',
+        r'..\projects\03\b\RAM512.tst',
+        r'..\projects\05\ComputerAdd-external.tst',
+        r'..\projects\05\ComputerAdd.tst',
+        r'..\projects\05\ComputerMax-external.tst',
+        r'..\projects\05\ComputerMax.tst',
+        r'..\projects\05\ComputerRect-external.tst',
+        r'..\projects\05\ComputerRect.tst',
+        r'..\projects\05\CPU-external.tst',
+        r'..\projects\05\CPU.tst',
+        # r'..\projects\05\Memory.tst',  # interactive test (passed manually)
+    ]
+    
+    # week 4/7-8/12 test files (CPUEmulator)
+    cpu_tst_files = [
+        # r'..\projects\04\fill\Fill.tst',  # interactive test (passed manually)
+        r'..\projects\04\fill\FillAutomatic.tst',
+        r'..\projects\04\mult\Mult.tst',
+        r'..\projects\07\MemoryAccess\BasicTest\BasicTest.tst',
+        r'..\projects\07\MemoryAccess\PointerTest\PointerTest.tst',
+        r'..\projects\07\MemoryAccess\StaticTest\StaticTest.tst',
+        r'..\projects\07\StackArithmetic\SimpleAdd\SimpleAdd.tst',
+        r'..\projects\07\StackArithmetic\StackTest\StackTest.tst',
+        r'..\projects\08\FunctionCalls\FibonacciElement\FibonacciElement.tst',
+        r'..\projects\08\FunctionCalls\NestedCall\NestedCall.tst',
+        r'..\projects\08\FunctionCalls\SimpleFunction\SimpleFunction.tst',
+        r'..\projects\08\FunctionCalls\StaticsTest\StaticsTest.tst',
+        r'..\projects\08\ProgramFlow\BasicLoop\BasicLoop.tst',
+        r'..\projects\08\ProgramFlow\FibonacciSeries\FibonacciSeries.tst',
+
+        # r'..\projects\12\ArrayTest\ArrayTest.tst',  # TODO
+        # r'..\projects\12\MathTest\MathTest.tst',  # TODO
+        # r'..\projects\12\MemoryTest\MemoryTest.tst'  # TODO
+    ]
+
+    # week 7-8 test files (VMEmulator)
+    vm_tst_files = [
+        r'..\projects\07\MemoryAccess\BasicTest\BasicTestVME.tst',
+        r'..\projects\07\MemoryAccess\PointerTest\PointerTestVME.tst',
+        r'..\projects\07\MemoryAccess\StaticTest\StaticTestVME.tst',
+        r'..\projects\07\StackArithmetic\SimpleAdd\SimpleAddVME.tst',
+        r'..\projects\07\StackArithmetic\StackTest\StackTestVME.tst',
+        r'..\projects\08\FunctionCalls\FibonacciElement\FibonacciElementVME.tst',
+        r'..\projects\08\FunctionCalls\NestedCall\NestedCallVME.tst',
+        r'..\projects\08\FunctionCalls\SimpleFunction\SimpleFunctionVME.tst',
+        r'..\projects\08\FunctionCalls\StaticsTest\StaticsTestVME.tst',
+        r'..\projects\08\ProgramFlow\BasicLoop\BasicLoopVME.tst',
+        r'..\projects\08\ProgramFlow\FibonacciSeries\FibonacciSeriesVME.tst',
+    ]
+
     debug_runs = [False]
 
     vm_static_dicts = {}
@@ -523,3 +603,62 @@ if __name__ == '__main__':
 
             # execute
             run(_asm_filepath, static_dict=_static_dict, tst_params=_tst_params, debug=_debug)
+
+        # run hdl tests (HardwareSimulator)
+        cmd = r'..\tools\HardwareSimulator.bat'
+        for test in hw_tst_files:
+            print(r"Running: %s %s" % (cmd, test))
+            result = subprocess.run([cmd, test], capture_output=True, text=True)
+            if 'End of script - Comparison ended successfully\n' != result.stdout and not result.stderr:
+                raise RuntimeError(r"Error when running %s: %s" % (cmd, result.stderr))
+
+            # different style of TST file, but the test has passed
+            if test in (r'..\projects\05\CPU-external.tst', r'..\projects\05\CPU.tst'):
+                continue
+
+            line = 0
+            out_file = test.replace(".tst", ".out")
+            cmp_file = test.replace(".tst", ".cmp")
+            with open(out_file) as out:
+                with open(cmp_file) as cmp:
+                    for index, (solution, current) in enumerate(zip(cmp, out)):
+                        if solution != current:
+                            raise RuntimeError("%s mismatch after line %s" % (out_file, index))
+                    line += 1
+
+        # run hack tests (CPUEmulator) -- shares CMP and OUT files with VMEmulator
+        cmd = r'..\tools\CPUEmulator.bat'
+        for test in cpu_tst_files:
+            print(r"Running: %s %s" % (cmd, test))
+            result = subprocess.run([cmd, test], capture_output=True, text=True)
+            if 'End of script - Comparison ended successfully\n' != result.stdout and not result.stderr:
+                raise RuntimeError(r"Error when running %s: %s" % (cmd, result.stderr))
+
+            line = 0
+            out_file = test.replace(".tst", ".out")
+            cmp_file = test.replace(".tst", ".cmp")
+            with open(out_file) as out:
+                with open(cmp_file) as cmp:
+                    for index, (solution, current) in enumerate(zip(cmp, out)):
+                        if solution != current:
+                            raise RuntimeError("%s mismatch after line %s" % (out_file, index))
+                    line += 1
+
+        # run VM tests (VMEmulator) -- shares CMP and OUT files with CPUEmulator
+        cmd = r'..\tools\VMEmulator.bat'
+        for test in vm_tst_files:
+            print(r"Running: %s %s" % (cmd, test))
+            result = subprocess.run([cmd, test], capture_output=True, text=True)
+            if 'End of script - Comparison ended successfully\n' != result.stdout and not result.stderr:
+                raise RuntimeError(r"Error when running %s: %s" % (cmd, result.stderr))
+
+            line = 0
+            out_file = test.replace("VME.tst", ".out")
+            cmp_file = test.replace("VME.tst", ".cmp")
+            with open(out_file) as out:
+                with open(cmp_file) as cmp:
+                    for index, (solution, current) in enumerate(zip(cmp, out)):
+                        if solution != current:
+                            raise RuntimeError("%s mismatch after line %s" % (out_file, index))
+                    line += 1
+
