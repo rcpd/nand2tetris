@@ -408,12 +408,20 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
     num_params = 0
 
     if symbol:
-        if symbol == "(":
-            exp_buffer.append("// (")  # inject expression marker into buffer
+        if symbol in ("(", "["):
+            store_pcode(pcode, "// %s" % symbol)
+            exp_buffer.append("// %s" % symbol)  # inject expression marker into buffer
 
         elif symbol == ")":
             # process everything up to & including the last expression opening from buffer
             pop_buffer(pcode, exp_buffer, stop_at="// (", pop_incl=True)
+            store_pcode(pcode, "// %s" % symbol)
+
+        elif symbol == "]":
+            # process everything up to & including the last expression opening from buffer
+            pop_buffer(pcode, exp_buffer, stop_at="// [", pop_incl=True)
+            store_pcode(pcode, "// %s" % symbol)
+            store_pcode(pcode, exp_buffer.pop())  # pop the array var as well
 
         elif symbol == ",":
             # process everything up to but not including the last expression opening from buffer
@@ -459,7 +467,7 @@ def pop_buffer(pcode, exp_buffer, stop_at=None, pop_incl=False):
         while exp_buffer[-1] != stop_at:
             store_pcode(pcode, exp_buffer.pop())
         if pop_incl:
-            store_pcode(pcode, exp_buffer.pop())
+            exp_buffer.pop()  # already printed
     else:
         while exp_buffer:
             store_pcode(pcode, exp_buffer.pop())
@@ -584,6 +592,9 @@ def main(filepath):
                     raise RuntimeError("unexpected keywords '%s' '%s' '%s'" % (keyword, var_type, elem.text))
 
             elif elem.tag == 'identifier':
+                # if elem.text == 'a':
+                #     print()  # debug
+
                 if keyword or statement:
                     identifier = elem.text
 
@@ -722,6 +733,28 @@ def main(filepath):
                         else:
                             raise RuntimeError("unexpected block '%s'" % block[-1])
 
+                elif symbol == "[":
+                    if lhs_var_name:  # collected during let statement
+                        exp_buffer.append("push %s %s // %s (array var)" %
+                                          (class_dict[class_name][func_name]['args'][lhs_var_name]['kind'],
+                                           class_dict[class_name][func_name]['args'][lhs_var_name]['index'],
+                                           lhs_var_name))
+                    else:
+                        raise NotImplementedError
+
+                    # mark the start of a new expression
+                    pcode, exp_buffer, parent_obj, child_func = \
+                        expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
+                                           class_name=class_name, func_name=func_name, symbol=symbol)
+
+                elif symbol == "]":
+                    # pop the last buffered expression (including the brackets)
+                    pcode, exp_buffer, parent_obj, child_func = \
+                        expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
+                                           class_name=class_name, func_name=func_name, symbol=symbol)
+
+                    store_pcode(pcode, "add // array var + offset")
+
                 elif symbol == "(":
                     # mark the start of a new expression
                     pcode, exp_buffer, parent_obj, child_func = \
@@ -859,4 +892,4 @@ if __name__ == '__main__':
                     print("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
-    # TODO: arrays (Average)
+    # TODO: assignment to an array (average)
