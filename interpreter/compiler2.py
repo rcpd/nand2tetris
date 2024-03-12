@@ -171,13 +171,12 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
             # allocate space on heap
             store_pcode(pcode, "push constant %s" % num_vars)
             store_pcode(pcode, "call Memory.alloc 1 // allocate object + params on heap")  # non-void return (no pop)
-            store_pcode(pcode, "pop pointer 0 // update 'this' to heap address")
+            store_pcode(pcode, "pop pointer 0 // *this = &<heap>")
 
         elif func_kind == "method":
             # move pointer to current object (implicit "this" argument)
-            store_pcode(pcode, "\n// param this argument 0")
-            store_pcode(pcode, "push argument 0")
-            store_pcode(pcode, "pop pointer 0 // update 'this' to object for method call")
+            store_pcode(pcode, "\npush argument 0 // &this")
+            store_pcode(pcode, "pop pointer 0 // *this =")
 
     return pcode, class_dict
 
@@ -236,17 +235,17 @@ def compile_assignment(class_dict, class_name, func_name, var_name, exp_buffer, 
 
     if not lhs_array:
         # typical assignment
-        exp_buffer.append("pop %s %s // = %s" % (class_dict[class_name][func_name]['args'][var_name]['kind'],
+        exp_buffer.append("pop %s %s // %s =" % (class_dict[class_name][func_name]['args'][var_name]['kind'],
                                                  class_dict[class_name][func_name]['args'][var_name]['index'],
                                                  var_name))
 
     elif not class_dict[class_name][func_name]['args'][var_name]['initialized']:
         # array constructor
-        exp_buffer.append("pop %s %s // = %s" % (class_dict[class_name][func_name]['args'][var_name]['kind'],
+        exp_buffer.append("pop %s %s // %s =" % (class_dict[class_name][func_name]['args'][var_name]['kind'],
                                                  class_dict[class_name][func_name]['args'][var_name]['index'],
                                                  var_name))
     else:
-        # array[offset] assignment
+        # array[index] assignment
         exp_buffer.append("pop that 0 // **array[index] = result")
         exp_buffer.append("push temp 0 // restore result")
         exp_buffer.append("pop pointer 1 // that = *array[index]")
@@ -386,7 +385,6 @@ def compile_var(pcode, class_dict, class_name, func_name, var_name, exp_buffer=N
     """
     emit pcode when while encountered
     """
-    # TODO: var vs array handling
     if type(exp_buffer) is list:
         exp_buffer.append("push %s %s // %s" %
                           (class_dict[class_name][func_name]['args'][var_name]['kind'],
@@ -469,9 +467,13 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
             exp_buffer = compile_call(pcode, parent_obj, child_func, num_params, statement, exp_buffer=exp_buffer)
             parent_obj = child_func = ''
 
-        # if var found compile directly (not buffer)
         elif identifier in class_dict[class_name][func_name]['args']:
-            compile_var(pcode, class_dict, class_name, func_name, identifier)
+            if class_dict[class_name][func_name]['args'][identifier]['type'] == 'Array':
+                # if var is array compile to buffer
+                compile_var(pcode, class_dict, class_name, func_name, identifier, exp_buffer=exp_buffer)
+            else:
+                # otherwise if var found compile directly (not buffer)
+                compile_var(pcode, class_dict, class_name, func_name, identifier)
 
     return pcode, exp_buffer, parent_obj, child_func
 
@@ -757,10 +759,12 @@ def main(filepath):
 
                 elif symbol == "[":
                     if lhs_var_name:  # collected during let statement
-                        exp_buffer.append("push %s %s // %s (*array var)" %
-                                          (class_dict[class_name][func_name]['args'][lhs_var_name]['kind'],
-                                           class_dict[class_name][func_name]['args'][lhs_var_name]['index'],
-                                           lhs_var_name))
+                        # only compile var to buffer now if var is array
+                        if class_dict[class_name][func_name]['args'][lhs_var_name]['type'] == 'Array':
+                            exp_buffer.append("push %s %s // %s (*array var)" %
+                                              (class_dict[class_name][func_name]['args'][lhs_var_name]['kind'],
+                                               class_dict[class_name][func_name]['args'][lhs_var_name]['index'],
+                                               lhs_var_name))
                     else:
                         raise NotImplementedError
 
@@ -775,7 +779,12 @@ def main(filepath):
                         expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
                                            class_name=class_name, func_name=func_name, symbol=symbol)
 
-                    store_pcode(pcode, "add // *array var + [offset]")
+                    store_pcode(pcode, "add // *array var + [index]")
+
+                    # if part of an expression deref the array[index] immediately
+                    if not lhs_array:
+                        store_pcode(pcode, "pop pointer 1 // *that =")
+                        store_pcode(pcode, "push that 0 // **that (array[index])")
 
                 elif symbol == "(":
                     # mark the start of a new expression
@@ -883,7 +892,7 @@ if __name__ == '__main__':
     strict_matches = {
         r"..\11\Seven\Main.vm": 10,  # all
         r"..\11\ConvertToBin\Main.vm": 114,  # all
-        r"..\11\Average\Main.vm": 96,  # wip
+        r"..\11\Average\Main.vm": 149,  # all
     }
 
     for _filepath in jack_filepaths:
@@ -915,4 +924,4 @@ if __name__ == '__main__':
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
 
-    # TODO: deref an array within an expression (average)
+    # TODO: add new test programs
