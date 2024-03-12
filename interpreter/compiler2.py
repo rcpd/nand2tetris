@@ -696,9 +696,12 @@ def main(filepath, file_list):
                 elif not var_type:
                     var_type = elem.text  # preserved for later
 
-                if keyword in ('function', 'method', 'constructor'):
-                    func_kind = keyword
+                # set on first instance
+                if elem.text in ('function', 'method', 'constructor'):
+                    func_kind = elem.text
 
+                # multiple token scope
+                if keyword in ('function', 'method', 'constructor'):
                     if not func_type:
                         # type could be keyword or identifier
                         if var_type and (var_type in types or var_type in objects):
@@ -798,11 +801,18 @@ def main(filepath, file_list):
         if elem.tag == 'keyword':
             if elem.text in ('true', 'false'):
                 exp_buffer = compile_boolean(pcode, elem.text, exp_buffer)
+                continue
             elif elem.text == 'this':
                 pcode, exp_buffer, parent_obj, child_func = \
                     expression_handler(pcode, statement, exp_buffer, parent_obj=parent_obj, child_func=child_func,
                                        keyword=elem.text)
-            elif not keyword:
+                continue
+
+            # set on first instance only
+            if elem.text in ('function', 'method', 'constructor'):
+                func_kind = elem.text
+
+            if not keyword:
                 keyword = elem.text  # preserved for later
             elif not var_type:
                 var_type = elem.text  # preserved for later
@@ -820,10 +830,6 @@ def main(filepath, file_list):
 
                 # function declaration
                 elif keyword in ('function', 'constructor', 'method'):
-                    # func_kind = 'function'  # preserved for later
-                    # FIXME: all functions treated as constructors
-                    if not func_kind:
-                        func_kind = keyword
                     if identifier in objects or identifier in types:
                         continue  # identifier was object type not function name
                     else:
