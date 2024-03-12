@@ -122,12 +122,15 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
             num_params = 0
 
         # declaration
-        store_pcode(pcode, "\n%s %s.%s %s" % (input_list[i-2][1], class_name, input_list[i][1], num_params))
+        store_pcode(pcode, "\nfunction %s.%s %s" % (class_name, input_list[i][1], num_params))
 
         if input_list[j-2][1] == "constructor":
             # allocate space on heap
-            store_pcode(pcode, "push %s" % num_params)
-            store_pcode(pcode, "call Memory.alloc 1 // allocate object + params on heap")
+            if num_params >= 1:
+                store_pcode(pcode, "push %s" % num_params)
+                store_pcode(pcode, "call Memory.alloc 1 // allocate object + params on heap")
+            else:
+                store_pcode(pcode, "call Memory.alloc 0 // allocate object + params on heap")
             store_pcode(pcode, "pop pointer 0 // update 'this' to heap address")
 
         elif input_list[j-2][1] == "method":
@@ -256,7 +259,10 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
             except KeyError:
                 var = class_dict[class_name]["args"][input_list[i][1]]
 
-            cmd.append("push %s %s // %s" % (var["kind"], var["index"], input_list[i][1]))
+            if var["kind"] == "field":
+                cmd.append("push %s %s // %s" % ("this", var["index"], input_list[i][1]))
+            else:
+                cmd.append("push %s %s // %s" % (var["kind"], var["index"], input_list[i][1]))
             proc.append(i)
             k += 1
 
@@ -285,7 +291,10 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
                     var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
                 except KeyError:
                     var = class_dict[class_name]["args"][input_list[i+1][1]]
-                cmd.append("push %s %s // %s" % (var["kind"], var["index"], input_list[i+1][1]))
+                if var["kind"] == "field":
+                    cmd.append("push %s %s // %s" % ("this", var["index"], input_list[i+1][1]))
+                else:
+                    cmd.append("push %s %s // %s" % (var["kind"], var["index"], input_list[i+1][1]))
                 proc.append(i+1)
                 k += 2
 
@@ -405,8 +414,12 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                         store_pcode(pcode, "// static call %s " % call_type)
 
                     if var is not None:
-                        store_pcode(pcode, "push %s %s // %s (implicit this push)" % (var["kind"], var["index"],
-                                                                                      input_list[i][1]))
+                        if var["kind"] == "field":
+                            store_pcode(pcode, "push %s %s // %s (implicit this push)" % ("this", var["index"],
+                                                                                          input_list[i][1]))
+                        else:
+                            store_pcode(pcode, "push %s %s // %s (implicit this push)" % (var["kind"], var["index"],
+                                                                                          input_list[i][1]))
 
                     if input_list[j+4][1] != ")":
                         pcode, proc = compile_expression(pcode, input_list, j+4, class_dict, class_name, func_name)
