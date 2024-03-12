@@ -77,7 +77,7 @@ def main(debug=False):
                 elif parent.tag in ("statements", "whileStatement") and input_list[i][0] == "symbol" \
                     and input_list[i][1] == "}":
                     if parent.tag == "statements":
-                        # close parent then insert current token
+                        # close parent and insert current token
                         parent = find_parent(output_root, parent)
                         child = ET.SubElement(parent, input_tuple[0])
                         child.text = " %s " % input_tuple[1]
@@ -85,13 +85,25 @@ def main(debug=False):
                     if parent.tag == "whileStatement":
                         # close parent
                         parent = find_parent(output_root, parent)
-                    
+                
+                # close expression (nested in term)
+                elif parent.tag == "term" and input_list[i][0] == "symbol" and input_list[i][1] in "]" \
+                    and find_parent(output_root, find_parent(output_root, parent)).tag == "term":
+                    # close parent until all tags closed
+                    for tag in ("term", "expression", "expressionList"):
+                        if parent.tag == tag:
+                            parent = find_parent(output_root, parent)
+
+                    # insert current token
+                    child = ET.SubElement(parent, input_tuple[0])
+                    child.text = " %s " % input_tuple[1]
+                
                 # close term/expression/expressionList ) or ]
                 elif parent.tag in ("term", "expression", "expressionList") \
                     and input_list[i][0] == "symbol" and input_list[i][1] in (")", "]"):
                     # close parent until all tags closed
-                    for k in range(0, 3):
-                        if parent.tag in ("term", "expression", "expressionList"):
+                    for tag in ("term", "expression", "expressionList"):
+                        if parent.tag == tag:
                             parent = find_parent(output_root, parent)
 
                     # insert current token
@@ -116,7 +128,7 @@ def main(debug=False):
                 # close term: symbols except "." and "("
                 elif parent.tag == "term" and input_list[i][0] == "symbol" \
                     and input_list[i][1] not in (".", "(", "["):
-                    # close parent then insert current token
+                    # close parent and insert current token
                     parent = find_parent(output_root, parent)
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
@@ -177,7 +189,7 @@ def main(debug=False):
 
                 # close parameterList
                 elif parent.tag == "parameterList" and input_list[i][0] == "symbol" and input_list[i][1] == ")":
-                    # close parent then insert current token
+                    # close parent and insert current token
                     parent = find_parent(output_root, parent)
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
