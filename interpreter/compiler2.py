@@ -570,6 +570,7 @@ def main(filepath, debug=False):
                             compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
                                               class_name=class_name, func_name=func_name, var_type=var_type,
                                               var_name=identifier, while_count=while_count, if_count=if_count)
+                        keyword = var_type = ''
 
                     # collect class/func for call, compile when paired
                     elif statement == 'do':
@@ -665,7 +666,7 @@ def main(filepath, debug=False):
                             store_pcode(pcode, "\ngoto WHILE_EXP%s // loop to start of while_block" % (while_count-1))
                             store_pcode(pcode, "\nlabel WHILE_END%s // end while_block" % (while_count-1))
                             block.pop()
-
+                            while_count -= 1
                         else:
                             raise RuntimeError("unexpected block '%s'" % block[-1])
 
