@@ -283,10 +283,12 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
 
     return pcode, proc
 
-
+# FIXME: over-runs if rhs array followed by expression
 def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_name, sub=False, proc=None):
     cmd = []
     # process expression
+    if i >= 99:
+        print("bp")
     while input_list[i][1] not in ("(", ")", ",", ";", "{", "["):
         if i in proc:
             return cmd, proc, i
@@ -325,11 +327,18 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
                     # get expression result for []
                     _cmd, proc, j = compile_sub_expression(sub_xps, input_list, j, class_dict, class_name,
                                                            func_name, sub=True, proc=proc)
-                    j += 1
                     for _c in _cmd:
                         sub_cmd.append(_c)  # preserve sub-sub commands
+
+                    if input_list[j][1] != "]":
+                        j += 1
+                    else:
+                        break
+
                 for c in sub_cmd:
                     cmd.append(c)  # roll sub-sub back into sub
+
+                return cmd, proc, i
 
         elif input_list[i][1] == "]":
             # add base + offset
@@ -413,45 +422,39 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
     elif input_list[i][1] == "let":
         # search statement for arrays as var or term (but not nested in expressions)
         j = i+2
-        count = 0
         equals = None
         while input_list[j][1] != ";":
             if input_list[j][1] == "=":
                 equals = j  # store equal position
-            if input_list[j][1] == "[":
-                count += 1
-                while input_list[j][1] != "]":
-                    j += 1  # skip expressions
+            j += 1
+
+        if input_list[i+1][0] == "identifier" and input_list[i+2][1] == "[":
+            # let arr[x] = y // let x = arr[y]
+            try:
+                var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
+            except KeyError:
+                var = class_dict[class_name]["args"][input_list[i+1][1]]
+            if var["kind"] == "field":
+                store_pcode(pcode, "push %s %s // %s (array)" % ("this", var["index"], input_list[i+1][1]))
             else:
-                j += 1
+                store_pcode(pcode, "push %s %s // %s (array)" % (var["kind"], var["index"], input_list[i+1][1]))
 
-        if count == 1:
-            if input_list[i+1][0] == "identifier" and input_list[i+2][1] == "[":
-                # let arr[x] = y
-                try:
-                    var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
-                except KeyError:
-                    var = class_dict[class_name]["args"][input_list[i+1][1]]
-                if var["kind"] == "field":
-                    store_pcode(pcode, "push %s %s // %s (array)" % ("this", var["index"], input_list[i+1][1]))
-                else:
-                    store_pcode(pcode, "push %s %s // %s (array)" % (var["kind"], var["index"], input_list[i+1][1]))
+            pcode, proc = compile_expression(pcode, input_list, i+3, class_dict, class_name, func_name)
+            # FIXME: expression should be lhs/rhs aware to execute this itself / prevent duplication
+            store_pcode(pcode, "pop temp 0 // discard expression push")
+            store_pcode(pcode, "push pointer 1 // retrieve array pointer")
+            store_pcode(pcode, "pop temp 0 // store array pointer")
 
-                pcode, proc = compile_expression(pcode, input_list, i+3, class_dict, class_name, func_name)
-                # TODO: temp should be tracked by compiler
-                store_pcode(pcode, "pop temp 0 // discard expression push")
-                store_pcode(pcode, "\n// result")
-                pcode, proc = compile_expression(pcode, input_list, equals+1, class_dict, class_name, func_name)
-                store_pcode(pcode, "pop that 0 // array[index] = result\n")
-                return pcode, class_dict
+            store_pcode(pcode, "\n// compute result")
+            pcode, proc = compile_expression(pcode, input_list, equals+1, class_dict, class_name, func_name)
+            store_pcode(pcode, "push temp 0 // retrieve array[index] pointer")
+            store_pcode(pcode, "pop pointer 1 // set array[index] pointer")
+            store_pcode(pcode, "pop that 0 // array[index] = result\n")
+            return pcode, class_dict
             # else: fall through to var=x case
 
-        elif count >= 2:
-            # array to array or multi-array assignment
-            raise NotImplementedError()
-
         # let <var> = x;
-        if input_list[i+2][1] == "=":
+        elif input_list[i+2][1] == "=":
             # handle right side of assignment first (result)
             pcode, class_dict = compile_sub_statement(pcode, input_list, i+3, class_dict, class_name, func_name, "let")
 
@@ -468,7 +471,7 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
             else:
                 raise RuntimeError(input_list[i+1])
         else:
-            raise RuntimeError(count, input_list[i+2])
+            raise RuntimeError(input_list[i+2])
 
     elif input_list[i][1] == "return":
         if input_list[i+1][1] != ";":
@@ -603,14 +606,12 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
 
                         store_pcode(pcode, "call %s.%s %s" % (class_obj, input_list[j+2][1], num_params))
                         if statement == "do":
-                            # TODO: temp should be tracked by compiler
                             store_pcode(pcode, "pop temp 0 // discard return on do call")
                     else:
                         # convert local calls to be fully qualified to current class scope
                         # FIXME: should check callee is method before inc params
                         store_pcode(pcode, "call %s.%s %s" % (class_name, input_list[j][1], num_params+1))
                         if statement == "do":
-                            # TODO: temp should be tracked by compiler
                             store_pcode(pcode, "pop temp 0 // discard return on do call")
                     return pcode, class_dict
 
