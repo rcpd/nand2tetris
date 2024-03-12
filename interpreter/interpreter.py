@@ -374,6 +374,7 @@ if __name__ == '__main__':
         r"..\projects\11\Pong",
         r"..\projects\11\Seven",
         r"..\projects\11\Square",
+        r"..\projects\12\Sys",
     ]
 
     # tokenizer/analyzer # TODO: projects 1-11 accounted for, included in tokenizer/analyzer/compiler
@@ -405,8 +406,10 @@ if __name__ == '__main__':
         r"..\projects\11\Square\Main.jack",
         r"..\projects\11\Square\Square.jack",
         r"..\projects\11\Square\SquareGame.jack",
+        r"..\projects\12\Sys\Sys.jack",
     ]
 
+    # compiler
     jack_filepath_lists = [  # TODO: projects 1-11 accounted for, included in interpreter/tokenizer/analyzer
         [r"..\projects\09\Average\Main.jack"],
         [r"..\projects\09\Fraction\Main.jack",
@@ -435,6 +438,7 @@ if __name__ == '__main__':
         [r"..\projects\11\Square\Main.jack",
          r"..\projects\11\Square\Square.jack",
          r"..\projects\11\Square\SquareGame.jack"],
+        [r"..\projects\12\Sys\Sys.jack"],
     ]
 
     # enforce matching of compiler against course compiler
