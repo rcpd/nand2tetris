@@ -139,7 +139,8 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
                     if input_list[j+2][1] == ",":
                         j += 1
                         continue
-                    if input_list[j+2][0] == "keyword" and input_list[j+3][0] == "identifier":
+                    if (input_list[j+2][0] == "keyword" or input_list[j+2][1] == "Array") and \
+                            input_list[j+3][0] == "identifier":
                         # update func/arg index
                         if "argument" not in class_dict[class_name][func_name]["index_dict"]:
                             class_dict[class_name][func_name]["index_dict"]["argument"] = 0
@@ -491,14 +492,21 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
                 k += 2
 
             elif input_list[i+1][0] == "identifier":
-                try:
+                var = None
+                if input_list[i+1][1] in class_dict[class_name][func_name]["args"]:
                     var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
-                except KeyError:
+                elif input_list[i+1][1] in class_dict[class_name]["args"]:
                     var = class_dict[class_name]["args"][input_list[i+1][1]]
-                if var["kind"] == "field":
-                    cmd.append("push %s %s // %s" % ("this", var["index"], input_list[i+1][1]))
-                else:
-                    cmd.append("push %s %s // %s" % (var["kind"], var["index"], input_list[i+1][1]))
+                elif input_list[i+1][1] in class_dict:
+                    cmd, proc, p, local_call, class_call, j, k = \
+                        compile_call_or_var(sub_xps, cmd, input_list, i, k, class_dict,
+                                            class_name, func_name, sub, proc, stat)
+
+                if var:
+                    if var["kind"] == "field":
+                        cmd.append("push %s %s // %s" % ("this", var["index"], input_list[i+1][1]))
+                    else:
+                        cmd.append("push %s %s // %s" % (var["kind"], var["index"], input_list[i+1][1]))
                 proc.append(i+1)
                 k += 2
 
@@ -537,6 +545,10 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
             cmd.append("push pointer 0 // this")
             k += 1
 
+        elif input_list[i][0] == "keyword" and input_list[i][1] == "null":
+            cmd.append("push constant 0 // null")
+            k += 1
+
         elif input_list[i][0] == "keyword" and input_list[i][1] in ("true", "false"):
             if input_list[i][1] == "true":
                 cmd.append("push constant 1")
@@ -567,8 +579,8 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
 
 char_map = {
         " ": 32, "!": 33, '"': 34, '#': 35, '$': 36, '%': 37, '&': 38, "'": 39, "(": 40, ")": 41, "*": 42, "+": 43,
-        ",": 44, "-": 45, ".": 46, "/": 47, "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 52, "6": 53, "7": 54,
-        "8": 55, "9": 57, ":": 58, ";": 59, "<": 60, "=": 61, ">": 62, "?": 63, "@": 64, "A": 65, "B": 66, "C": 67,
+        ",": 44, "-": 45, ".": 46, "/": 47, "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 53, "6": 54, "7": 55,
+        "8": 56, "9": 57, ":": 58, ";": 59, "<": 60, "=": 61, ">": 62, "?": 63, "@": 64, "A": 65, "B": 66, "C": 67,
         "D": 68, "E": 69, "F": 70, "G": 71, "H": 72, "I": 73, "J": 74, "K": 75, "L": 76, "M": 77, "N": 78, "O": 79,
         "P": 80, "Q": 81, "R": 82, "S": 83, "T": 84, "U": 85, "V": 86, "W": 87, "X": 88, "Y": 89, "Z": 90, "[": 91,
         "\\": 92, "]": 93, "^": 94, "_": 95, "`": 96, "a": 97, "b": 98, "c": 99, "d": 100, "e": 101, "f": 102, "g": 103,
@@ -726,6 +738,8 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                 store_pcode(pcode, "push constant 0 // false")
         elif input_list[j][0] == "integerConstant":
             store_pcode(pcode, "push constant %s" % input_list[j][1])
+        elif input_list[j][0] == "keyword" and input_list[j][1] == "null":
+            store_pcode(pcode, "push constant 0 // null")
 
         else:
             raise RuntimeError(input_list[j])
