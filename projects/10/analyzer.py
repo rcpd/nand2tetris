@@ -47,19 +47,10 @@ def main(debug=False):
             if debug:
                 print("// line:", input_tuple[0], input_tuple[1])
 
-            # open subroutineDec
+            # process tokens
             try:
-                if parent.tag == "class" and input_list[j][0] == "keyword" \
-                    and input_list[j][1] == "function":
-                    # insert current token
-                    child = ET.SubElement(parent, input_tuple[0])
-                    child.text = " %s " % input_tuple[1]
-
-                    # insert new token and update parent
-                    parent = ET.SubElement(parent, "subroutineDec")
-
-                # close varDec/term/expression/letStatement/doStatement/returnStatement ;
-                elif input_list[i][0] == "symbol" and input_list[i][1] == ";":
+                # close varDec/term/expression/letStatement/doStatement/returnStatement/classVarDec ;
+                if input_list[i][0] == "symbol" and input_list[i][1] == ";":
                     if parent.tag == "varDec":
                         # insert current token and close parent
                         child = ET.SubElement(parent, input_tuple[0])
@@ -92,6 +83,36 @@ def main(debug=False):
                         child.text = " %s " % input_tuple[1]
                         parent = find_parent(output_root, parent)
 
+                    elif parent.tag == "classVarDec":
+                        # insert current token and close parent
+                        child = ET.SubElement(parent, input_tuple[0])
+                        child.text = " %s " % input_tuple[1]
+                        parent = find_parent(output_root, parent)
+
+                # open subroutineDec
+                elif parent.tag == "class" and input_list[i][0] == "keyword" and input_list[i][1] == "function":
+                    # insert new token and update parent
+                    parent = ET.SubElement(parent, "subroutineDec")
+
+                    # insert current token
+                    child = ET.SubElement(parent, input_tuple[0])
+                    child.text = " %s " % input_tuple[1]
+
+                # open classVarDec
+                elif parent.tag == "class" and input_list[i][0] == "symbol" and input_list[i][1] == "{":
+                    # only process if there are elements to add
+                    if not (input_list[j][0] == "keyword" and input_list[j][1] == "function"):
+                        # insert current token
+                        child = ET.SubElement(parent, input_tuple[0])
+                        child.text = " %s " % input_tuple[1]
+
+                        # insert new token and update parent
+                        parent = ET.SubElement(parent, "classVarDec")
+                    else:
+                        # insert current token
+                        child = ET.SubElement(parent, input_tuple[0])
+                        child.text = " %s " % input_tuple[1]
+
                 # open varDec
                 elif input_list[i][0] == "keyword" and input_list[i][1] == "var":
                     # insert new token and update parent
@@ -117,8 +138,6 @@ def main(debug=False):
                     if parent.tag == "subroutineDec":
                         # close parent and insert current token
                         parent = find_parent(output_root, parent)
-                        child = ET.SubElement(parent, input_tuple[0])
-                        child.text = " %s " % input_tuple[1]
 
                 # close expression (nested in term)
                 elif parent.tag == "term" and input_list[i][0] == "symbol" and input_list[i][1] in "]" \
