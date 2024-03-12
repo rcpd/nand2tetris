@@ -355,51 +355,53 @@ if __name__ == '__main__':
     # regular VM programs
     # TODO: standardise paths
     _vm_dirpaths = [
-        r'..\07\MemoryAccess\BasicTest',
-        r'..\07\MemoryAccess\PointerTest',
-        r'..\07\MemoryAccess\StaticTest',
-        r'..\07\StackArithmetic\SimpleAdd',
-        r'..\07\StackArithmetic\StackTest',
+        # r'..\07\MemoryAccess\BasicTest',
+        # r'..\07\MemoryAccess\PointerTest',
+        # r'..\07\MemoryAccess\StaticTest',
+        # r'..\07\StackArithmetic\SimpleAdd',
+        # r'..\07\StackArithmetic\StackTest',
+        #
+        # r'..\08\ProgramFlow\BasicLoop',
+        # r'..\08\ProgramFlow\FibonacciSeries',
+        # r'..\08\FunctionCalls\SimpleFunction',
 
-        r'..\08\ProgramFlow\BasicLoop',
-        r'..\08\ProgramFlow\FibonacciSeries',
-        r'..\08\FunctionCalls\SimpleFunction',
+        r"..\11\Seven",
     ]
 
     # VM programs that require non-spec bootstrap to pass tests
     _vm_bootstrap_paths = [
-        r'..\08\FunctionCalls\FibonacciElement',
-        r'..\08\FunctionCalls\NestedCall',
-        r'..\08\FunctionCalls\StaticsTest'
+        # r'..\08\FunctionCalls\FibonacciElement',
+        # r'..\08\FunctionCalls\NestedCall',
+        # r'..\08\FunctionCalls\StaticsTest'
     ]
 
     _vm_dirpaths = _vm_dirpaths + _vm_bootstrap_paths
 
     vm_asm_filepaths = [
-        "../07/MemoryAccess/BasicTest/BasicTest.asm",
-        "../07/MemoryAccess/PointerTest/PointerTest.asm",
-        "../07/MemoryAccess/StaticTest/StaticTest.asm",
-        "../07/StackArithmetic/SimpleAdd/SimpleAdd.asm",
-        "../07/StackArithmetic/StackTest/StackTest.asm",
-
-        "../08/FunctionCalls/FibonacciElement/FibonacciElement.asm",
-        "../08/FunctionCalls/NestedCall/NestedCall.asm",
-        "../08/FunctionCalls/SimpleFunction/SimpleFunction.asm",
-        "../08/FunctionCalls/StaticsTest/StaticsTest.asm",
-        "../08/ProgramFlow/BasicLoop/BasicLoop.asm",
-        "../08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
+        # "../07/MemoryAccess/BasicTest/BasicTest.asm",
+        # "../07/MemoryAccess/PointerTest/PointerTest.asm",
+        # "../07/MemoryAccess/StaticTest/StaticTest.asm",
+        # "../07/StackArithmetic/SimpleAdd/SimpleAdd.asm",
+        # "../07/StackArithmetic/StackTest/StackTest.asm",
+        #
+        # "../08/FunctionCalls/FibonacciElement/FibonacciElement.asm",
+        # "../08/FunctionCalls/NestedCall/NestedCall.asm",
+        # "../08/FunctionCalls/SimpleFunction/SimpleFunction.asm",
+        # "../08/FunctionCalls/StaticsTest/StaticsTest.asm",
+        # "../08/ProgramFlow/BasicLoop/BasicLoop.asm",
+        # "../08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
     ]
 
     binary_asm_filepaths = [
-        "../04/fill/fill.asm",
-        "../04/mult/mult.asm",
-        "../06/add/add.asm",
-        "../06/max/max.asm",
-        "../06/max/maxL.asm",
-        "../06/pong/pong.asm",
-        "../06/pong/pongL.asm",
-        "../06/rect/rect.asm",
-        "../06/rect/rectL.asm",
+        # "../04/fill/fill.asm",
+        # "../04/mult/mult.asm",
+        # "../06/add/add.asm",
+        # "../06/max/max.asm",
+        # "../06/max/maxL.asm",
+        # "../06/pong/pong.asm",
+        # "../06/pong/pongL.asm",
+        # "../06/rect/rect.asm",
+        # "../06/rect/rectL.asm",
     ]
 
     # debug_runs = [True, False]
