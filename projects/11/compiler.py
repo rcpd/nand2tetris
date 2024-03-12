@@ -283,12 +283,9 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
 
     return pcode, proc
 
-# FIXME: over-runs if rhs array followed by expression
 def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_name, sub=False, proc=None):
     cmd = []
     # process expression
-    if i >= 99:
-        print("bp")
     while input_list[i][1] not in ("(", ")", ",", ";", "{", "["):
         if i in proc:
             return cmd, proc, i
@@ -330,7 +327,7 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
                     for _c in _cmd:
                         sub_cmd.append(_c)  # preserve sub-sub commands
 
-                    if input_list[j][1] != "]":
+                    if input_list[j][1] not in ("]", ";"):
                         j += 1
                     else:
                         break
@@ -357,9 +354,14 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
                     # get expression result then parse operator
                     _cmd, proc, j = compile_sub_expression(sub_xps, input_list, j, class_dict, class_name,
                                                            func_name, sub=True, proc=proc)
-                    j += 1
                     for _c in _cmd:
                         sub_cmd.append(_c)  # preserve sub-sub commands
+
+                    if input_list[j][1] != ";":
+                        j += 1
+                    else:
+                        break
+
                 for c in sub_cmd:
                     cmd.append(c)  # roll sub-sub back into sub
 
