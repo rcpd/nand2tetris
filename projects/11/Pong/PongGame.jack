@@ -76,6 +76,7 @@ class PongGame {
 	            if (key = 132) { do bat.setDirection(2); }
 		        else {
                     if (key = 140) { let exit = true; }
+                    else { let exit = exit; }
 		        }
             }
 
@@ -92,6 +93,7 @@ class PongGame {
             do Output.moveCursor(10,27);
 	        do Output.printString("Game Over");
 	    }
+	    else { let exit = exit; }
             
         return;
     }
@@ -129,9 +131,12 @@ class PongGame {
                     do Output.moveCursor(22,7);
                     do Output.printInt(score);
                 }
+                else { let exit = exit; }
             }
+            else { let exit = exit; }
             do ball.bounce(bouncingDirection);
         }
+        else { let exit = exit; }
         return;
     }
 }
