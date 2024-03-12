@@ -199,9 +199,13 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
                 proc.append(i)
                 k += 1
 
-            store_pcode(pcode, "%s" % op_map[input_list[i][1]])  # parse op
-            proc.append(i)
-            k += 1
+                if input_list[i-1][1] not in (",", "("):
+                    store_pcode(pcode, "add")  # x-y == -y+x
+
+            else:
+                store_pcode(pcode, "%s" % op_map[input_list[i][1]])  # parse op
+                proc.append(i)
+                k += 1
         elif input_list[i][1] == "(":
             if sub and k == 0:
                 # if "(" returned on first pos seek past previous expression
