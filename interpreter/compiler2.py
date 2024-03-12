@@ -25,18 +25,18 @@ char_map = {
 
 # compiled library functions header (kind, type, params)
 sys_func = {
-    "Math": {"init:": {"kind": "func", "type": "void", "args": (), "len": 0},
+    "Math": {"init": {"kind": "func", "type": "void", "args": (), "len": 0},
              "abs": {"kind": "func", "type": "int", "args": ("int",), "len": 1},
              "multiply": {"kind": "func", "type": "int", "args": ("int", "int"), "len": 2},
              "divide": {"kind": "func", "type": "int", "args": ("int", "int"), "len": 2},
              "min": {"kind": "func", "type": "int", "args": ("int", "int"), "len": 2},
              "max": {"kind": "func", "type": "int", "args": ("int", "int"), "len": 2},
              "sqrt": {"kind": "func", "type": "int", "args": ("int",), "len": 1}},
-    "Memory": {"init:": {"kind": "func", "type": "void", "args": (), "len": 0},
-               "peek:": {"kind": "func", "type": "int", "args": ("int", ), "len": 1},
-               "poke:": {"kind": "func", "type": "void", "args": ("int", "int"), "len": 2},
-               "alloc:": {"kind": "func", "type": "Array", "args": ("int",), "len": 1},
-               "deAlloc:": {"kind": "func", "type": "void", "args": ("Array",), "len": 1}},
+    "Memory": {"init": {"kind": "func", "type": "void", "args": (), "len": 0},
+               "peek": {"kind": "func", "type": "int", "args": ("int", ), "len": 1},
+               "poke": {"kind": "func", "type": "void", "args": ("int", "int"), "len": 2},
+               "alloc": {"kind": "func", "type": "Array", "args": ("int",), "len": 1},
+               "deAlloc": {"kind": "func", "type": "void", "args": ("Array",), "len": 1}},
     "String": {"new": {"kind": "const", "type": "String", "args": ("int",), "len": 1},
                "dispose": {"kind": "method", "type": "void", "args": (), "len": 0},
                "length": {"kind": "method", "type": "int", "args": (), "len": 0},
@@ -49,32 +49,32 @@ sys_func = {
                "backSpace": {"kind": "func", "type": "char", "args": (), "len": 0},
                "doubleQuote": {"kind": "func", "type": "char", "args": (), "len": 0},
                "newLine": {"kind": "func", "type": "char", "args": (), "len": 0}},
-    "Array": {"new:": {"kind": "const", "type": "Array", "args": ("int",), "len": 1},
-              "dispose:": {"kind": "method", "type": "void", "args": (), "len": 0}},
-    "Output": {"init:": {"kind": "func", "type": "void", "args": (), "len": 0},
-               "moveCursor:": {"kind": "func", "type": "void", "args": ("int", "int"), "len": 2},
-               "printChar:": {"kind": "func", "type": "void", "args": ("char",), "len": 1},
-               "printString:": {"kind": "func", "type": "void", "args": ("String",), "len": 1},
-               "printInt:": {"kind": "func", "type": "void", "args": ("int",), "len": 1},
-               "println:": {"kind": "func", "type": "void", "args": (), "len": 0},
-               "backSpace:": {"kind": "func", "type": "void", "args": (), "len": 0}},
-    "Screen": {"init:": {"kind": "func", "type": "void", "args": (), "len": 0},
-               "clearScreen:": {"kind": "func", "type": "void", "args": (), "len": 0},
-               "setColor:": {"kind": "func", "type": "void", "args": ("boolean", ), "len": 1},
-               "drawPixel:": {"kind": "func", "type": "void", "args": ("int", "int"), "len": 2},
-               "drawLine:": {"kind": "func", "type": "void", "args": ("int", "int", "int", "int"), "len": 4},
-               "drawRectangle:": {"kind": "func", "type": "void", "args": ("int", "int", "int", "int"), "len": 4},
-               "drawCirlce:": {"kind": "func", "type": "void", "args": ("int", "int", "int"), "len": 3}},
-    "Keyboard": {"init:": {"kind": "func", "type": "void", "args": (), "len": 0},
-                 "keyPressed:": {"kind": "func", "type": "char", "args": (), "len": 0},
-                 "readChar:": {"kind": "func", "type": "char", "args": (), "len": 0},
-                 "readLine:": {"kind": "func", "type": "String", "args": ("String",), "len": 1},
-                 "readInt:": {"kind": "func", "type": "int", "args": ("String",), "len": 1},
+    "Array": {"new": {"kind": "const", "type": "Array", "args": ("int",), "len": 1},
+              "dispose": {"kind": "method", "type": "void", "args": (), "len": 0}},
+    "Output": {"init": {"kind": "func", "type": "void", "args": (), "len": 0},
+               "moveCursor": {"kind": "func", "type": "void", "args": ("int", "int"), "len": 2},
+               "printChar": {"kind": "func", "type": "void", "args": ("char",), "len": 1},
+               "printString": {"kind": "func", "type": "void", "args": ("String",), "len": 1},
+               "printInt": {"kind": "func", "type": "void", "args": ("int",), "len": 1},
+               "println": {"kind": "func", "type": "void", "args": (), "len": 0},
+               "backSpace": {"kind": "func", "type": "void", "args": (), "len": 0}},
+    "Screen": {"init": {"kind": "func", "type": "void", "args": (), "len": 0},
+               "clearScreen": {"kind": "func", "type": "void", "args": (), "len": 0},
+               "setColor": {"kind": "func", "type": "void", "args": ("boolean", ), "len": 1},
+               "drawPixel": {"kind": "func", "type": "void", "args": ("int", "int"), "len": 2},
+               "drawLine": {"kind": "func", "type": "void", "args": ("int", "int", "int", "int"), "len": 4},
+               "drawRectangle": {"kind": "func", "type": "void", "args": ("int", "int", "int", "int"), "len": 4},
+               "drawCirlce": {"kind": "func", "type": "void", "args": ("int", "int", "int"), "len": 3}},
+    "Keyboard": {"init": {"kind": "func", "type": "void", "args": (), "len": 0},
+                 "keyPressed": {"kind": "func", "type": "char", "args": (), "len": 0},
+                 "readChar": {"kind": "func", "type": "char", "args": (), "len": 0},
+                 "readLine": {"kind": "func", "type": "String", "args": ("String",), "len": 1},
+                 "readInt": {"kind": "func", "type": "int", "args": ("String",), "len": 1},
                  },
-    "Sys": {"init:": {"kind": "func", "type": "void", "args": (), "len": 0},
-            "halt:": {"kind": "func", "type": "void", "args": (), "len": 0},
-            "error:": {"kind": "func", "type": "void", "args": ("int",), "len": 1},
-            "wait:": {"kind": "func", "type": "void", "args": ("int",), "len": 1}},
+    "Sys": {"init": {"kind": "func", "type": "void", "args": (), "len": 0},
+            "halt": {"kind": "func", "type": "void", "args": (), "len": 0},
+            "error": {"kind": "func", "type": "void", "args": ("int",), "len": 1},
+            "wait": {"kind": "func", "type": "void", "args": ("int",), "len": 1}},
     }
 
 # primitives & keywords
@@ -185,43 +185,49 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
     return pcode, class_dict
 
 
-def compile_statement(pcode, statement, class_dict, class_name, func_name, call_class, call_func,
-                      var_type, var_name, num_args, exp_buffer, prescan=False):
+# TODO: update compile_statement calls
+def compile_statement(pcode=None, statement=None, class_dict=None, class_name=None, func_name=None, call_class=None,
+                      call_func=None, var_type=None, var_name=None, num_args=None, exp_buffer=None, while_count=0,
+                      prescan=False):
     """
     provides a common interface to the statement compilers
     """
 
     if statement == "do":
-        pcode = compile_call(pcode, call_class, call_func, num_args, statement)
+        pcode = compile_call(pcode=pcode, call_class=call_class, call_func=call_func, num_args=num_args,
+                             statement=statement)
         num_args = 0
 
     elif statement == "let":
-        exp_buffer = compile_lhs_statement(class_dict, class_name, func_name, var_name, exp_buffer)
+        exp_buffer = compile_lhs_statement(class_dict=class_dict, class_name=class_name, func_name=func_name,
+                                           var_name=var_name, exp_buffer=exp_buffer)
 
     elif statement == "return":
         # looks up func type (affects return behaviour)
-        pcode = compile_return(pcode, class_dict, class_name, func_name)
+        pcode = compile_return(pcode=pcode, class_dict=class_dict, class_name=class_name, func_name=func_name)
 
     elif statement == "while":
-        raise NotImplementedError
+        pcode, while_count = compile_while(pcode=pcode, while_count=while_count)
 
     elif statement == "if":
         raise NotImplementedError
 
     elif statement == "var":
         # update class/func dict
-        pcode, class_dict = compile_vardec(pcode, class_dict, class_name, func_name, 'local', var_type, var_name,
+        pcode, class_dict = compile_vardec(pcode=pcode, class_dict=class_dict, class_name=class_name,
+                                           func_name=func_name, var_kind='local', var_type=var_type, var_name=var_name,
                                            prescan=prescan)
 
     elif statement == "param":
         # update class/func dict
-        pcode, class_dict = compile_vardec(pcode, class_dict, class_name, func_name, 'argument', var_type, var_name,
-                                           prescan=prescan)
+        pcode, class_dict = compile_vardec(pcode=pcode, class_dict=class_dict, class_name=class_name,
+                                           func_name=func_name, var_kind='argument', var_type=var_type,
+                                           var_name=var_name, prescan=prescan)
 
     else:
         raise RuntimeError("Unexpected statement type '%s'" % statement)
 
-    return pcode, class_dict, num_args, exp_buffer
+    return pcode, class_dict, num_args, while_count, exp_buffer
 
 
 def compile_lhs_statement(class_dict, class_name, func_name, var_name, exp_buffer):
@@ -323,6 +329,16 @@ def compile_boolean(value, exp_buffer):
     return exp_buffer
 
 
+def compile_while(pcode, while_count):
+    """
+    emit pcode when while encountered
+    """
+
+    store_pcode(pcode, "\nWHILE_EXP%s" % while_count)
+    while_count += 1
+    return pcode, while_count
+
+
 def main(filepath, debug=False):
     """
     main engine:
@@ -372,17 +388,17 @@ def main(filepath, debug=False):
 
                 if keyword == 'class':
                     class_name = identifier  # preserved for later
-                    func_kind = 'method'  # preserved for later
                     pcode, class_dict = compile_class(pcode, class_name, class_dict)
 
                 elif keyword == 'function':
                     func_name = identifier  # preserved for later
+                    func_kind = keyword  # preserved for later
                     if not func_kind:
                         raise RuntimeError("undefined function kind for '%s.%s'" % (class_name, func_name))
                     pcode, class_dict = compile_function(pcode, func_name, _type, func_kind, class_dict, class_name)
 
                 elif statement in ('var', 'param'):
-                    pcode, class_dict, num_args, exp_buffer = \
+                    pcode, class_dict, num_args, while_count, exp_buffer = \
                         compile_statement(pcode, statement, class_dict, class_name, func_name, None, None, _type,
                                           identifier, num_args, exp_buffer, prescan=True)
 
@@ -400,7 +416,7 @@ def main(filepath, debug=False):
         # persist through loop scope
         parent = 'class'
         exp_buffer = []
-        num_args = 0
+        num_args = while_count = 0
         class_name = func_kind = call_class = call_func = statement = func_name = keyword = _type = identifier = ''
         func_type = symbol = lhs_var_name = rhs_parent = rhs_child = ''
 
@@ -421,6 +437,8 @@ def main(filepath, debug=False):
             if elem.tag == 'keyword':
                 if elem.text in ('true', 'false'):
                     exp_buffer = compile_boolean(elem.text, exp_buffer)
+                elif elem.text == 'while':
+                    compile_statement(pcode=pcode, while_count=while_count)
                 elif not keyword:
                     keyword = elem.text  # preserved for later
                 elif not _type:
@@ -437,11 +455,11 @@ def main(filepath, debug=False):
                     identifier = elem.text
                     if keyword == 'class':
                         class_name = identifier  # preserved for later
-                        func_kind = 'method'  # preserved for later
                         pcode, class_dict = compile_class(pcode, class_name, class_dict)
 
                     elif keyword == 'function':
                         func_name = identifier  # preserved for later
+                        func_kind = 'function'  # preserved for later
                         if not func_kind:
                             raise RuntimeError("undefined function kind for %s.%s" % (class_name, func_name))
                         pcode, class_dict = compile_function(pcode, func_name, _type, func_kind, class_dict, class_name)
@@ -450,7 +468,7 @@ def main(filepath, debug=False):
                         # catch param case where type is only keyword
                         if not _type and keyword in types:
                             _type = keyword
-                        pcode, class_dict, num_args, exp_buffer = \
+                        pcode, class_dict, num_args, while_count, exp_buffer = \
                             compile_statement(pcode, statement, class_dict, class_name, func_name,
                                               None, None, _type, identifier, num_args, exp_buffer)
 
@@ -468,7 +486,7 @@ def main(filepath, debug=False):
                     elif statement == 'let':
                         if not lhs_var_name:
                             lhs_var_name = identifier  # preserved for later
-                            pcode, class_dict, num_args, exp_buffer = \
+                            pcode, class_dict, num_args, while_count, exp_buffer = \
                                 compile_statement(pcode, statement, class_dict, class_name, func_name,
                                                   call_class, call_func, _type, identifier, num_args, exp_buffer)
                         elif not rhs_parent:
@@ -492,7 +510,7 @@ def main(filepath, debug=False):
                         num_params = None
                         if rhs_parent in sys_func:
                             if rhs_child in sys_func[rhs_parent]:
-                                num_params = sys_func[rhs_parent][rhs_child]
+                                num_params = sys_func[rhs_parent][rhs_child]['len']
                         if not num_params:
                             raise NotImplementedError
 
@@ -508,12 +526,12 @@ def main(filepath, debug=False):
                         exp_buffer.append(op_map[symbol])
                 elif symbol == ';':
                     if statement == 'do':
-                        pcode, class_dict, num_args, exp_buffer = \
+                        pcode, class_dict, num_args, while_count, exp_buffer = \
                             compile_statement(pcode, statement, class_dict, None, None,
                                               call_class, call_func, None, None, num_args, exp_buffer)
                         call_class = call_func = ''
                     elif statement == 'return':
-                        pcode, class_dict, num_args, exp_buffer = \
+                        pcode, class_dict, num_args, while_count, exp_buffer = \
                             compile_statement(pcode, statement, class_dict, class_name, func_name,
                                               None, None, None, None, num_args, exp_buffer)
 
