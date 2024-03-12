@@ -4,7 +4,7 @@ Python bindings & test framework for Nand2Tetris HACK Assembly language
 import assembler
 import tester
 import translator
-
+import subprocess
 
 def dump_call_tree(call_tree, debug_msg):
     if len(call_tree) == 0:
@@ -365,6 +365,69 @@ if __name__ == '__main__':
     # TODO: when compiler is stable, add Project 9-11 Jack/VM/ASM/XML files to interpreter chain (integration test only)
     # TODO: if OS ever completed, add Project 12 Jack/VM/ASM/XML files to interpreter chain (integration test only)
 
+    # compile jack programs
+    jack_dirpaths = [
+        r"D:\dev\nand2tetris\projects\09\Average",
+        r"D:\dev\nand2tetris\projects\09\Fraction",
+        r"D:\dev\nand2tetris\projects\09\HelloWorld",
+        r"D:\dev\nand2tetris\projects\09\List",
+        r"D:\dev\nand2tetris\projects\09\Square",
+        r"D:\dev\nand2tetris\projects\10\ArrayTest",
+        # r"D:\dev\nand2tetris\projects\10\ExpressionLessSquare",  # does not compile on course compiler
+        r"D:\dev\nand2tetris\projects\10\Square",
+        r"D:\dev\nand2tetris\projects\11\ConvertToBin",
+        r"D:\dev\nand2tetris\projects\11\Average",
+        r"D:\dev\nand2tetris\projects\11\ComplexArrays",
+        r"D:\dev\nand2tetris\projects\11\Pong",
+        r"D:\dev\nand2tetris\projects\11\Seven",
+        r"D:\dev\nand2tetris\projects\11\Square",
+    ]
+
+    jack_filepaths = [
+        r"D:\dev\nand2tetris\projects\09\Average\Main.jack",
+        r"D:\dev\nand2tetris\projects\09\Fraction\Main.jack",
+        r"D:\dev\nand2tetris\projects\09\Fraction\Fraction.jack",
+        r"D:\dev\nand2tetris\projects\09\HelloWorld\Main.jack",
+        r"D:\dev\nand2tetris\projects\09\List\Main.jack",
+        r"D:\dev\nand2tetris\projects\09\List\List.jack",
+        r"D:\dev\nand2tetris\projects\09\Square\Main.jack",
+        r"D:\dev\nand2tetris\projects\09\Square\Square.jack",
+        r"D:\dev\nand2tetris\projects\09\Square\SquareGame.jack",
+
+        r"D:\dev\nand2tetris\projects\10\ArrayTest\Main.jack",
+        r"D:\dev\nand2tetris\projects\10\Square\Main.jack",
+        r"D:\dev\nand2tetris\projects\10\Square\Square.jack",
+        r"D:\dev\nand2tetris\projects\10\Square\SquareGame.jack",
+
+        # does not compile on course compiler
+        # r"D:\dev\nand2tetris\projects\10\ExpressionLessSquare\Main.jack",
+        # r"D:\dev\nand2tetris\projects\10\ExpressionLessSquare\Square.jack",
+        # r"D:\dev\nand2tetris\projects\10\ExpressionLessSquare\SquareGame.jack",
+
+        r"D:\dev\nand2tetris\projects\11\Average\Main.jack",
+        r"D:\dev\nand2tetris\projects\11\ComplexArrays\Main.jack",
+        r"D:\dev\nand2tetris\projects\11\ConvertToBin\Main.jack",
+        r"D:\dev\nand2tetris\projects\11\Pong\Main.jack",
+        r"D:\dev\nand2tetris\projects\11\Pong\Ball.jack",
+        r"D:\dev\nand2tetris\projects\11\Pong\Bat.jack",
+        r"D:\dev\nand2tetris\projects\11\Pong\PongGame.jack",
+        r"D:\dev\nand2tetris\projects\11\Seven\Main.jack",
+        r"D:\dev\nand2tetris\projects\11\Square\Main.jack",
+        r"D:\dev\nand2tetris\projects\11\Square\Square.jack",
+        r"D:\dev\nand2tetris\projects\11\Square\SquareGame.jack",
+    ]
+
+    jack_vm_libraries = [
+        r"..\tools\OS\Array.vm",
+        r"..\tools\OS\Keyboard.vm",
+        r"..\tools\OS\Math.vm",
+        r"..\tools\OS\Memory.vm",
+        r"..\tools\OS\Output.vm",
+        r"..\tools\OS\Screen.vm",
+        r"..\tools\OS\String.vm",
+        r"..\tools\OS\Sys.vm",
+    ]
+
     # regular VM programs
     # TODO: standardise paths
     _vm_dirpaths = [
@@ -386,7 +449,7 @@ if __name__ == '__main__':
         r'..\projects\08\FunctionCalls\StaticsTest'
     ]
 
-    _vm_dirpaths = _vm_dirpaths + _vm_bootstrap_paths
+    _vm_dirpaths = _vm_dirpaths + _vm_bootstrap_paths + jack_vm_libraries
 
     vm_asm_filepaths = [  # test scripts
         "../projects/07/MemoryAccess/BasicTest/BasicTest.asm",
@@ -419,32 +482,36 @@ if __name__ == '__main__':
 
     vm_static_dicts = {}
     for _debug in debug_runs:
-        # translate VM to ASM
-        for _vm_dir in _vm_dirpaths:
-            vm_static_dicts[_vm_dir] = translator.translate(_vm_dir, _vm_bootstrap_paths, debug=False)
+        # compile Jack to VM
+        for jack_dir in jack_dirpaths:
+            subprocess.run([r"D:\dev\nand2tetris\tools\JackCompiler.bat", jack_dir])
 
-        # assemble all ASM to HACK and binary match if available
-        _asm_filepaths = vm_asm_filepaths + binary_asm_filepaths
-        for _asm_filepath in _asm_filepaths:
-            assembler.assemble(_asm_filepath, debug=False)
-
-        # load & execute modules without test scripts
-        for _asm_filepath in binary_asm_filepaths:
-            run(_asm_filepath, debug=False)
-
-        # load & execute modules with test scripts
-        for _asm_filepath in vm_asm_filepaths:
-            _tst_filepath = _asm_filepath.replace(".asm", ".tst")
-            _cmp_filepath = _asm_filepath.replace(".asm", ".cmp")
-            _tst_params = tester.load_tst(_tst_filepath, debug=False)
-            _tst_params["compare"] = tester.load_cmp(_cmp_filepath, debug=False)
-
-            # retrieve static_dict from translator run
-            _static_dict = None
-            for _vm_dir in _vm_dirpaths:
-                # TODO: standardise paths
-                if _vm_dir.replace("\\", "/") in _asm_filepath:
-                    _static_dict = vm_static_dicts[_vm_dir]
-
-            # execute
-            run(_asm_filepath, static_dict=_static_dict, tst_params=_tst_params, debug=_debug)
+        # # translate VM to ASM
+        # for _vm_dir in _vm_dirpaths:
+        #     vm_static_dicts[_vm_dir] = translator.translate(_vm_dir, _vm_bootstrap_paths, debug=False)
+        #
+        # # assemble all ASM to HACK and binary match if available
+        # _asm_filepaths = vm_asm_filepaths + binary_asm_filepaths
+        # for _asm_filepath in _asm_filepaths:
+        #     assembler.assemble(_asm_filepath, debug=False)
+        #
+        # # load & execute modules without test scripts
+        # for _asm_filepath in binary_asm_filepaths:
+        #     run(_asm_filepath, debug=False)
+        #
+        # # load & execute modules with test scripts
+        # for _asm_filepath in vm_asm_filepaths:
+        #     _tst_filepath = _asm_filepath.replace(".asm", ".tst")
+        #     _cmp_filepath = _asm_filepath.replace(".asm", ".cmp")
+        #     _tst_params = tester.load_tst(_tst_filepath, debug=False)
+        #     _tst_params["compare"] = tester.load_cmp(_cmp_filepath, debug=False)
+        #
+        #     # retrieve static_dict from translator run
+        #     _static_dict = None
+        #     for _vm_dir in _vm_dirpaths:
+        #         # TODO: standardise paths
+        #         if _vm_dir.replace("\\", "/") in _asm_filepath:
+        #             _static_dict = vm_static_dicts[_vm_dir]
+        #
+        #     # execute
+        #     run(_asm_filepath, static_dict=_static_dict, tst_params=_tst_params, debug=_debug)

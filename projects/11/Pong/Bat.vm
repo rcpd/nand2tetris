@@ -1,252 +1,207 @@
-// class Bat
-
-function Bat.new 10
-push constant 10
-call Memory.alloc 1 // allocate object + params on heap
-pop pointer 0 // update 'this' to heap address
-push argument 0 // Ax (arg)
-pop this 0 // x =
-
-push argument 1 // Ay (arg)
-pop this 1 // y =
-
-push argument 2 // Awidth (arg)
-pop this 2 // width =
-
-push argument 3 // Aheight (arg)
-pop this 3 // height =
-
+function Bat.new 0
+push constant 5
+call Memory.alloc 1
+pop pointer 0
+push argument 0
+pop this 0
+push argument 1
+pop this 1
+push argument 2
+pop this 2
+push argument 3
+pop this 3
 push constant 2
-pop this 4 // direction =
-
-push pointer 0 // Bat (this)
+pop this 4
+push pointer 0
 call Bat.show 1
-pop temp 0 // discard return on do call
-push pointer 0 // this
+pop temp 0
+push pointer 0
 return
-
 function Bat.dispose 0
 push argument 0
-pop pointer 0 // update 'this' to object for method call
-push pointer 0 // this
+pop pointer 0
+push pointer 0
 call Memory.deAlloc 1
-pop temp 0 // discard return on do call
-push constant 0 // void return
+pop temp 0
+push constant 0
 return
-
 function Bat.show 0
 push argument 0
-pop pointer 0 // update 'this' to object for method call
-push constant 1
-neg // true
+pop pointer 0
+push constant 0
+not
 call Screen.setColor 1
-pop temp 0 // discard return on do call
-push pointer 0 // Bat (this)
+pop temp 0
+push pointer 0
 call Bat.draw 1
-pop temp 0 // discard return on do call
-push constant 0 // void return
+pop temp 0
+push constant 0
 return
-
 function Bat.hide 0
 push argument 0
-pop pointer 0 // update 'this' to object for method call
-push constant 0 // false
+pop pointer 0
+push constant 0
 call Screen.setColor 1
-pop temp 0 // discard return on do call
-push pointer 0 // Bat (this)
+pop temp 0
+push pointer 0
 call Bat.draw 1
-pop temp 0 // discard return on do call
-push constant 0 // void return
+pop temp 0
+push constant 0
 return
-
 function Bat.draw 0
 push argument 0
-pop pointer 0 // update 'this' to object for method call
-push this 0 // x
-push this 1 // y
-push this 0 // x
-push this 2 // width
+pop pointer 0
+push this 0
+push this 1
+push this 0
+push this 2
 add
-push this 1 // y
-push this 3 // height
+push this 1
+push this 3
 add
 call Screen.drawRectangle 4
-pop temp 0 // discard return on do call
-push constant 0 // void return
+pop temp 0
+push constant 0
 return
-
 function Bat.setDirection 0
 push argument 0
-pop pointer 0 // update 'this' to object for method call
-push argument 1 // Adirection (arg)
-pop this 4 // direction =
-
-push constant 0 // void return
+pop pointer 0
+push argument 1
+pop this 4
+push constant 0
 return
-
 function Bat.getLeft 0
 push argument 0
-pop pointer 0 // update 'this' to object for method call
-push this 0 // x
+pop pointer 0
+push this 0
 return
-
 function Bat.getRight 0
 push argument 0
-pop pointer 0 // update 'this' to object for method call
-push this 0 // x
-push this 2 // width
+pop pointer 0
+push this 0
+push this 2
 add
 return
-
 function Bat.setWidth 0
 push argument 0
-pop pointer 0 // update 'this' to object for method call
-push pointer 0 // Bat (this)
+pop pointer 0
+push pointer 0
 call Bat.hide 1
-pop temp 0 // discard return on do call
-push argument 1 // Awidth (arg)
-pop this 2 // width =
-
-push pointer 0 // Bat (this)
+pop temp 0
+push argument 1
+pop this 2
+push pointer 0
 call Bat.show 1
-pop temp 0 // discard return on do call
-push constant 0 // void return
+pop temp 0
+push constant 0
 return
-
 function Bat.move 0
 push argument 0
-pop pointer 0 // update 'this' to object for method call
-
-// if <expression>
-push this 4 // direction
+pop pointer 0
+push this 4
 push constant 1
 eq
-
-if-goto IF_move_0 // jump to start if (true)
-goto ELSE_move_0 // jump to else/end (false)
-
-label IF_move_0 // start if (true)
-push this 0 // x
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push this 0
 push constant 4
-neg
-add
-pop this 0 // x =
-
-
-// if <expression>
-push this 0 // x
+sub
+pop this 0
+push this 0
 push constant 0
 lt
-
-if-goto IF_move_1 // jump to start if (true)
-goto ELSE_move_1 // jump to else/end (false)
-
-label IF_move_1 // start if (true)
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
 push constant 0
-pop this 0 // x =
-
-
-label ELSE_move_1 // else
-label IF_END_move_1 // exit if
-
-push constant 0 // false
+pop this 0
+label IF_FALSE1
+push constant 0
 call Screen.setColor 1
-pop temp 0 // discard return on do call
-push this 0 // x
-push this 2 // width
+pop temp 0
+push this 0
+push this 2
 add
 push constant 1
 add
-push this 1 // y
-push this 0 // x
-push this 2 // width
+push this 1
+push this 0
+push this 2
 add
 push constant 4
 add
-push this 1 // y
-push this 3 // height
+push this 1
+push this 3
 add
 call Screen.drawRectangle 4
-pop temp 0 // discard return on do call
-push constant 1
-neg // true
+pop temp 0
+push constant 0
+not
 call Screen.setColor 1
-pop temp 0 // discard return on do call
-push this 0 // x
-push this 1 // y
-push this 0 // x
+pop temp 0
+push this 0
+push this 1
+push this 0
 push constant 3
 add
-push this 1 // y
-push this 3 // height
+push this 1
+push this 3
 add
 call Screen.drawRectangle 4
-pop temp 0 // discard return on do call
-goto IF_END_move_0 // jump over else (true)
-
-label ELSE_move_0 // start else (false)
-push this 0 // x
+pop temp 0
+goto IF_END0
+label IF_FALSE0
+push this 0
 push constant 4
 add
-pop this 0 // x =
-
-
-// if <expression>
-push this 0 // x
-push this 2 // width
+pop this 0
+push this 0
+push this 2
 add
 push constant 511
 gt
-
-if-goto IF_move_2 // jump to start if (true)
-goto ELSE_move_2 // jump to else/end (false)
-
-label IF_move_2 // start if (true)
+if-goto IF_TRUE2
+goto IF_FALSE2
+label IF_TRUE2
 push constant 511
-push this 2 // width
-neg
-add
-pop this 0 // x =
-
-label IF_END_move_2 // exit if
-
-push constant 0 // false
+push this 2
+sub
+pop this 0
+label IF_FALSE2
+push constant 0
 call Screen.setColor 1
-pop temp 0 // discard return on do call
-push this 0 // x
+pop temp 0
+push this 0
 push constant 4
-neg
-add
-push this 1 // y
-push this 0 // x
+sub
+push this 1
+push this 0
 push constant 1
-neg
-add
-push this 1 // y
-push this 3 // height
+sub
+push this 1
+push this 3
 add
 call Screen.drawRectangle 4
-pop temp 0 // discard return on do call
-push constant 1
-neg // true
+pop temp 0
+push constant 0
+not
 call Screen.setColor 1
-pop temp 0 // discard return on do call
-push this 0 // x
-push this 2 // width
+pop temp 0
+push this 0
+push this 2
 add
 push constant 3
-neg
+sub
+push this 1
+push this 0
+push this 2
 add
-push this 1 // y
-push this 0 // x
-push this 2 // width
-add
-push this 1 // y
-push this 3 // height
+push this 1
+push this 3
 add
 call Screen.drawRectangle 4
-pop temp 0 // discard return on do call
-label IF_END_move_0 // exit if
-
-push constant 0 // void return
+pop temp 0
+label IF_END0
+push constant 0
 return

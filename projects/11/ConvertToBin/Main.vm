@@ -1,163 +1,114 @@
-// class Main
-
 function Main.main 1
-// var int value (local 0)
-// function call Main.fillMemory
 push constant 8000
 push constant 1
 push constant 500
 call Main.fillMemory 3
-pop temp 0 // discard return on do call
-// function call Main.fillMemory
+pop temp 0
 push constant 8001
 push constant 16
 push constant 1
 neg
 call Main.fillMemory 3
-pop temp 0 // discard return on do call
+pop temp 0
 push constant 8000
 call Memory.peek 1
-pop local 0 // value =
-
-// function call Main.convert
-push local 0 // value (arg)
+pop local 0
+push local 0
 call Main.convert 1
-pop temp 0 // discard return on do call
-push constant 0 // void return
+pop temp 0
+push constant 0
 return
-
 function Main.convert 3
-// var int mask (local 0)
-// var int position (local 1)
-// var boolean loop (local 2)
-push constant 1
-neg // true
-pop local 2 // loop =
-
-
-label WHILE_TEST_convert_0 // test while <expression>
-push local 2 // loop (arg)
-
-if-goto WHILE_TRUE_convert_0 // jump to start while (true)
-goto WHILE_FALSE_convert_0 // jump to exit while (false)
-
-label WHILE_TRUE_convert_0 // start while
-push local 1 // position (arg)
+push constant 0
+not
+pop local 2
+label WHILE_EXP0
+push local 2
+not
+if-goto WHILE_END0
+push local 1
 push constant 1
 add
-pop local 1 // position =
-
-// function call Main.nextMask
-push local 0 // mask (arg)
+pop local 1
+push local 0
 call Main.nextMask 1
-pop local 0 // mask =
-
-
-// if <expression>
-push local 1 // position (arg)
+pop local 0
+push local 1
 push constant 16
 gt
 not
-
-if-goto IF_convert_0 // jump to start if (true)
-goto ELSE_convert_0 // jump to else/end (false)
-
-label IF_convert_0 // start if (true)
-
-// if <expression>
-push argument 0 // value (arg)
-push local 0 // mask
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
+push argument 0
+push local 0
 and
 push constant 0
 eq
 not
-
-if-goto IF_convert_1 // jump to start if (true)
-goto ELSE_convert_1 // jump to else/end (false)
-
-label IF_convert_1 // start if (true)
+if-goto IF_TRUE1
+goto IF_FALSE1
+label IF_TRUE1
 push constant 8000
-push local 1 // position
+push local 1
 add
 push constant 1
 call Memory.poke 2
-pop temp 0 // discard return on do call
-goto IF_END_convert_1 // jump over else (true)
-
-label ELSE_convert_1 // start else (false)
+pop temp 0
+goto IF_END1
+label IF_FALSE1
 push constant 8000
-push local 1 // position
+push local 1
 add
 push constant 0
 call Memory.poke 2
-pop temp 0 // discard return on do call
-label IF_END_convert_1 // exit if
-
-goto IF_END_convert_0 // jump over else (true)
-
-label ELSE_convert_0 // start else (false)
-push constant 0 // false
-pop local 2 // loop =
-
-label IF_END_convert_0 // exit if
-
-goto WHILE_TEST_convert_0 // loop or exit
-label WHILE_FALSE_convert_0 // exit while
-
-push constant 0 // void return
+pop temp 0
+label IF_END1
+goto IF_END0
+label IF_FALSE0
+push constant 0
+pop local 2
+label IF_END0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
 return
-
 function Main.nextMask 0
-
-// if <expression>
-push argument 0 // mask (arg)
+push argument 0
 push constant 0
 eq
-
-if-goto IF_nextMask_0 // jump to start if (true)
-goto ELSE_nextMask_0 // jump to else/end (false)
-
-label IF_nextMask_0 // start if (true)
+if-goto IF_TRUE0
+goto IF_FALSE0
+label IF_TRUE0
 push constant 1
 return
-goto IF_END_nextMask_0 // jump over else (true)
-
-label ELSE_nextMask_0 // start else (false)
-push argument 0 // mask (arg)
+goto IF_END0
+label IF_FALSE0
+push argument 0
 push constant 2
 call Math.multiply 2
 return
-label IF_END_nextMask_0 // exit if
-
-
+label IF_END0
 function Main.fillMemory 0
-
-label WHILE_TEST_fillMemory_0 // test while <expression>
-push argument 1 // length (arg)
+label WHILE_EXP0
+push argument 1
 push constant 0
 gt
-
-if-goto WHILE_TRUE_fillMemory_0 // jump to start while (true)
-goto WHILE_FALSE_fillMemory_0 // jump to exit while (false)
-
-label WHILE_TRUE_fillMemory_0 // start while
-push argument 0 // startAddress (arg)
-push argument 2 // value (arg)
+not
+if-goto WHILE_END0
+push argument 0
+push argument 2
 call Memory.poke 2
-pop temp 0 // discard return on do call
-push argument 1 // length (arg)
+pop temp 0
+push argument 1
 push constant 1
-neg
-add
-pop argument 1 // length =
-
-push argument 0 // startAddress (arg)
+sub
+pop argument 1
+push argument 0
 push constant 1
 add
-pop argument 0 // startAddress =
-
-goto WHILE_TEST_fillMemory_0 // loop or exit
-label WHILE_FALSE_fillMemory_0 // exit while
-
-push constant 0 // void return
+pop argument 0
+goto WHILE_EXP0
+label WHILE_END0
+push constant 0
 return
