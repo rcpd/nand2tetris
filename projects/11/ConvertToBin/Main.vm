@@ -28,9 +28,9 @@ pop local 2 // loop
 
 // while <expression>
 push local 2 // loop
-if-goto WHILE_START_convert
-goto WHILE_END_convert
-label WHILE_START_convert
+if-goto WHILE_START_convert_0
+goto WHILE_END_convert_0
+label WHILE_START_convert_0
 push local 1 // position
 push constant 1
 add
@@ -44,9 +44,9 @@ push local 1 // position
 push constant 16
 gt
 not
-if-goto IF_TRUE_convert
-goto IF_FALSE_convert
-label IF_TRUE_convert
+if-goto IF_TRUE_convert_0
+goto IF_FALSE_convert_0
+label IF_TRUE_convert_0
 
 // if <expression>
 push argument 0 // value
@@ -55,9 +55,9 @@ and
 push constant 0
 eq
 not
-if-goto IF_TRUE_convert
-goto IF_FALSE_convert
-label IF_TRUE_convert
+if-goto IF_TRUE_convert_1
+goto IF_FALSE_convert_1
+label IF_TRUE_convert_1
 push constant 8000
 push local 1 // position
 add
@@ -65,7 +65,7 @@ push constant 1
 call Memory.poke 2
 
 // else
-label IF_FALSE_convert
+label IF_FALSE_convert_1
 push constant 8000
 push local 1 // position
 add
@@ -73,12 +73,12 @@ push constant 0
 call Memory.poke 2
 
 // else
-label IF_FALSE_convert
+label IF_FALSE_convert_0
 push constant 0
 pop local 2 // loop
 
 // end_while
-label WHILE_END_convert
+label WHILE_END_convert_0
 return
 
 function Main.nextMask 1
@@ -87,14 +87,14 @@ function Main.nextMask 1
 push argument 0 // mask
 push constant 0
 eq
-if-goto IF_TRUE_nextMask
-goto IF_FALSE_nextMask
-label IF_TRUE_nextMask
+if-goto IF_TRUE_nextMask_0
+goto IF_FALSE_nextMask_0
+label IF_TRUE_nextMask_0
 push constant 1
 return
 
 // else
-label IF_FALSE_nextMask
+label IF_FALSE_nextMask_0
 push argument 0 // mask
 push constant 2
 call Math.multiply 2
@@ -106,9 +106,9 @@ function Main.fillMemory 3
 push argument 1 // length
 push constant 0
 gt
-if-goto WHILE_START_fillMemory
-goto WHILE_END_fillMemory
-label WHILE_START_fillMemory
+if-goto WHILE_START_fillMemory_0
+goto WHILE_END_fillMemory_0
+label WHILE_START_fillMemory_0
 push argument 0 // startAddress
 push argument 2 // value
 call Memory.poke 2
@@ -123,5 +123,5 @@ add
 pop argument 0 // startAddress
 
 // end_while
-label WHILE_END_fillMemory
+label WHILE_END_fillMemory_0
 return
