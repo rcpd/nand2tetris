@@ -367,11 +367,10 @@ if __name__ == '__main__':
     Project 12:   Implement the OS libraries in Jack
     '''
 
-    # TODO: confirm what functional testing is already done Interpreter/Tester (ASM)
     # TODO: when compiler is stable, add Project 9-11 Jack/VM/ASM/XML files (integration test)
     # TODO: add Project 12 Jack/VM/ASM/XML files (test programs + libraries) (integration test)
 
-    # compile jack programs
+    # compile jack programs (JackCompiler, translator)
     jack_dirpaths = [
         r"..\projects\09\Average",
         r"..\projects\09\Fraction",
@@ -389,6 +388,7 @@ if __name__ == '__main__':
         r"..\projects\11\Square",
     ]
 
+    # tokenizer/analyzer
     jack_filepaths = [
         r"..\projects\09\Average\Main.jack",
         r"..\projects\09\Fraction\Main.jack",
@@ -419,7 +419,7 @@ if __name__ == '__main__':
         r"..\projects\11\Square\SquareGame.jack",
     ]
 
-    # VM programs
+    # VM programs (translator only, interpreted below)
     _vm_dirpaths = [
         r'..\projects\07\MemoryAccess\BasicTest',
         r'..\projects\07\MemoryAccess\PointerTest',
@@ -431,7 +431,8 @@ if __name__ == '__main__':
         r'..\projects\08\FunctionCalls\SimpleFunction',
     ]
 
-    # VM programs that require non-spec bootstrap to pass tests
+    # VM programs that require non-spec bootstrap to pass tests (translator only, interpreted/tested below)
+    # (bootstrap is injected into ASM which is loaded by tester + CPUEmulator)
     _vm_bootstrap_paths = [
         r'..\projects\08\FunctionCalls\FibonacciElement',
         r'..\projects\08\FunctionCalls\NestedCall',
@@ -440,7 +441,7 @@ if __name__ == '__main__':
 
     _vm_dirpaths = _vm_dirpaths + _vm_bootstrap_paths + jack_dirpaths
 
-    # VM test scripts
+    # VM test scripts (assembler/tester/interpreter)
     vm_asm_filepaths = [
         r"..\projects\07\MemoryAccess\BasicTest\BasicTest.asm",
         r"..\projects\07\MemoryAccess\PointerTest\PointerTest.asm",
@@ -455,7 +456,7 @@ if __name__ == '__main__':
         r"..\projects\08\ProgramFlow\FibonacciSeries\FibonacciSeries.asm",
     ]
 
-    # assembled & binary match to solution (where available)
+    # assembler/interpreter (no tests / execution only)
     binary_asm_filepaths = [
         r"..\projects\04\fill\fill.asm",
         r"..\projects\04\mult\mult.asm",
@@ -485,7 +486,7 @@ if __name__ == '__main__':
         # r"..\projects\11\Square\Square.asm",
     ]
 
-    # week 1-5 HDL test files (HardwareSimulator)
+    # HDL tests (HardwareSimulator)
     hw_tst_files = [
         r'..\projects\01\And.tst',
         r'..\projects\01\And16.tst',
@@ -527,7 +528,7 @@ if __name__ == '__main__':
         # r'..\projects\05\Memory.tst',  # interactive test (passed manually)
     ]
     
-    # week 4/7-8/12 test files (CPUEmulator)
+    # ASM tests (CPUEmulator)
     cpu_tst_files = [
         # r'..\projects\04\fill\Fill.tst',  # interactive test (passed manually)
         r'..\projects\04\fill\FillAutomatic.tst',
@@ -549,7 +550,7 @@ if __name__ == '__main__':
         # r'..\projects\12\MemoryTest\MemoryTest.tst'  # TODO
     ]
 
-    # week 7-8 test files (VMEmulator)
+    # VM tests (VMEmulator)
     vm_tst_files = [
         r'..\projects\07\MemoryAccess\BasicTest\BasicTestVME.tst',
         r'..\projects\07\MemoryAccess\PointerTest\PointerTestVME.tst',
