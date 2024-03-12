@@ -111,9 +111,9 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
                              "index": class_dict[class_name][func_name]["index_dict"]["argument"]}
                         j += 2
             else:
-                raise RuntimeError
+                raise RuntimeError(input_list[j+1][1])
         else:
-            raise RuntimeError
+            raise RuntimeError(input_list[j-2][1])
 
     else:
         if "local" in class_dict[class_name][input_list[i][1]]["index_dict"]:
@@ -172,6 +172,7 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=
 
                 elif input_list[i][1] in ("field", "static"):
                     # update class/<field/static> index
+                    # FIXME: field and possibly other segments were over-counted
                     if input_list[i][1] not in class_dict[class_name]["index_dict"]:
                         class_dict[class_name]["index_dict"][input_list[i][1]] = 0
                     else:
@@ -183,7 +184,7 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=
                             {"kind": input_list[i][1], "type": input_list[j+1][1],
                              "index": class_dict[class_name]["index_dict"][input_list[i][1]]}
                 else:
-                    raise RuntimeError("Unexpected kind in var dec")
+                    raise RuntimeError(input_list[i][1])
 
             else:
                 # compile the declaration
@@ -196,7 +197,7 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=
                                 (input_list[j+2][1], input_list[i+1][1], input_list[j+2][1],
                                  class_dict[class_name]["args"][input_list[j][1]]["index"]))
                 else:
-                    raise RuntimeError("Unexpected kind in var dec")
+                    raise RuntimeError(input_list[i][1])
 
             j += 1
 
@@ -243,7 +244,7 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
     # process expression
     while input_list[i][1] not in ("(", ")", ",", ";", "{"):
         if i in proc:
-            raise RuntimeError()
+            raise RuntimeError("Passed an already processed node")
             # return cmd, proc
 
         k = 0
@@ -361,14 +362,14 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
                 # parse the return value
                 pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
             else:
-                raise RuntimeError("Unexpected return value on void function/method")
+                raise RuntimeError(class_dict[class_name][func_name]["type"])
         else:
             if class_dict[class_name][func_name]["type"] == "void":
                 if class_dict[class_name][func_name]["kind"] == "method":
                     # pass the implicit void return for methods
                     store_pcode(pcode, "push constant 0 // void return")
             else:
-                raise RuntimeError("Expected return value on non-void function/method")
+                raise RuntimeError(class_dict[class_name][func_name]["type"])
         store_pcode(pcode, "return")
 
     elif input_list[i][1] == "while":
@@ -551,7 +552,7 @@ def main(filepath, debug=False):
                     pcode, class_dict, class_name = compile_class(pcode, input_list, j, class_dict)
                     store_pcode(pcode, "", write=filepath)
                 else:
-                    raise RuntimeError()
+                    raise RuntimeError(input_list[j][0])
 
             # open subroutineDec
             elif parent.tag == "class" and input_list[i][0] == "keyword" \
@@ -783,6 +784,61 @@ def main(filepath, debug=False):
                 pass  # can't eval look-ahead rules from last token
             else:
                 raise
+
+    # post-run index error checking
+    for class_name in class_dict:
+        index_fields = 0
+        index_statics = 0
+        arg_fields = 0
+        arg_statics = 0
+        if "field" in class_dict[class_name]["index_dict"]:
+            index_fields = class_dict[class_name]["index_dict"]["field"]+1
+        if "static" in class_dict[class_name]["index_dict"]:
+            index_statics = class_dict[class_name]["index_dict"]["static"]+1
+        for var in class_dict[class_name]["args"]:
+            if class_dict[class_name]["args"][var]["kind"] == "field":
+                arg_fields += 1
+            elif class_dict[class_name]["args"][var]["kind"] == "static":
+                arg_fields += 1
+            else:
+                raise RuntimeError(class_dict[class_name]["args"][var]["kind"])
+
+        if index_fields != arg_fields or index_statics != arg_statics:
+            print()
+            import pprint
+            pprint.pprint(class_dict[class_name]["index_dict"])
+            pprint.pprint(class_dict[class_name]["args"])
+            raise RuntimeError(class_name, index_fields, arg_fields)
+
+        for func_name in class_dict[class_name]:
+            if "kind" not in class_dict[class_name][func_name]:
+                continue
+            if class_dict[class_name][func_name]["kind"] not in ("function", "method", "constructor"):
+                raise RuntimeError("Unexpected kind")
+
+            index_local = 0
+            index_argument = 0
+            arg_local = 0
+            arg_argument = 0
+            for var in class_dict[class_name][func_name]["args"]:
+                if class_dict[class_name][func_name]["args"][var]["kind"] == "local":
+                    arg_local += 1
+                elif class_dict[class_name][func_name]["args"][var]["kind"] == "argument":
+                    arg_argument += 1
+                else:
+                    raise RuntimeError("Unexpected kind")
+
+            if "local" in class_dict[class_name][func_name]["index_dict"]:
+                index_local = class_dict[class_name][func_name]["index_dict"]["local"]+1
+            if "argument" in class_dict[class_name][func_name]["index_dict"]:
+                index_argument = class_dict[class_name][func_name]["index_dict"]["argument"]+1
+
+            if index_local != arg_local or index_argument != arg_argument:
+                print()
+                import pprint
+                pprint.pprint(class_dict[class_name][func_name]["index_dict"])
+                pprint.pprint(class_dict[class_name][func_name]["args"])
+                raise RuntimeError(class_name, index_fields, arg_fields)
 
     # write output
     output_filepath = filepath.replace(".jack", ".vm")
