@@ -62,7 +62,7 @@ def find_ancestor(tree, node, ancestors):
 #         return True
 
 
-def store_pcode(pcode, cmd, write=None, debug=True):
+def store_pcode(pcode, cmd, write=None, strip=False, debug=True):
     if debug:
         if cmd.strip() != "":
             print(cmd)
@@ -74,7 +74,10 @@ def store_pcode(pcode, cmd, write=None, debug=True):
     else:
         # overwrite at end if successful
         # don't append empty debug "write" calls
-        pcode.append(cmd+"\n")
+        if strip:
+            pcode.append(cmd.strip())
+        else:
+            pcode.append(cmd+"\n")
 
     return pcode
 
@@ -248,7 +251,7 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=
     return pcode, class_dict
 
 
-def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, sub=False, proc=None):
+def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, sub=False, proc=None, stat=None):
     """
     Notes:
     - recursing on "," flips the push order (not easily reversed)
@@ -262,13 +265,13 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
 
     # always try to parse first
     cmd, proc, i = compile_sub_expression(pcode, input_list, i, class_dict, class_name, func_name, sub=True,
-                                          proc=proc)
+                                          proc=proc, stat=stat)
     sub_xps.append(cmd)
 
     while input_list[i][1] not in (";", "{", "="):
         # recurse until all brackets unpacked (if any)
         cmd, proc, i = compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_name,
-                                              sub=True, proc=proc)
+                                              sub=True, proc=proc, stat=stat)
         sub_xps.append(cmd)
 
         # FIXME: some functions advance one additional symbol
@@ -283,13 +286,15 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
 
     return pcode, proc
 
-def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_name, sub=False, proc=None):
+
+def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_name, sub=False, proc=None, stat=None):
     cmd = []
     # process expression
     while input_list[i][1] not in ("(", ")", ",", ";", "{", "["):
         if i in proc:
             return cmd, proc, i
-
+        if input_list[i][1] == "~":
+            print("bp")
         k = 0
         # parse x <op> y expressions
         if input_list[i][0] == "integerConstant":
@@ -298,36 +303,144 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
             k += 1
 
         elif input_list[i][0] == "identifier":
-            try:
-                var = class_dict[class_name][func_name]["args"][input_list[i][1]]
-            except KeyError:
-                var = class_dict[class_name]["args"][input_list[i][1]]
+            # call or var
+            var = None
+            call_obj = None
+            # check if call // identify "do class.func();" or "do func();"
+            class_call = (input_list[i+1][1] == "." and input_list[i+2][0] == "identifier" and
+                          input_list[i+3][1] == "(")
+            local_call = False
+            if not class_call and input_list[i][1] in class_dict[class_name]:
+                local_call = True
+            if class_call or local_call:
+                # determine parent of callee function
+                if local_call:
+                    var = class_dict[class_name][input_list[i][1]]
+                elif class_call:
+                    call_obj = input_list[i][1] + "." + input_list[i+2][1]
+                    if input_list[i][1] in class_dict[class_name][func_name]["args"]:  # local obj
+                        var = class_dict[class_name][func_name]["args"][input_list[i][1]]
+                    elif input_list[i][1] in class_dict[class_name]["args"]:  # class attr obj
+                        var = class_dict[class_name]["args"][input_list[i][1]]
+                    elif input_list[i+2][1] in class_dict[class_name]:  # class func
+                        var = class_dict[class_name][input_list[i+2][1]]
+                    else:
+                        cmd.append("// external call %s" % call_obj)
+            else:  # function arg
+                if input_list[i][1] in class_dict[class_name][func_name]["args"]:  # local arg
+                    var = class_dict[class_name][func_name]["args"][input_list[i][1]]
+                elif input_list[i][1] in class_dict[class_name]["args"]:  # class attr
+                    var = class_dict[class_name]["args"][input_list[i][1]]
 
-            if var["kind"] == "field":
-                if input_list[i+1][1] == "[":
-                    cmd.append("push %s %s // %s (array)" % ("this", var["index"], input_list[i][1]))
+            if var is not None:
+                # push implicit "this" argument for class methods
+                # FIXME: should not assume callee is method when pushing this
+                if var["kind"] == "field":
+                    if input_list[i+1][1] == "[":
+                        cmd.append("push %s %s // %s (array)" % ("this", var["index"], input_list[i][1]))
+                    else:
+                        cmd.append("push this %s // %s" % (var["index"], input_list[i][1]))
+
+                elif var["kind"] == "method":
+                    cmd.append("push pointer 0 // %s (this)" % class_name)
+
+                elif var["kind"] in ("function", "constructor"):
+                    cmd.append("// function call %s" % call_obj)
+
                 else:
-                    cmd.append("push %s %s // %s" % ("this", var["index"], input_list[i][1]))
-            else:
-                if input_list[i+1][1] == "[":
-                    cmd.append("push %s %s // %s (array)" % (var["kind"], var["index"], input_list[i][1]))
-                else:
-                    cmd.append("push %s %s // %s" % (var["kind"], var["index"], input_list[i][1]))
+                    if input_list[i+1][1] == "[":
+                        cmd.append("push %s %s // %s (array)" % (var["kind"], var["index"], input_list[i][1]))
+                    else:
+                        cmd.append("push %s %s // %s (arg)" % (var["kind"], var["index"], input_list[i][1]))
+
             proc.append(i)
             k += 1
 
-            if input_list[i+1][1] == "[":
-                # array[x] // where x is expression and array is already pushed
-                j = i+2  # move over bracket
-                sub_cmd = []
-                while input_list[j][1] != "]":
+            sub_cmd = []
+            j = 0
+            if class_call and input_list[i+4][1] != ")":
+                # process call expression
+                j = i+4  # move over bracket
+            elif local_call and input_list[i+2][1] != ")":
+                j = i+2
+
+            if j:
+                # process expression in () for call
+                while input_list[j][1] not in (";", "{"):  # ) short-circuits on nested
                     # get expression result for []
                     _cmd, proc, j = compile_sub_expression(sub_xps, input_list, j, class_dict, class_name,
                                                            func_name, sub=True, proc=proc)
                     for _c in _cmd:
                         sub_cmd.append(_c)  # preserve sub-sub commands
 
-                    if input_list[j][1] not in ("]", ";"):
+                    if input_list[j][1] not in (";", "{"):  # ) short-circuits on nested
+                        j += 1
+                    else:
+                        break
+
+                for c in sub_cmd:
+                    cmd.append(c)  # roll sub-sub back into sub
+
+            # count params for call
+            p = 0
+            num_params = 0
+            if class_call:
+                p = i+4
+            elif local_call:
+                p = i+2
+            if p:
+                if input_list[p][1] != ")":
+                    num_params = 1
+                while input_list[p][1] != ";":
+                    if input_list[p][1] == ",":
+                        num_params += 1
+                    p += 1
+
+            # compile call
+            if class_call:
+                # lookup class for object (func table > class table > assume external)
+                try:
+                    class_obj = class_dict[class_name][func_name]["args"][input_list[i][1]]["type"]
+                    # FIXME: might be function but might not be in dict
+                    # TODO: need to roll all files into pre-scan
+                    num_params += 1  # inc for implicit this
+                except KeyError:
+                    try:
+                        class_obj = class_dict[class_name]["args"][input_list[i][1]]["type"]
+                        # FIXME: might be function but might not be in dict
+                        # TODO: need to roll all files into pre-scan
+                        num_params += 1  # inc for implicit this
+                    except KeyError:
+                        class_obj = input_list[i][1]  # external must be function
+
+                cmd.append("call %s.%s %s" % (class_obj, input_list[i+2][1], num_params))
+                if stat == "do":
+                    cmd.append("pop temp 0 // discard return on do call")
+
+            elif local_call:
+                # convert local calls to be fully qualified to current class scope
+                # FIXME: should check callee is method before inc params
+                cmd.append("call %s.%s %s" % (class_name, input_list[i][1], num_params+1))
+                if stat == "do":
+                    cmd.append("pop temp 0 // discard return on do call")
+
+            # exit condition for calls
+            if local_call or class_call:
+                return cmd, proc, p
+
+            # continue on for arrays, operators, keywords, strings
+            if input_list[i+1][1] == "[":
+                # array[x] // where x is expression and array is already pushed
+                j = i+2  # move over bracket
+                sub_cmd = []
+                while input_list[j][1] not in ("]", ";", "{"):
+                    # get expression result for []
+                    _cmd, proc, j = compile_sub_expression(sub_xps, input_list, j, class_dict, class_name,
+                                                           func_name, sub=True, proc=proc)
+                    for _c in _cmd:
+                        sub_cmd.append(_c)  # preserve sub-sub commands
+
+                    if input_list[j][1] not in ("]", ";", "{"):
                         j += 1
                     else:
                         break
@@ -350,14 +463,14 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
             if input_list[i+1][1] == "(":
                 j = i+2  # move over bracket
                 sub_cmd = []
-                while input_list[j][1] != ")":
+                while input_list[j][1] not in (";", "{"):
                     # get expression result then parse operator
                     _cmd, proc, j = compile_sub_expression(sub_xps, input_list, j, class_dict, class_name,
                                                            func_name, sub=True, proc=proc)
                     for _c in _cmd:
                         sub_cmd.append(_c)  # preserve sub-sub commands
 
-                    if input_list[j][1] != ";":
+                    if input_list[j][1] not in (";", "{"):
                         j += 1
                     else:
                         break
@@ -392,11 +505,13 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
                 proc.append(i)
 
             if input_list[i+1][1] == "(":
+                # FIXME: might over-run if k > 0
                 i = j  # return to pos where sub-sub processed
 
         elif input_list[i][0] == "keyword" and input_list[i][1] == "this":
             cmd.append("push pointer 0 // this")
             k += 1
+
         elif input_list[i][0] == "keyword" and input_list[i][1] in ("true", "false"):
             if input_list[i][1] == "true":
                 cmd.append("push constant 1")
@@ -404,14 +519,42 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
             else:
                 cmd.append("push constant 0 // false")
             k += 1
+
         elif input_list[i][0] == "stringConstant":
-            raise NotImplementedError()
+            cmd.append("push constant %s // strlen" % len(input_list[i][1]))
+            cmd.append("call String.new 1 // %s" % input_list[i][1])
+            for c, char in enumerate(input_list[i][1]):
+                compile_char(char, cmd)
+                cmd.append("call String.appendChar 2")  # TODO: why 2?
+            k += 1
+
         else:
             raise RuntimeError(input_list[i])
 
         i += k
 
     return cmd, proc, i
+
+
+char_map = {
+        " ": 32, "!": 33, '"': 34, '#': 35, '$': 36, '%': 37, '&': 38, "'": 39, "(": 40, ")": 41, "*": 42, "+": 43,
+        ",": 44, "-": 45, ".": 46, "/": 47, "0": 48, "1": 49, "2": 50, "3": 51, "4": 52, "5": 52, "6": 53, "7": 54,
+        "8": 55, "9": 57, ":": 58, ";": 59, "<": 60, "=": 61, ">": 62, "?": 63, "@": 64, "A": 65, "B": 66, "C": 67,
+        "D": 68, "E": 69, "F": 70, "G": 71, "H": 72, "I": 73, "J": 74, "K": 75, "L": 76, "M": 77, "N": 78, "O": 79,
+        "P": 80, "Q": 81, "R": 82, "S": 83, "T": 84, "U": 85, "V": 86, "W": 87, "X": 88, "Y": 89, "Z": 90, "[": 91,
+        "\\": 92, "]": 93, "^": 94, "_": 95, "`": 96, "a": 97, "b": 98, "c": 99, "d": 100, "e": 101, "f": 102, "g": 103,
+        "h": 104, "i": 105, "j": 106, "k": 107, "l": 108, "m": 109, "n": 110, "o": 111, "p": 112, "q": 113, "r": 114,
+        "s": 115, "t": 116, "u": 117, "v": 118, "w": 119, "x": 120, "y": 121, "z": 122, "{": 123, "|": 124, "}": 125,
+        "~": 126, "newline": 128, "backspace": 129, "left_arrow": 130, "up_arrow": 131, "right_arrow": 133, "home": 134,
+        "end": 135, "page_up": 136, "page_down": 137, "insert": 138, "delete": 139, "esc": 140, "f1": 141, "f2": 142,
+        "f3": 143, "f4": 144, "f5": 145, "f6": 146, "f7": 147, "f8": 148, "f9": 149, "f10": 150, "f11": 151, "f12": 152
+    }
+
+
+def compile_char(char, pcode):
+    global char_map
+    store_pcode(pcode, "push constant %s // %s (char)" % (char_map[char], char), strip=True)
+    return pcode
 
 
 def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
@@ -494,7 +637,8 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
         class_dict, while_index = label_index(class_dict, class_name, func_name, "while")
         store_pcode(pcode, "\nlabel WHILE_TEST_%s_%s // test while <expression>" % (func_name, while_index["count"]))
         pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
-        store_pcode(pcode, "\nif-goto WHILE_TRUE_%s_%s // jump to start while (true)" % (func_name, while_index["count"]))
+        store_pcode(pcode, "\nif-goto WHILE_TRUE_%s_%s // jump to start while (true)" %
+                    (func_name, while_index["count"]))
         store_pcode(pcode, "goto WHILE_FALSE_%s_%s // jump to exit while (false)" % (func_name, while_index["count"]))
         store_pcode(pcode, "\nlabel WHILE_TRUE_%s_%s // start while" % (func_name, while_index["count"]))
     elif input_list[i][1] == "if":
@@ -530,97 +674,15 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                 else:
                     store_pcode(pcode, "push %s %s // %s (array)" % (var["kind"], var["index"], input_list[j][1]))
 
-                pcode, proc = compile_expression(pcode, input_list, j+2, class_dict, class_name, func_name)
+                pcode, proc = compile_expression(pcode, input_list, j+2, class_dict, class_name, func_name,
+                                                 stat=statement)
                 return pcode, class_dict
 
             else:
-                # handle call // identify "do class.func();" or "do func();"
-                class_call = (input_list[j+1][1] == "." and input_list[j+2][0] == "identifier" and
-                              input_list[j+3][1] == "(")
-                local_call = False
-                if not class_call and input_list[j][1] in class_dict[class_name]:
-                    local_call = True
-                if class_call or input_list[j+1][1] == "(":
-                    # determine parent of callee function
-                    var = None
-                    call_obj = None
-                    if local_call:
-                        var = class_dict[class_name][input_list[j][1]]
-                    if class_call:
-                        call_obj = input_list[j][1] + "." + input_list[j+2][1]
-                        if input_list[j][1] in class_dict[class_name][func_name]["args"]:  # local obj
-                            var = class_dict[class_name][func_name]["args"][input_list[j][1]]
-                        elif input_list[j][1] in class_dict[class_name]["args"]:  # class attr obj
-                            var = class_dict[class_name]["args"][input_list[j][1]]
-                        elif input_list[j+2][1] in class_dict[class_name]:  # class func
-                            var = class_dict[class_name][input_list[j+2][1]]
-                        else:
-                            store_pcode(pcode, "// external call %s" % call_obj)
-
-                    if var is not None:
-                        # push implicit "this" argument for class methods
-                        if var["kind"] == "field":
-                            # FIXME: should not assume callee is method when pushing this
-                            store_pcode(pcode, "push %s %s // %s (this)" % ("this", var["index"], input_list[j][1]))
-                        elif var["kind"] == "method":
-                            store_pcode(pcode, "push pointer 0 // %s (this)" % class_name)
-                        elif var["kind"] in ("function", "constructor"):
-                            store_pcode(pcode, "// function call %s" % call_obj)
-                        else:
-                            store_pcode(pcode, "push %s %s // %s (this)" % (var["kind"], var["index"],
-                                                                            input_list[j][1]))
-                    if class_call and input_list[j+4][1] != ")":
-                        pcode, proc = compile_expression(pcode, input_list, j+4, class_dict, class_name, func_name)
-
-                    else:
-                        if input_list[j+2][1] != ")":
-                            pcode, proc = compile_expression(pcode, input_list, j+4, class_dict, class_name, func_name)
-
-                    # count params for call
-                    if class_call:
-                        k = j+4
-                    else:
-                        k = j+2
-                    num_params = 0
-                    if input_list[k][1] != ")":
-                        num_params = 1
-                    while input_list[k][1] != ";":
-                        if input_list[k][1] == ",":
-                            num_params += 1
-                        k += 1
-
-                    # compile call
-                    if class_call:
-                        # lookup class for object (func table > class table > assume external)
-                        try:
-                            class_obj = class_dict[class_name][func_name]["args"][input_list[j][1]]["type"]
-                            # FIXME: might be function but might not be in dict
-                            # TODO: need to roll all files into pre-scan
-                            num_params += 1  # inc for implicit this
-                        except KeyError:
-                            try:
-                                class_obj = class_dict[class_name]["args"][input_list[j][1]]["type"]
-                                # FIXME: might be function but might not be in dict
-                                # TODO: need to roll all files into pre-scan
-                                num_params += 1  # inc for implicit this
-                            except KeyError:
-                                class_obj = input_list[j][1]  # external must be function
-
-                        store_pcode(pcode, "call %s.%s %s" % (class_obj, input_list[j+2][1], num_params))
-                        if statement == "do":
-                            store_pcode(pcode, "pop temp 0 // discard return on do call")
-                    else:
-                        # convert local calls to be fully qualified to current class scope
-                        # FIXME: should check callee is method before inc params
-                        store_pcode(pcode, "call %s.%s %s" % (class_name, input_list[j][1], num_params+1))
-                        if statement == "do":
-                            store_pcode(pcode, "pop temp 0 // discard return on do call")
-                    return pcode, class_dict
-
-                else:
-                    # if not array or call pass to expression handler
-                    pcode, proc = compile_expression(pcode, input_list, j, class_dict, class_name, func_name)
-                    return pcode, class_dict
+                # pass remainder to expression handler
+                pcode, proc = compile_expression(pcode, input_list, j, class_dict, class_name, func_name,
+                                                 stat=statement)
+                return pcode, class_dict
 
         # handle constants (true/false/integer)
         elif input_list[j][0] == "keyword" and input_list[j][1] in ("true", "false"):

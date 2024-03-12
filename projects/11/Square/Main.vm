@@ -5,10 +5,10 @@ function Main.main 1
 // external call SquareGame.new
 call SquareGame.new 0
 pop local 0 // game =
-push local 0 // game (this)
+push local 0 // game (arg)
 call SquareGame.run 1
 pop temp 0 // discard return on do call
-push local 0 // game (this)
+push local 0 // game (arg)
 call SquareGame.dispose 1
 pop temp 0 // discard return on do call
 push constant 0 // void return
