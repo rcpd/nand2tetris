@@ -511,6 +511,7 @@ def main(filepath, debug=False):
         # persist through loop scope
         parent = 'class'
         exp_buffer = []
+        block = []
         num_args = while_count = if_count = 0
         class_name = func_kind = call_class = call_func = statement = func_name = keyword = var_type = identifier = ''
         func_type = symbol = lhs_var_name = rhs_parent = rhs_child = parent_obj = child_func = ''
@@ -526,8 +527,7 @@ def main(filepath, debug=False):
             # has children
             if elem:
                 parent = elem.tag
-                # reset tag context on depth change
-                # exlcusion: class_name, func_kind, call_class, call_func, statement, func_name, lhs_var_name
+                # reset select tag contexts on depth change
                 keyword = var_type = identifier = func_type = symbol = ''
 
             # set keyword flag (single depth)
@@ -567,7 +567,7 @@ def main(filepath, debug=False):
                         pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
                             compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
                                               class_name=class_name, func_name=func_name, var_type=var_type,
-                                              var_name=identifier)
+                                              var_name=identifier, if_count=if_count)
 
                     # collect class/func for call, compile when paired
                     elif statement == 'do':
@@ -584,7 +584,7 @@ def main(filepath, debug=False):
                             pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
                                 compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
                                                   class_name=class_name, func_name=func_name, var_name=identifier,
-                                                  exp_buffer=exp_buffer)
+                                                  exp_buffer=exp_buffer, if_count=if_count)
                         else:
                             pcode, exp_buffer, parent_obj, child_func = \
                                 expression_handler(pcode, statement, exp_buffer, class_dict=class_dict,
@@ -610,7 +610,7 @@ def main(filepath, debug=False):
                 # if symbol in (r"(){},") or symbol in op_map:
                 #     print("PCODE: // '%s'" % symbol)
 
-                if symbol in "}.":
+                if symbol in ".":
                     pass
                 elif symbol == "=" and parent == 'letStatement':
                     pass  # ignore first '=' in let statement (expressions will have different parent)
@@ -618,21 +618,49 @@ def main(filepath, debug=False):
                     if exp_buffer:
                         raise RuntimeError("unparsed expressions still in buffer: %s" % exp_buffer)
 
-                    if statement == 'while':
-                        # TODO: compile_while_goto
-                        store_pcode(pcode, "\nnot // end while expression / while_jump (1/2)")
-                        store_pcode(pcode, "\nif-goto WHILE_END%s // while_jump (2/2) [break loop if not]" % while_count)
-                        while_count += 1
+                    elif keyword == 'else':  # no explicit statement type for else
+                        # TODO: compile_else_start
+                        block.append(keyword)
+                        # close the latest if_true block (-1) but don't dec until IF_END
+                        store_pcode(pcode, "\nlabel IF_FALSE%s // begin if_false_block" % (if_count-1))
+
                     elif statement == 'if':
-                        # TODO: compile_if_goto
+                        # TODO: compile_if_start
+                        block.append(statement)
                         store_pcode(pcode, "\nif-goto IF_TRUE%s // end if expression / if_true_jump" % if_count)
                         store_pcode(pcode, "\ngoto IF_FALSE%s // if_false_jump" % if_count)
                         store_pcode(pcode, "\nlabel IF_TRUE%s // begin if_true_block" % if_count)
-                        if_count += 1
+                        if_count += 1  # inc now so any nested if are correct
+
+                    elif statement == 'while':
+                        # TODO: compile_while_goto
+                        block.append(statement)
+                        store_pcode(pcode, "\nnot // end while expression / while_jump (1/2)")
+                        store_pcode(pcode, "\nif-goto WHILE_END%s // while_jump (2/2) [break loop if not]" %
+                                    while_count)
+                        while_count += 1
+
                     elif statement == 'param':
                         pass
                     elif keyword not in ('class', 'function'):
                         raise RuntimeError("unexpected '{' (statement '%s', keyword '%s')" % (statement, keyword))
+
+                elif symbol == "}":
+                    if block:
+                        if block[-1] == 'else':
+                            # TODO: compile_else_end
+                            store_pcode(pcode, "\nlabel IF_END%s // end if_block" % (if_count-1))
+                            block.pop()
+                            # FIXME: how to handle if-without-else ?
+                            if_count -= 1
+                        elif block[-1] == 'if':
+                            store_pcode(pcode, "\ngoto IF_END%s // end if_true_block" % (if_count-1))
+                            block.pop()
+
+                        elif block[-1] == 'while':
+                            pass
+                        else:
+                            raise RuntimeError("unexpected block '%s'" % block[-1])
 
                 elif symbol == "(":
                     # mark the start of a new expression
@@ -659,7 +687,7 @@ def main(filepath, debug=False):
                         # TODO: if returning a value it needs to be processed before this
                         pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
                             compile_statement(pcode=pcode, class_dict=class_dict, class_name=class_name,
-                                              func_name=func_name, statement=statement)
+                                              func_name=func_name, statement=statement, if_count=if_count)
 
                     if exp_buffer:
                         raise RuntimeError("unparsed expressions still in buffer: %s" % exp_buffer)
@@ -684,8 +712,9 @@ def main(filepath, debug=False):
                 store_pcode(pcode, "\n// begin if expression")
             elif elem.tag == 'whileStatement':
                 statement = 'while'
-                compile_statement(pcode=pcode, statement=statement, class_dict=class_dict, num_args=num_args,
-                                  while_count=while_count, if_count=if_count, exp_buffer=exp_buffer)
+                pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
+                    compile_statement(pcode=pcode, statement=statement, class_dict=class_dict, num_args=num_args,
+                                      while_count=while_count, if_count=if_count, exp_buffer=exp_buffer)
             elif elem.tag == 'varDec':
                 statement = 'var'
             elif elem.tag == 'parameterList':
@@ -734,7 +763,7 @@ if __name__ == '__main__':
     # matched to course compiler
     strict_matches = {
         r"..\11\Seven\Main.vm": 10,  # all
-        r"..\11\ConvertToBin\Main.vm": 57,  # wip
+        r"..\11\ConvertToBin\Main.vm": 72,  # wip
     }
 
     for _filepath in jack_filepaths:
@@ -757,7 +786,6 @@ if __name__ == '__main__':
         wip = match.replace(".vm", "_out.vm")
         with open(match) as org_file:
             with open(wip) as cur_file:
-                # index = 0
                 for index, (solution, current) in enumerate(zip(org_file, cur_file)):
                     if solution != current:
                         break
@@ -766,4 +794,4 @@ if __name__ == '__main__':
                     print("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
-    # TODO: else
+    # TODO: end_while
