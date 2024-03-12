@@ -374,7 +374,7 @@ if __name__ == '__main__':
         r"..\projects\11\Pong",
         r"..\projects\11\Seven",
         r"..\projects\11\Square",
-        r"..\projects\12\Sys",
+        r"..\projects\12\SysTest",
     ]
 
     # tokenizer/analyzer # TODO: projects 1-11 accounted for, included in tokenizer/analyzer/compiler
@@ -406,7 +406,8 @@ if __name__ == '__main__':
         r"..\projects\11\Square\Main.jack",
         r"..\projects\11\Square\Square.jack",
         r"..\projects\11\Square\SquareGame.jack",
-        r"..\projects\12\Sys\Sys.jack",
+        r"..\projects\12\SysTest\Main.jack",
+        r"..\projects\12\SysTest\Sys.jack",
     ]
 
     # compiler
@@ -438,7 +439,8 @@ if __name__ == '__main__':
         [r"..\projects\11\Square\Main.jack",
          r"..\projects\11\Square\Square.jack",
          r"..\projects\11\Square\SquareGame.jack"],
-        [r"..\projects\12\Sys\Sys.jack"],
+        [r"..\projects\12\SysTest\Main.jack",
+         r"..\projects\12\SysTest\Sys.jack"],
     ]
 
     # enforce matching of compiler against course compiler
@@ -461,6 +463,8 @@ if __name__ == '__main__':
         r"..\projects\11\Pong\Main.vm": 13,
         r"..\projects\11\Pong\PongGame.vm": 318,
         r"..\projects\11\ComplexArrays\Main.vm": 702,
+        r"..\projects\12\SysTest\Main.vm": 281,
+        # r"..\projects\12\SysTest\Sys.vm": 999,  # TODO
     }
 
     # VM programs (translator only, interpreted below) # TODO: projects 1-11 accounted for, included in translator
@@ -470,13 +474,27 @@ if __name__ == '__main__':
         r'..\projects\07\MemoryAccess\StaticTest',
         r'..\projects\07\StackArithmetic\SimpleAdd',
         r'..\projects\07\StackArithmetic\StackTest',
+        r'..\projects\08\ProgramFlow\BasicLoop',
+        r'..\projects\08\ProgramFlow\FibonacciSeries',
         # r'..\projects\08\FunctionCalls\FibonacciElement',  # bootstrap
         # r'..\projects\08\FunctionCalls\NestedCall',  # bootstrap
         r'..\projects\08\FunctionCalls\SimpleFunction',
         # r'..\projects\08\FunctionCalls\StaticsTest'  # bootstrap
-        r'..\projects\08\ProgramFlow\BasicLoop',
-        r'..\projects\08\ProgramFlow\FibonacciSeries',
-
+        r"..\projects\09\Average",
+        r"..\projects\09\Fraction",
+        r"..\projects\09\HelloWorld",
+        r"..\projects\09\List",
+        r"..\projects\09\Square",
+        r"..\projects\10\ArrayTest",
+        # r"..\projects\10\ExpressionLessSquare",  # nonsense code that shouldn't compile or run
+        r"..\projects\10\Square",
+        r"..\projects\11\Average",
+        r"..\projects\11\ComplexArrays",
+        r"..\projects\11\ConvertToBin",
+        r"..\projects\11\Pong",
+        r"..\projects\11\Seven",
+        r"..\projects\11\Square",
+        r"..\projects\12\SysTest",
     ]
 
     # VM programs # TODO: projects 1-11 accounted for, included in translator
@@ -488,7 +506,7 @@ if __name__ == '__main__':
         r'..\projects\08\FunctionCalls\StaticsTest'
     ]
 
-    _vm_dirpaths = _vm_dirpaths + _vm_bootstrap_paths + jack_dirpaths
+    _vm_dirpaths = _vm_dirpaths + _vm_bootstrap_paths
 
     # VM test scripts # TODO: projects 1-11 accounted for, included in assembler/python_hdl
     # (assembler/tester/interpreter)
@@ -735,8 +753,12 @@ if __name__ == '__main__':
                             raise RuntimeError("%s mismatch after line %s" % (out_file, index))
                     line += 1
 
+    # FIXME: analyzer is dropping } if no token after { in while (Sys.jack)
     # TODO: Project 12: Implement the OS libraries in Jack, compile/test (test programs included)
     # TODO: add integration for Project 12 translate/execute/assemble ASM > HACK (integration test)
+
+    # TODO: file lists should be imported from common file
+    # TODO: jack_matches / strict_matches should be max lines not const number
 
     # TODO: translator finish stack mapping: other stack manip(stacksize), functions(stackframes)
     # TODO: maybe stacksize should be <start-sp>-esp function instead?

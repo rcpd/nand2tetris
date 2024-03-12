@@ -885,7 +885,25 @@ if __name__ == "__main__":
         r'..\projects\07\StackArithmetic\StackTest',
         r'..\projects\08\ProgramFlow\BasicLoop',
         r'..\projects\08\ProgramFlow\FibonacciSeries',
+        # r'..\projects\08\FunctionCalls\FibonacciElement',  # bootstrap
+        # r'..\projects\08\FunctionCalls\NestedCall',  # bootstrap
         r'..\projects\08\FunctionCalls\SimpleFunction',
+        # r'..\projects\08\FunctionCalls\StaticsTest'  # bootstrap
+        r"..\projects\09\Average",
+        r"..\projects\09\Fraction",
+        r"..\projects\09\HelloWorld",
+        r"..\projects\09\List",
+        r"..\projects\09\Square",
+        r"..\projects\10\ArrayTest",
+        # r"..\projects\10\ExpressionLessSquare",  # nonsense code that shouldn't compile or run
+        r"..\projects\10\Square",
+        r"..\projects\11\Average",
+        r"..\projects\11\ComplexArrays",
+        r"..\projects\11\ConvertToBin",
+        r"..\projects\11\Pong",
+        r"..\projects\11\Seven",
+        r"..\projects\11\Square",
+        r"..\projects\12\SysTest",
     ]
 
     # VM programs that require non-spec bootstrap to pass tests
