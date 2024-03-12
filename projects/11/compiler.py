@@ -155,7 +155,7 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name):
     
     # process expression
     # TODO: remove duplication of single vs multi term parse
-    while input_list[i][1] not in ("(", ")"):
+    while input_list[i][1] not in ("(", ")", ";"):
         inc = 0
         # parse x <op> y expressions
         if input_list[i][0] == "integerConstant":
@@ -198,9 +198,9 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
     input_list[i][0] == "keyword" and input_list[i][1] in ("let", "do", "while", "if", "return")
     """
     if input_list[i][1] == "do":
-        pcode, class_dict = compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_name)
+        pcode, class_dict = compile_sub_statement(pcode, input_list, i+1, class_dict, class_name, func_name)
     elif input_list[i][1] == "let":
-        # let value = Memory.peek(8000);
+        # let <var> = x;
         if input_list[i+2][1] == "=":
             # handle right side of assignment first
             pcode, class_dict = compile_sub_statement(pcode, input_list, i+3, class_dict, class_name, func_name)
@@ -209,11 +209,22 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
                 # pop result into destination segment
                 var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
                 store_pcode(pcode, "pop %s %s" % (var["type"], var["index"]))
+            else:
+                raise RuntimeError(input_list[i+1])
         else:
-            raise RuntimeError(input_list[i+2][1])
+            raise RuntimeError(input_list[i+2])
 
     elif input_list[i][1] == "return":
         store_pcode(pcode, "return")
+    elif input_list[i][1] == "while":
+        store_pcode(pcode, "// while <expression>")
+        pcode, compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
+        store_pcode(pcode, "if-goto WHILE_START_%s" % func_name)  # TODO: label_dict
+        store_pcode(pcode, "goto WHILE_END_%s" % func_name)
+        store_pcode(pcode, "label WHILE_START_%s" % func_name)
+        # ...
+        # store_pcode(pcode, "label WHILE_END_%s" % func_name)
+
     else:
         raise RuntimeError(input_list[i])
     return pcode, class_dict
@@ -223,16 +234,31 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
     """
     Compile common components of statements
     """
-    while input_list[i][1] != ";":
-        if input_list[i][0] == "identifier":
+    j = i
+    while input_list[j][1] != ";":
+        if input_list[j][0] == "identifier":
             # call
-            if input_list[i+1][1] == "." and input_list[i+2][0] == "identifier"\
-                    and input_list[i+3][1] == "(":
-                if input_list[i+4][1] != ")":
-                    pcode = compile_expression(pcode, input_list, i+4, class_dict, class_name, func_name)
-                num_args = class_dict[input_list[i][1]][input_list[i+2][1]]["index_dict"]["argument"]
-                store_pcode(pcode, "call %s.%s %s" % (input_list[i][1], input_list[i+2][1], num_args + 1))
-        i += 1
+            if input_list[j+1][1] == "." and input_list[j+2][0] == "identifier" and input_list[j+3][1] == "(":
+                if input_list[j+4][1] != ")":
+                    # parse function params
+                    pcode = compile_expression(pcode, input_list, j+4, class_dict, class_name, func_name)
+                # parse call
+                num_args = class_dict[input_list[j][1]][input_list[j+2][1]]["index_dict"]["argument"]
+                store_pcode(pcode, "call %s.%s %s" % (input_list[j][1], input_list[j+2][1], num_args + 1))
+                return pcode, class_dict
+            else:
+                pcode = compile_expression(pcode, input_list, j, class_dict, class_name, func_name)
+                return pcode, class_dict
+
+        elif input_list[j][0] == "keyword" and input_list[j][1] in ("true" or "false"):
+            if input_list[j][1] == "true":
+                store_pcode(pcode, "push constant 1")
+                store_pcode(pcode, "neg")
+            else:
+                store_pcode(pcode, "push constant 0")
+        else:
+            raise RuntimeError(input_list[j])
+        j += 1
     return pcode, class_dict
 
 
