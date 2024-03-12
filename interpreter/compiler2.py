@@ -555,8 +555,6 @@ def main(filepath):
 
                         # built-in types like 'Array'
                         elif identifier in types:
-                            if identifier != 'Array':
-                                raise RuntimeError()  # debug
                             var_type = identifier
                             continue  # process on next loop
 
@@ -883,13 +881,44 @@ if __name__ == '__main__':
     """
 
     jack_filepaths = [
+        # compiled / tested
+        r"..\09\Average\Main.jack",
         r"..\11\Seven\Main.jack",
         r"..\11\ConvertToBin\Main.jack",
         r"..\11\Average\Main.jack",
+
+        # wip
+        # r"..\09\Fraction\Main.jack",
+        # r"..\09\Fraction\Fraction.jack",
+        # r"..\09\HelloWorld\Main.jack",
+        # r"..\09\List\Main.jack",
+        # r"..\09\List\List.jack",
+        # r"..\09\Square\Main.jack",
+        # r"..\09\Square\Square.jack",
+        # r"..\09\Square\SquareGame.jack",
+        #
+        # r"..\10\ArrayTest\Main.jack",
+        # r"..\10\ExpressionLessSquare\Main.jack",
+        # r"..\10\ExpressionLessSquare\Square.jack",
+        # r"..\10\ExpressionLessSquare\SquareGame.jack",
+        # r"..\10\Square\Main.jack",
+        # r"..\10\Square\Square.jack",
+        # r"..\10\Square\SquareGame.jack",
+        #
+        # r"..\11\Square\Main.jack",
+        # r"..\11\Square\Square.jack",
+        # r"..\11\Square\SquareGame.jack",
+        #
+        # r"..\11\ComplexArrays\Main.jack",
+        # r"..\11\Pong\Ball.jack",
+        # r"..\11\Pong\Bat.jack",
+        # r"..\11\Pong\Main.jack",
+        # r"..\11\Pong\PongGame.jack",
     ]
 
     # matched to course compiler
     strict_matches = {
+        r"..\09\Average\Main.vm": 149,  # all
         r"..\11\Seven\Main.vm": 10,  # all
         r"..\11\ConvertToBin\Main.vm": 114,  # all
         r"..\11\Average\Main.vm": 149,  # all
