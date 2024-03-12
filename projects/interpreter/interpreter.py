@@ -8,7 +8,6 @@ import translator
 
 def run(asm_filepath, tst_params=None, debug=False):
     # TODO: (week 6-8) all asm/tst/cmp/out/vms parsed/compiled/executed/passed
-    # TODO: translator refactor comments -- inline would be easiest
     # TODO: translator segment/stack/call tree mapping
     # TODO: doc strings
     # TODO: (future) write a HDL module for interpreter?
@@ -311,8 +310,8 @@ if __name__ == '__main__':
         "../06/rect/rectL.asm",
     ]
 
-    # debug_runs = [True, False]
-    debug_runs = [False]
+    debug_runs = [True, False]
+    # debug_runs = [False]
     for _debug in debug_runs:
         # transpile VM to ASM
         translator.translate(_vm_dirpaths, _vm_bootstrap_paths, debug=_debug)

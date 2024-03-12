@@ -4,10 +4,10 @@ D=A
 M=D
 
 // (-3) function Sys.init 0
-(Sys.init)
+(Sys.init) // function Sys.init 0
 
 // (-6) push constant 4
-@4
+@4 // push constant 4
 D=A
 @SP
 A=M
@@ -15,8 +15,8 @@ M=D
 @SP
 M=M+1
 
-// (-9) call Main.fibonacci 1   // computes the 4th fibonacci element
-(sys.Main.fibonacci.1)
+// (-9) call Main.fibonacci 1 // computes the 4th fibonacci element
+(sys.Main.fibonacci.1) // call Main.fibonacci 1 // computes the 4th fibonacci element
 @sys.Main.fibonacci.1 // create the RIP pointer and push it to the stack
 D=A
 @SP
@@ -83,17 +83,17 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-11) label WHILE
-(sys.WHILE)
+(sys.WHILE) // label WHILE
 
-// (-14) goto WHILE              // loops infinitely
-@sys.WHILE
+// (-14) goto WHILE // loops infinitely
+@sys.WHILE // goto WHILE // loops infinitely
 0;JMP // unconditional jump
 
 // (-16) function Main.fibonacci 0
-(Main.fibonacci)
+(Main.fibonacci) // function Main.fibonacci 0
 
 // (-19) push argument 0
-@ARG
+@ARG // push argument 0
 D=M
 @0
 A=D+A
@@ -105,7 +105,7 @@ M=D
 M=M+1
 
 // (-21) push constant 2
-@2
+@2 // push constant 2
 D=A
 @SP
 A=M
@@ -113,8 +113,8 @@ M=D
 @SP
 M=M+1
 
-// (-23) lt                     // checks if n<2
-@SP // *esp
+// (-23) lt // checks if n<2
+@SP // *esp // lt // checks if n<2
 M=M-1 // *esp-- (*val2)
 A=M // [val2]
 D=M // d = [val2]
@@ -141,8 +141,8 @@ M=D // [esp] = eq result
 M=M+1 // *esp++
 
 // (-28) if-goto IF_TRUE
-@0 // push a zero onto the stack
-D=A
+@0 // if-goto IF_TRUE
+D=A // push a zero onto the stack
 @SP
 A=M
 M=D
@@ -160,14 +160,14 @@ D=M-D // d = [val1] - [val2] // leave esp here (pop equivalent)
 D;JNE // jump if not zero
 
 // (-30) goto IF_FALSE
-@main.IF_FALSE
+@main.IF_FALSE // goto IF_FALSE
 0;JMP // unconditional jump
 
-// (-32) label IF_TRUE          // if n<2, return n
-(main.IF_TRUE)
+// (-32) label IF_TRUE // if n<2, return n
+(main.IF_TRUE) // label IF_TRUE // if n<2, return n
 
 // (-35) push argument 0
-@ARG
+@ARG // push argument 0
 D=M
 @0
 A=D+A
@@ -180,8 +180,8 @@ M=M+1
 
 // (-37) return
 
-// (-39) pop argument 0 // function return: move result to ARG[0] (soon to be last stack item)
-@ARG
+// (-39) pop argument 0 // return: move result to ARG[0] (soon to be last stack item)
+@ARG // pop argument 0 // return: move result to ARG[0] (soon to be last stack item)
 D=M
 @0
 D=D+A
@@ -199,7 +199,7 @@ A=M
 M=D
 @SP
 M=M-1
-@ARG // *ARG[0] // function return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1
+@ARG // *ARG[0] // return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
 M=D // [esp] = *ARG[0]+1
@@ -240,11 +240,11 @@ A=M-D // *LCL-5 (*LCL)
 A=M // d = [LCL-5] (*LCL)
 0;JMP // return (jump to RIP)
 
-// (-41) label IF_FALSE         // if n>=2, returns fib(n-2)+fib(n-1)
-(main.IF_FALSE)
+// (-41) label IF_FALSE // if n>=2, returns fib(n-2)+fib(n-1)
+(main.IF_FALSE) // label IF_FALSE // if n>=2, returns fib(n-2)+fib(n-1)
 
 // (-44) push argument 0
-@ARG
+@ARG // push argument 0
 D=M
 @0
 A=D+A
@@ -256,7 +256,7 @@ M=D
 M=M+1
 
 // (-46) push constant 2
-@2
+@2 // push constant 2
 D=A
 @SP
 A=M
@@ -265,7 +265,7 @@ M=D
 M=M+1
 
 // (-48) sub
-@SP
+@SP // sub
 M=M-1
 A=M
 D=M
@@ -276,8 +276,8 @@ M=M-D
 @SP
 M=M+1
 
-// (-51) call Main.fibonacci 1  // computes fib(n-2)
-(main.Main.fibonacci.3)
+// (-51) call Main.fibonacci 1 // computes fib(n-2)
+(main.Main.fibonacci.3) // call Main.fibonacci 1 // computes fib(n-2)
 @main.Main.fibonacci.3 // create the RIP pointer and push it to the stack
 D=A
 @SP
@@ -344,7 +344,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-53) push argument 0
-@ARG
+@ARG // push argument 0
 D=M
 @0
 A=D+A
@@ -356,7 +356,7 @@ M=D
 M=M+1
 
 // (-55) push constant 1
-@1
+@1 // push constant 1
 D=A
 @SP
 A=M
@@ -365,7 +365,7 @@ M=D
 M=M+1
 
 // (-57) sub
-@SP
+@SP // sub
 M=M-1
 A=M
 D=M
@@ -376,8 +376,8 @@ M=M-D
 @SP
 M=M+1
 
-// (-60) call Main.fibonacci 1  // computes fib(n-1)
-(main.Main.fibonacci.4)
+// (-60) call Main.fibonacci 1 // computes fib(n-1)
+(main.Main.fibonacci.4) // call Main.fibonacci 1 // computes fib(n-1)
 @main.Main.fibonacci.4 // create the RIP pointer and push it to the stack
 D=A
 @SP
@@ -443,8 +443,8 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 @Main.fibonacci // *func (parsed from call <label> <num_args>)
 0;JMP // jump into EIP (*func)
 
-// (-62) add                    // returns fib(n-1) + fib(n-2)
-@SP
+// (-62) add // returns fib(n-1) + fib(n-2)
+@SP // add // returns fib(n-1) + fib(n-2)
 M=M-1
 A=M
 D=M
@@ -457,8 +457,8 @@ M=M+1
 
 // (-64) return
 
-// (-66) pop argument 0 // function return: move result to ARG[0] (soon to be last stack item)
-@ARG
+// (-66) pop argument 0 // return: move result to ARG[0] (soon to be last stack item)
+@ARG // pop argument 0 // return: move result to ARG[0] (soon to be last stack item)
 D=M
 @0
 D=D+A
@@ -476,7 +476,7 @@ A=M
 M=D
 @SP
 M=M-1
-@ARG // *ARG[0] // function return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1
+@ARG // *ARG[0] // return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
 M=D // [esp] = *ARG[0]+1

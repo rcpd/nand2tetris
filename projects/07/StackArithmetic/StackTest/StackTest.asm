@@ -1,6 +1,6 @@
 
 // (-3) push constant 17
-@17
+@17 // push constant 17
 D=A
 @SP
 A=M
@@ -9,7 +9,7 @@ M=D
 M=M+1
 
 // (-5) push constant 17
-@17
+@17 // push constant 17
 D=A
 @SP
 A=M
@@ -18,7 +18,7 @@ M=D
 M=M+1
 
 // (-7) eq
-@SP // *esp
+@SP // eq // *esp 
 M=M-1 // *esp-- (*val2)
 A=M // [val2]
 D=M // d = [val2]
@@ -45,7 +45,7 @@ M=D // [esp] = eq result
 M=M+1 // *esp++
 
 // (-12) push constant 17
-@17
+@17 // push constant 17
 D=A
 @SP
 A=M
@@ -54,7 +54,7 @@ M=D
 M=M+1
 
 // (-14) push constant 16
-@16
+@16 // push constant 16
 D=A
 @SP
 A=M
@@ -63,7 +63,7 @@ M=D
 M=M+1
 
 // (-16) eq
-@SP // *esp
+@SP // eq // *esp 
 M=M-1 // *esp-- (*val2)
 A=M // [val2]
 D=M // d = [val2]
@@ -90,7 +90,7 @@ M=D // [esp] = eq result
 M=M+1 // *esp++
 
 // (-21) push constant 16
-@16
+@16 // push constant 16
 D=A
 @SP
 A=M
@@ -99,7 +99,7 @@ M=D
 M=M+1
 
 // (-23) push constant 17
-@17
+@17 // push constant 17
 D=A
 @SP
 A=M
@@ -108,7 +108,7 @@ M=D
 M=M+1
 
 // (-25) eq
-@SP // *esp
+@SP // eq // *esp 
 M=M-1 // *esp-- (*val2)
 A=M // [val2]
 D=M // d = [val2]
@@ -135,7 +135,7 @@ M=D // [esp] = eq result
 M=M+1 // *esp++
 
 // (-30) push constant 892
-@892
+@892 // push constant 892
 D=A
 @SP
 A=M
@@ -144,7 +144,7 @@ M=D
 M=M+1
 
 // (-32) push constant 891
-@891
+@891 // push constant 891
 D=A
 @SP
 A=M
@@ -153,7 +153,7 @@ M=D
 M=M+1
 
 // (-34) lt
-@SP // *esp
+@SP // *esp // lt
 M=M-1 // *esp-- (*val2)
 A=M // [val2]
 D=M // d = [val2]
@@ -180,7 +180,7 @@ M=D // [esp] = eq result
 M=M+1 // *esp++
 
 // (-39) push constant 891
-@891
+@891 // push constant 891
 D=A
 @SP
 A=M
@@ -189,7 +189,7 @@ M=D
 M=M+1
 
 // (-41) push constant 892
-@892
+@892 // push constant 892
 D=A
 @SP
 A=M
@@ -198,7 +198,7 @@ M=D
 M=M+1
 
 // (-43) lt
-@SP // *esp
+@SP // *esp // lt
 M=M-1 // *esp-- (*val2)
 A=M // [val2]
 D=M // d = [val2]
@@ -225,7 +225,7 @@ M=D // [esp] = eq result
 M=M+1 // *esp++
 
 // (-48) push constant 891
-@891
+@891 // push constant 891
 D=A
 @SP
 A=M
@@ -234,7 +234,7 @@ M=D
 M=M+1
 
 // (-50) push constant 891
-@891
+@891 // push constant 891
 D=A
 @SP
 A=M
@@ -243,7 +243,7 @@ M=D
 M=M+1
 
 // (-52) lt
-@SP // *esp
+@SP // *esp // lt
 M=M-1 // *esp-- (*val2)
 A=M // [val2]
 D=M // d = [val2]
@@ -270,7 +270,7 @@ M=D // [esp] = eq result
 M=M+1 // *esp++
 
 // (-57) push constant 32767
-@32767
+@32767 // push constant 32767
 D=A
 @SP
 A=M
@@ -279,7 +279,7 @@ M=D
 M=M+1
 
 // (-59) push constant 32766
-@32766
+@32766 // push constant 32766
 D=A
 @SP
 A=M
@@ -288,7 +288,7 @@ M=D
 M=M+1
 
 // (-61) gt
-@SP // *esp
+@SP // *esp // gt
 M=M-1 // *esp-- (*val2)
 A=M // [val2]
 D=M // d = [val2]
@@ -315,7 +315,7 @@ M=D // [esp] = eq result
 M=M+1 // *esp++
 
 // (-66) push constant 32766
-@32766
+@32766 // push constant 32766
 D=A
 @SP
 A=M
@@ -324,7 +324,7 @@ M=D
 M=M+1
 
 // (-68) push constant 32767
-@32767
+@32767 // push constant 32767
 D=A
 @SP
 A=M
@@ -333,7 +333,7 @@ M=D
 M=M+1
 
 // (-70) gt
-@SP // *esp
+@SP // *esp // gt
 M=M-1 // *esp-- (*val2)
 A=M // [val2]
 D=M // d = [val2]
@@ -360,7 +360,7 @@ M=D // [esp] = eq result
 M=M+1 // *esp++
 
 // (-75) push constant 32766
-@32766
+@32766 // push constant 32766
 D=A
 @SP
 A=M
@@ -369,7 +369,7 @@ M=D
 M=M+1
 
 // (-77) push constant 32766
-@32766
+@32766 // push constant 32766
 D=A
 @SP
 A=M
@@ -378,7 +378,7 @@ M=D
 M=M+1
 
 // (-79) gt
-@SP // *esp
+@SP // *esp // gt
 M=M-1 // *esp-- (*val2)
 A=M // [val2]
 D=M // d = [val2]
@@ -405,7 +405,7 @@ M=D // [esp] = eq result
 M=M+1 // *esp++
 
 // (-84) push constant 57
-@57
+@57 // push constant 57
 D=A
 @SP
 A=M
@@ -414,7 +414,7 @@ M=D
 M=M+1
 
 // (-86) push constant 31
-@31
+@31 // push constant 31
 D=A
 @SP
 A=M
@@ -423,7 +423,7 @@ M=D
 M=M+1
 
 // (-88) push constant 53
-@53
+@53 // push constant 53
 D=A
 @SP
 A=M
@@ -432,7 +432,7 @@ M=D
 M=M+1
 
 // (-90) add
-@SP
+@SP // add
 M=M-1
 A=M
 D=M
@@ -444,7 +444,7 @@ M=D+M
 M=M+1
 
 // (-92) push constant 112
-@112
+@112 // push constant 112
 D=A
 @SP
 A=M
@@ -453,7 +453,7 @@ M=D
 M=M+1
 
 // (-94) sub
-@SP
+@SP // sub
 M=M-1
 A=M
 D=M
@@ -465,7 +465,7 @@ M=M-D
 M=M+1
 
 // (-96) neg
-@SP
+@SP // neg
 M=M-1
 A=M
 M=-M
@@ -473,7 +473,7 @@ M=-M
 M=M+1
 
 // (-98) and
-@SP
+@SP // and
 M=M-1
 A=M
 D=M
@@ -485,7 +485,7 @@ M=D&M
 M=M+1
 
 // (-100) push constant 82
-@82
+@82 // push constant 82
 D=A
 @SP
 A=M
@@ -494,7 +494,7 @@ M=D
 M=M+1
 
 // (-102) or
-@SP
+@SP // or
 M=M-1
 A=M
 D=M
@@ -506,7 +506,7 @@ M=M|D
 M=M+1
 
 // (-104) not
-@SP
+@SP // not
 M=M-1
 A=M
 M=!M

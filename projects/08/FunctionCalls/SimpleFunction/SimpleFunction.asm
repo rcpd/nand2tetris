@@ -1,9 +1,9 @@
 
 // (-3) function SimpleFunction.test 2
-(SimpleFunction.test)
+(SimpleFunction.test) // function SimpleFunction.test 2
 
 // (-6) push local 0
-@LCL
+@LCL // push local 0
 D=M
 @0
 A=D+A
@@ -15,7 +15,7 @@ M=D
 M=M+1
 
 // (-8) push local 1
-@LCL
+@LCL // push local 1
 D=M
 @1
 A=D+A
@@ -27,7 +27,7 @@ M=D
 M=M+1
 
 // (-10) add
-@SP
+@SP // add
 M=M-1
 A=M
 D=M
@@ -39,7 +39,7 @@ M=D+M
 M=M+1
 
 // (-12) not
-@SP
+@SP // not
 M=M-1
 A=M
 M=!M
@@ -47,7 +47,7 @@ M=!M
 M=M+1
 
 // (-14) push argument 0
-@ARG
+@ARG // push argument 0
 D=M
 @0
 A=D+A
@@ -59,7 +59,7 @@ M=D
 M=M+1
 
 // (-16) add
-@SP
+@SP // add
 M=M-1
 A=M
 D=M
@@ -71,7 +71,7 @@ M=D+M
 M=M+1
 
 // (-18) push argument 1
-@ARG
+@ARG // push argument 1
 D=M
 @1
 A=D+A
@@ -83,7 +83,7 @@ M=D
 M=M+1
 
 // (-20) sub
-@SP
+@SP // sub
 M=M-1
 A=M
 D=M
@@ -96,8 +96,8 @@ M=M+1
 
 // (-22) return
 
-// (-24) pop argument 0 // function return: move result to ARG[0] (soon to be last stack item)
-@ARG
+// (-24) pop argument 0 // return: move result to ARG[0] (soon to be last stack item)
+@ARG // pop argument 0 // return: move result to ARG[0] (soon to be last stack item)
 D=M
 @0
 D=D+A
@@ -115,7 +115,7 @@ A=M
 M=D
 @SP
 M=M-1
-@ARG // *ARG[0] // function return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1
+@ARG // *ARG[0] // return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
 M=D // [esp] = *ARG[0]+1
