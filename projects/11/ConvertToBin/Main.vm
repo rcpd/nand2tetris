@@ -1,0 +1,8 @@
+// class Main
+function Main.main 0
+// var int value (local)
+push constant 8001
+push constant 16
+push constant 1
+neg
+call Main.fillMemory 0
