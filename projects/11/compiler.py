@@ -521,11 +521,14 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
             k += 1
 
         elif input_list[i][0] == "stringConstant":
-            cmd.append("push constant %s // strlen" % len(input_list[i][1]))
-            cmd.append("call String.new 1 // %s" % input_list[i][1])
+            cmd.append("push constant %s // strlen" % (len(input_list[i][1])+1))
+            cmd.append("call String.new 1 // \"%s\"" % input_list[i][1])
             for c, char in enumerate(input_list[i][1]):
                 compile_char(char, cmd)
                 cmd.append("call String.appendChar 2")  # TODO: why 2?
+            # pad with space  # TODO: find where padding stripped
+            compile_char(" ", cmd)
+            cmd.append("call String.appendChar 2 // padding space")  # TODO: why 2?
             k += 1
 
         else:

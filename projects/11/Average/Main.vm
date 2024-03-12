@@ -5,65 +5,165 @@ function Main.main 4
 // var int length (local 1)
 // var int i (local 2)
 // var int sum (local 3)
-push constant 3
+// external call Keyboard.readInt
+push constant 18 // strlen
+call String.new 1 // "How many numbers?"
+push constant 72 // H (char)
+call String.appendChar 2
+push constant 111 // o (char)
+call String.appendChar 2
+push constant 119 // w (char)
+call String.appendChar 2
+push constant 32 //   (char)
+call String.appendChar 2
+push constant 109 // m (char)
+call String.appendChar 2
+push constant 97 // a (char)
+call String.appendChar 2
+push constant 110 // n (char)
+call String.appendChar 2
+push constant 121 // y (char)
+call String.appendChar 2
+push constant 32 //   (char)
+call String.appendChar 2
+push constant 110 // n (char)
+call String.appendChar 2
+push constant 117 // u (char)
+call String.appendChar 2
+push constant 109 // m (char)
+call String.appendChar 2
+push constant 98 // b (char)
+call String.appendChar 2
+push constant 101 // e (char)
+call String.appendChar 2
+push constant 114 // r (char)
+call String.appendChar 2
+push constant 115 // s (char)
+call String.appendChar 2
+push constant 63 // ? (char)
+call String.appendChar 2
+push constant 32 //   (char)
+call String.appendChar 2 // padding space
+call Keyboard.readInt 1
 pop local 1 // length =
 // external call Array.new
-push local 1 // length
+push local 1 // length (arg)
 call Array.new 1
 pop local 0 // a =
-push local 0 // a (array)
 push constant 0
+pop local 2 // i =
+
+label WHILE_TEST_main_0 // test while <expression>
+push local 2 // i (arg)
+push local 1 // length
+lt
+
+if-goto WHILE_TRUE_main_0 // jump to start while (true)
+goto WHILE_FALSE_main_0 // jump to exit while (false)
+
+label WHILE_TRUE_main_0 // start while
+push local 0 // a (array)
+push local 2 // i (arg)
 add // offset = array + [index]
 pop pointer 1 // *that = array[index]
 push that 0 // array[index]
 pop temp 0 // discard expression push
+push pointer 1 // retrieve array pointer
+pop temp 0 // store array pointer
 
-// result
-push constant 0
+// compute result
+// external call Keyboard.readInt
+push constant 16 // strlen
+call String.new 1 // "Enter a number:"
+push constant 69 // E (char)
+call String.appendChar 2
+push constant 110 // n (char)
+call String.appendChar 2
+push constant 116 // t (char)
+call String.appendChar 2
+push constant 101 // e (char)
+call String.appendChar 2
+push constant 114 // r (char)
+call String.appendChar 2
+push constant 32 //   (char)
+call String.appendChar 2
+push constant 97 // a (char)
+call String.appendChar 2
+push constant 32 //   (char)
+call String.appendChar 2
+push constant 110 // n (char)
+call String.appendChar 2
+push constant 117 // u (char)
+call String.appendChar 2
+push constant 109 // m (char)
+call String.appendChar 2
+push constant 98 // b (char)
+call String.appendChar 2
+push constant 101 // e (char)
+call String.appendChar 2
+push constant 114 // r (char)
+call String.appendChar 2
+push constant 58 // : (char)
+call String.appendChar 2
+push constant 32 //   (char)
+call String.appendChar 2 // padding space
+call Keyboard.readInt 1
+push temp 0 // retrieve array[index] pointer
+pop pointer 1 // set array[index] pointer
 pop that 0 // array[index] = result
 
-push local 0 // a (array)
-push constant 1
+push local 3 // sum (arg)
+push local 0 // a
+add
+push local 2 // i (arg)
 add // offset = array + [index]
 pop pointer 1 // *that = array[index]
 push that 0 // array[index]
-pop temp 0 // discard expression push
-
-// result
-push constant 2
-pop that 0 // array[index] = result
-
-push local 0 // a (array)
-push constant 2
-add // offset = array + [index]
-pop pointer 1 // *that = array[index]
-push that 0 // array[index]
-pop temp 0 // discard expression push
-
-// result
-push constant 15
-pop that 0 // array[index] = result
-
-push local 0 // a (array)
-push local 0 // a (array)
-push local 0 // a (array)
-push constant 0
-add // offset = array + [index]
-pop pointer 1 // *that = array[index]
-push that 0 // array[index]
+pop local 3 // sum =
+push local 2 // i (arg)
 push constant 1
 add
-add // offset = array + [index]
-pop pointer 1 // *that = array[index]
-push that 0 // array[index]
-add // offset = array + [index]
-pop pointer 1 // *that = array[index]
-push that 0 // array[index]
-push constant 2
-call Math.multiply 2
-pop local 3 // sum =
+pop local 2 // i =
+goto WHILE_TEST_main_0 // loop or exit
+label WHILE_FALSE_main_0 // exit while
+
+// external call Output.printString
+push constant 15 // strlen
+call String.new 1 // "The average is"
+push constant 84 // T (char)
+call String.appendChar 2
+push constant 104 // h (char)
+call String.appendChar 2
+push constant 101 // e (char)
+call String.appendChar 2
+push constant 32 //   (char)
+call String.appendChar 2
+push constant 97 // a (char)
+call String.appendChar 2
+push constant 118 // v (char)
+call String.appendChar 2
+push constant 101 // e (char)
+call String.appendChar 2
+push constant 114 // r (char)
+call String.appendChar 2
+push constant 97 // a (char)
+call String.appendChar 2
+push constant 103 // g (char)
+call String.appendChar 2
+push constant 101 // e (char)
+call String.appendChar 2
+push constant 32 //   (char)
+call String.appendChar 2
+push constant 105 // i (char)
+call String.appendChar 2
+push constant 115 // s (char)
+call String.appendChar 2
+push constant 32 //   (char)
+call String.appendChar 2 // padding space
+call Output.printString 1
+pop temp 0 // discard return on do call
 // external call Output.printInt
-push local 3 // sum
+push local 3 // sum (arg)
 push local 1 // length
 call Math.divide 2
 call Output.printInt 1
