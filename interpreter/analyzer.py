@@ -259,6 +259,19 @@ def main(filepath, debug=False):
                     # insert new token and update parent
                     parent = Et.SubElement(parent, "term")
 
+            # open statement (inner statement after { for while/if)
+            elif input_list[i][0] == "symbol" and input_list[i][1] == "{" \
+                    and parent.tag in ("ifStatement", "whileStatement"):
+
+                # insert current token
+                child = Et.SubElement(parent, input_tuple[0])
+                child.text = " %s " % input_tuple[1]
+
+                # if required insert statements & update parent
+                if parent.tag != "statements":
+                    # insert new token and update parent
+                    parent = Et.SubElement(parent, "statements")
+
             # open statements (letStatement/doStatement/whileStatement/ifStatement)
             elif input_list[i][0] == "keyword" and input_list[i][1] in ("let", "do", "while", "if", "return"):
                 # if required insert statements & update parent
@@ -292,7 +305,7 @@ def main(filepath, debug=False):
                 # insert new token and update parent
                 parent = Et.SubElement(parent, "parameterList")
 
-            # insert current token"
+            # insert current token
             else:
                 child = Et.SubElement(parent, input_tuple[0])
                 child.text = " %s " % input_tuple[1]
