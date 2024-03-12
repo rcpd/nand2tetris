@@ -73,6 +73,7 @@
           <identifier> draw </identifier>
           <symbol> ( </symbol>
           <expressionList>
+            <expression/>
           </expressionList>
           <symbol> ) </symbol>
           <symbol> ; </symbol>
@@ -95,8 +96,7 @@
     <keyword> void </keyword>
     <identifier> dispose </identifier>
     <symbol> ( </symbol>
-    <parameterList>
-    </parameterList>
+    <parameterList/>
     <symbol> ) </symbol>
     <subroutineBody>
       <symbol> { </symbol>
