@@ -53,13 +53,6 @@ def main(debug=False):
         for i, input_tuple in enumerate(input_list):
             j = i+1  # next token
 
-            # TODO: debug
-            try:
-                if input_list[i][1] == "-" and input_list[j][1] == "j":
-                    print("bp")
-            except IndexError:
-                pass
-
             if debug:
                 print("// line:", input_tuple[0], input_tuple[1])
 
@@ -208,15 +201,16 @@ def main(debug=False):
 
                 # open expression/expressionList
                 elif (input_list[i][0] == "symbol" and input_list[i][1] == "=") \
-                    or (parent.tag in ("expression", "term", "letStatement", "whileStatement", "doStatement", "ifStatement")
-                        and input_list[i][0] == "symbol" and input_list[i][1] in ("(", "[")):
+                    or (parent.tag in ("expression", "term", "letStatement", "whileStatement", "doStatement",
+                        "ifStatement") and input_list[i][0] == "symbol" and input_list[i][1] in ("(", "[")):
 
                     if parent.tag != "expression":
                         # insert current token
                         child = ET.SubElement(parent, input_tuple[0])
                         child.text = " %s " % input_tuple[1]
 
-                        if parent.tag not in ("letStatement", "whileStatement", "ifStatement") and input_list[i][1] != "[":
+                        if parent.tag not in ("letStatement", "whileStatement", "ifStatement") \
+                            and input_list[i][1] != "[":
                             # test if already part of expressionList
                             # term > expression > expressionList
                             if parent.tag == "term":
@@ -310,19 +304,26 @@ def main(debug=False):
                 else:
                     raise
 
-        # write output
-        tree_string = ET.tostring(output_root)
-        raw_xml = minidom.parseString(tree_string)
-        pretty_xml = raw_xml.toprettyxml(indent="  ").replace(r'<?xml version="1.0" ?>'+"\n", '')
+        # write/check output
         output_filepath = filepath.replace(".jack", "_out.xml")
-        print("Writing: %s" % output_filepath)
+        match_filepath = filepath.replace(".jack", ".xml")
+        tree_string = ET.tostring(output_root).strip()
+        raw_xml = minidom.parseString(tree_string)
+        pretty_xml = raw_xml.toprettyxml(indent="  ").replace(r'<?xml version="1.0" ?>'+'\n', '')
+        # pretty_xml += "\n"
 
-        # if debug:
-        print("\n%s" % pretty_xml)
+        print("Writing: %s" % output_filepath)
+        if debug:
+            print(pretty_xml)
 
         with open(output_filepath, "w") as output_file:
             output_file.write(pretty_xml)
+        with open(match_filepath, "r") as match_file:
+            match_contents = match_file.read()
+
+        if match_contents != pretty_xml:
+            raise RuntimeError("%s did not match solution file" % output_file)
 
 
 if __name__ == '__main__':
-    main(debug=True)
+    main(debug=False)
