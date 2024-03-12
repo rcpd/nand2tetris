@@ -133,34 +133,18 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                # open expression (nested in term)
-                elif input_list[i][0] == "symbol" and input_list[i][1] == "[" and parent.tag == "term":
-                    # insert current token
-                    child = ET.SubElement(parent, input_tuple[0])
-                    child.text = " %s " % input_tuple[1]
-
-                    # insert new token and update parent
-                    parent = ET.SubElement(parent, "expression")
-
-                # open expression
+                # open expression/expressionList
                 elif (input_list[i][0] == "symbol" and input_list[i][1] == "=") \
-                    or (parent.tag in ("letStatement", "whileStatement")
+                    or (parent.tag in ("term", "letStatement", "whileStatement", "doStatement")
                         and input_list[i][0] == "symbol" and input_list[i][1] in ("(", "[")):
                     # insert current token
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
+                    if parent.tag not in ("letStatement", "whileStatement") and input_list[i][1] != "[":
+                        parent = ET.SubElement(parent, "expressionList")
+
                     # insert new token and update parent
-                    parent = ET.SubElement(parent, "expression")
-
-                # open expressionList
-                elif parent.tag == "term" and input_list[i][0] == "symbol" and input_list[i][1] == "(":
-                    # insert current token
-                    child = ET.SubElement(parent, input_tuple[0])
-                    child.text = " %s " % input_tuple[1]
-
-                    # insert new tokens & update parents
-                    parent = ET.SubElement(parent, "expressionList")
                     parent = ET.SubElement(parent, "expression")
 
                 # open term
