@@ -18,6 +18,9 @@ def dump_call_tree(call_tree, debug_msg):
 def run(asm_filepath, static_dict=None, tst_params=None, debug=False):
     # TODO: (week 6-8) all asm/tst/cmp/out/vms parsed/compiled/executed/passed
     # TODO: translator finish stack mapping: other stack manip(stacksize), functions(stackframes)
+    # TODO: maybe stacksize should be <start-sp>-esp function instead?
+    # TODO: maybe stack metadata could use address labels dict?
+    # TODO: experiment with ebp (stackframe pointer) implementation
     # TODO: move remaining python comments to asm: associate all asm with function, check linebreaks
     # TODO: doc strings
     # TODO: (future) write a HDL module for interpreter?
