@@ -352,6 +352,19 @@ def run(asm_filepath, static_dict=None, tst_params=None, debug=False):
 
 
 if __name__ == '__main__':
+    '''
+    Projects 1-5: HDL, see python_hdl project for hardware emulation validation
+    Project 6:    Assembler, binary hack files are matched against cmp solution binary
+    Project 7-8:  VM > ASM transpile, orchestrated with tst script, tested against cmp solution machine state
+                  Resulting asm files also assembled to hack (integration test only)
+    Project 9-10: Jack files are tokenized/analyzed, also compiled (integration test only)
+                  Note: Project 9 does not have solution files (tested manually)
+    Project 11:   Compiler, updated tokenizer/analyzer
+    Project 12:   Implement the OS libraries in Jack
+    '''
+    # TODO: when compiler is stable, add Project 9-11 Jack/VM/ASM/XML files to interpreter chain (integration test only)
+    # TODO: if OS ever completed, add Project 12 Jack/VM/ASM/XML files to interpreter chain (integration test only)
+
     # regular VM programs
     # TODO: standardise paths
     _vm_dirpaths = [
@@ -364,8 +377,6 @@ if __name__ == '__main__':
         r'..\projects\08\ProgramFlow\BasicLoop',
         r'..\projects\08\ProgramFlow\FibonacciSeries',
         r'..\projects\08\FunctionCalls\SimpleFunction',
-
-        # r"..\projects\11\Seven",  # TODO: is injecting changes?
     ]
 
     # VM programs that require non-spec bootstrap to pass tests
@@ -392,7 +403,7 @@ if __name__ == '__main__':
         "../projects/08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
     ]
 
-    binary_asm_filepaths = [  # compilation only
+    binary_asm_filepaths = [  # compilation & binary match to solution (where available)
         "../projects/04/fill/fill.asm",
         "../projects/04/mult/mult.asm",
         "../projects/06/add/add.asm",
@@ -402,8 +413,6 @@ if __name__ == '__main__':
         "../projects/06/pong/pongL.asm",
         "../projects/06/rect/rect.asm",
         "../projects/06/rect/rectL.asm",
-
-        # r"../projects/11/Seven/Seven.asm",  # TODO: is injecting changes?
     ]
 
     debug_runs = [True]

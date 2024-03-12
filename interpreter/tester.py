@@ -144,7 +144,7 @@ def load_cmp(cmp_filepath, debug=False):
 
 if __name__ == '__main__':
     tst_filepaths = [
-        # TODO: week 5 and below use different multi row format
+        # week 5 and below use different multi row format (tested manually)
         # "../04/fill/fill.tst",  # no cmp, no meaningful test
         # "../04/mult/mult.tst",
 
