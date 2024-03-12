@@ -145,7 +145,7 @@ def load_cmp(cmp_filepath, debug=False):
 
 if __name__ == '__main__':
     tst_filepaths = [
-        # project 1-12 accounted for, included in interpreter
+        # project 1-12 accounted for & included in interpreter!
 
         # week 5 and below use different multi row format (tested with HardwareSimulator/CPUEmulator)
         # r'..\projects\04\fill\Fill.tst',  # interactive test (passed manually)
@@ -163,11 +163,6 @@ if __name__ == '__main__':
         r"..\projects\08\FunctionCalls\StaticsTest\StaticsTest.tst",
         r"..\projects\08\ProgramFlow\BasicLoop\BasicLoop.tst",
         r"..\projects\08\ProgramFlow\FibonacciSeries\FibonacciSeries.tst",
-
-        # r'..\projects\12\ArrayTest\ArrayTest.tst',  # TODO
-        # r'..\projects\12\MathTest\MathTest.tst',  # TODO
-        # r'..\projects\12\MemoryTest\MemoryTest.tst'  # TODO
-        # r'..\projects\12\MemoryTest\MemoryDiag.tst'  # TODO
     ]
 
     debug_runs = [True, False]

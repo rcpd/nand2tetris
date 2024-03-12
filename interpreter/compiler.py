@@ -1290,8 +1290,12 @@ if __name__ == '__main__':
         [r"..\projects\11\Square\Main.jack",
          r"..\projects\11\Square\Square.jack",
          r"..\projects\11\Square\SquareGame.jack"],
+
+        # TODO: Project 12
         [r"..\projects\12\SysTest\Main.jack",
          r"..\projects\12\SysTest\Sys.jack"],
+        [r"..\projects\12\ArrayTest\Main.jack",
+         r"..\projects\12\ArrayTest\Array.jack"],
     ]
 
     # matched to course compiler
@@ -1316,6 +1320,9 @@ if __name__ == '__main__':
         r"..\projects\11\ComplexArrays\Main.vm": 702,
         r"..\projects\12\SysTest\Main.vm": 281,
         r"..\projects\12\SysTest\Sys.vm": 83,
+        r"..\projects\12\ArrayTest\Main.vm": 131,
+        r"..\projects\12\ArrayTest\Array.vm": 23,
+
     }
 
     debug = True  # default True if run from main, otherwise False if called externally

@@ -903,7 +903,10 @@ if __name__ == "__main__":
         r"..\projects\11\Pong",
         r"..\projects\11\Seven",
         r"..\projects\11\Square",
+
+        # TODO: Project 12
         r"..\projects\12\SysTest",
+        r"..\projects\12\ArrayTest",
     ]
 
     # VM programs that require non-spec bootstrap to pass tests
