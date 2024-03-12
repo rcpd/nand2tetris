@@ -290,6 +290,9 @@ def compile_assignment(class_dict, class_name, func_name, var_name, exp_buffer, 
         exp_buffer.append("push temp 0 // restore result")
         exp_buffer.append("pop pointer 1 // that = *array[index]")
         exp_buffer.append("pop temp 0 // save result (rhs/call/expression)")
+        exp_buffer.append("push %s %s // %s (*array var)" %
+                          (class_dict[class_name][func_name]['args'][var_name]['kind'],
+                           class_dict[class_name][func_name]['args'][var_name]['index'], var_name))
 
     if var_scope == 'local':
         class_dict[class_name][func_name]['args'][var_name]['initialized'] = True
@@ -603,8 +606,17 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
             pcode, exp_buffer = pop_buffer(pcode, exp_buffer, stop_at="// (")  # i.e. expression was not bracketed
 
     elif identifier:
+        # identify array var
+        array = False
+        if func_name and identifier in class_dict[class_name][func_name]['args']:
+            if class_dict[class_name][func_name]['args'][identifier]['type'] == 'Array':
+                array = True
+        elif identifier in class_dict[class_name]['args']:
+            if class_dict[class_name]['args'][identifier]['type'] == 'Array':
+                array = True
+
         # attempt to lookup class/func attributes (2 passes)
-        if not parent_obj:
+        if not array and not parent_obj:
             if identifier in sys_func or identifier in class_dict:
                 parent_obj = identifier
 
@@ -616,7 +628,7 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
                 if class_dict[class_name]['args'][identifier]['type'] in objects:
                     parent_obj = class_dict[class_name]['args'][identifier]['type']
 
-        elif not child_func:
+        elif not array and parent_obj and not child_func:
             if parent_obj in sys_func:
                 if identifier in sys_func[parent_obj]:
                     child_func = identifier
@@ -625,20 +637,20 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
                     child_func = identifier
 
         # if parent/child pair found assume call & compile
-        if parent_obj and child_func:
+        if not array and parent_obj and child_func:
             exp_buffer = compile_call(pcode, parent_obj, child_func, num_params, statement, class_name=class_name,
                                       exp_buffer=exp_buffer, class_dict=class_dict, qualified=True)
             parent_obj = child_func = ''
 
         # compile unqualified function call
-        elif identifier in class_dict[class_name]:
+        elif not array and identifier in class_dict[class_name]:
             exp_buffer = compile_call(pcode, class_name, identifier, num_params, statement, class_name=class_name,
                                       exp_buffer=exp_buffer, class_dict=class_dict, qualified=False)
             parent_obj = child_func = ''
 
         # compile as regular var (local)
         elif identifier in class_dict[class_name][func_name]['args']:
-            if class_dict[class_name][func_name]['args'][identifier]['type'] == 'Array':
+            if array:
                 # if var is array compile to buffer
                 exp_buffer = compile_var(pcode, class_dict, class_name, func_name, identifier, 'local',
                                          exp_buffer=exp_buffer)
@@ -648,7 +660,7 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
 
         # compile as regular var (member)
         elif identifier in class_dict[class_name]['args']:
-            if class_dict[class_name]['args'][identifier]['type'] == 'Array':
+            if array:
                 # if var is array compile to buffer
                 exp_buffer = compile_var(pcode, class_dict, class_name, func_name, identifier, 'member',
                                          exp_buffer=exp_buffer)
@@ -716,9 +728,6 @@ def main(filepath, file_list):
                 keyword = var_type = func_type = ''  # reset tag context on depth change
 
             if elem.tag == 'keyword':
-                # if elem.text == 'null' and 'List.jack' in pre_file:
-                #     print()
-
                 if not keyword:
                     keyword = elem.text  # preserved for later
                 elif not var_type:
@@ -739,9 +748,6 @@ def main(filepath, file_list):
 
             elif elem.tag == 'identifier':
                 identifier = elem.text
-
-                # if identifier == 'List' and 'List.jack' in pre_file:
-                #     print()
 
                 if keyword == 'class':
                     class_name = identifier  # preserved for later
@@ -1053,16 +1059,6 @@ def main(filepath, file_list):
                 end_block = True  # compilation triggered on next token due to if-no-else case
 
             elif symbol == "[":
-                if lhs_var_name:  # collected during let statement
-                    # only compile var to buffer now if var is array
-                    if class_dict[class_name][func_name]['args'][lhs_var_name]['type'] == 'Array':
-                        exp_buffer.append("push %s %s // %s (*array var)" %
-                                          (class_dict[class_name][func_name]['args'][lhs_var_name]['kind'],
-                                           class_dict[class_name][func_name]['args'][lhs_var_name]['index'],
-                                           lhs_var_name))
-                else:
-                    raise NotImplementedError  # FIXME: array in rhs expression
-
                 # mark the start of a new expression
                 pcode, exp_buffer, parent_obj, child_func = \
                     expression_handler(pcode, statement, exp_buffer, class_dict=class_dict, identifier=identifier,
@@ -1077,9 +1073,13 @@ def main(filepath, file_list):
                 pcode = store_pcode(pcode, "add // *array var + [index]")
 
                 # if part of an expression deref the array[index] immediately
+                # FIXME: how to deref arrays in expression that doesn't also activate on LHS premuaturely?
+                #  let b[a[3]] = a[3] + 3;
                 if not lhs_array:
                     pcode = store_pcode(pcode, "pop pointer 1 // *that =")
                     pcode = store_pcode(pcode, "push that 0 // **that (array[index])")
+                else:
+                    pass  # <<
 
             elif symbol == "(":
                 # mark the start of a new expression
@@ -1173,25 +1173,25 @@ if __name__ == '__main__':
 
     jack_filepaths = [
         # compiled / tested
-        # [r"..\09\Average\Main.jack"],
-        # [r"..\11\Seven\Main.jack"],
-        # [r"..\11\ConvertToBin\Main.jack"],
-        # [r"..\09\Fraction\Main.jack",
-        #  r"..\09\Fraction\Fraction.jack"],
-        # [r"..\09\HelloWorld\Main.jack"],
-        # [r"..\09\List\Main.jack",
-        #  r"..\09\List\List.jack"],
-        # [r"..\09\Square\Main.jack",
-        #  r"..\09\Square\Square.jack",
-        #  r"..\09\Square\SquareGame.jack"],
-        # [r"..\10\ArrayTest\Main.jack"],
-        # [r"..\11\Pong\Ball.jack",
-        #  r"..\11\Pong\Bat.jack",
-        #  r"..\11\Pong\Main.jack",
-        #  r"..\11\Pong\PongGame.jack"],
+        [r"..\09\Average\Main.jack"],
+        [r"..\11\Seven\Main.jack"],
+        [r"..\11\ConvertToBin\Main.jack"],
+        [r"..\09\Fraction\Main.jack",
+         r"..\09\Fraction\Fraction.jack"],
+        [r"..\09\HelloWorld\Main.jack"],
+        [r"..\09\List\Main.jack",
+         r"..\09\List\List.jack"],
+        [r"..\09\Square\Main.jack",
+         r"..\09\Square\Square.jack",
+         r"..\09\Square\SquareGame.jack"],
+        [r"..\10\ArrayTest\Main.jack"],
+        [r"..\11\Pong\Ball.jack",
+         r"..\11\Pong\Bat.jack",
+         r"..\11\Pong\Main.jack",
+         r"..\11\Pong\PongGame.jack"],
 
         # wip
-        # [r"..\11\ComplexArrays\Main.jack"],  # FIXME: array in rhs expression
+        [r"..\11\ComplexArrays\Main.jack"],  # FIXME: array in lhs array / rhs expression
 
         # TODO: add Project 12 test programs
 
