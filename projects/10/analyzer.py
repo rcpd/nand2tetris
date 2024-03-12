@@ -4,8 +4,22 @@ from xml.dom import minidom
 
 
 def find_parent(tree, node):
+    """
+    Draw a map of the tree and yield the parent from node
+    """
     parent_map = {c: p for p in tree.iter() for c in p}
     return parent_map[node]
+
+
+def find_ancestor(tree, node, ancestors):
+    """
+    Draw a map of the tree and yield the parent from node until ancestor is found
+    """
+    if node.tag not in ancestors:
+        parent_map = {c: p for p in tree.iter() for c in p}
+        while parent_map[node].tag not in ancestors:
+            node = parent_map[node]
+    return node
 
 
 def main(debug=False):
