@@ -1,0 +1,9 @@
+// class Main
+function Main.main 0
+push constant 2
+push constant 3
+call Math.multiply 2
+push constant 1
+add
+call Output.printInt 1
+return
