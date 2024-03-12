@@ -1,3 +1,8 @@
+"""
+From a JACK source file tokenize every word/symbol in the source file into the *T_out.xml
+Where available the solution files are *T.xml (i.e. not *T_out.xml)
+"""
+
 import xml.etree.ElementTree as ET
 import re
 import os

@@ -232,8 +232,10 @@ def main(filepath, debug=False):
                 if exp_buffer:
                     pcode = compile_literal(pcode, exp_buffer.pop())
             elif symbol in op_map:
-                # FIXME: "neg" not "sub" in terms
-                exp_buffer.append(op_map[symbol])
+                if symbol == "-" and parent == "term":
+                    exp_buffer.append("neg")  # not "sub"
+                else:
+                    exp_buffer.append(op_map[symbol])
             elif symbol == ',':
                 pass
             elif symbol == ';':

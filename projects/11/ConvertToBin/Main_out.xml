@@ -66,9 +66,8 @@
             </expression>
             <symbol> , </symbol>
             <expression>
-              <term/>
-              <symbol> - </symbol>
               <term>
+                <symbol> - </symbol>
                 <integerConstant> 1 </integerConstant>
               </term>
             </expression>
