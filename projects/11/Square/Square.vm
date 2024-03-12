@@ -10,6 +10,7 @@ push argument 1 // Ay
 pop this 1 // y =
 push argument 2 // Asize
 pop this 2 // size =
+push pointer 0 // Square (this)
 call Square.draw 1
 push pointer 0 // this
 return
@@ -82,11 +83,13 @@ and
 if-goto IF_incSize_0 // enter if
 goto ELSE_incSize_0 // exit if or enter else
 label IF_incSize_0 // start if
+push pointer 0 // Square (this)
 call Square.erase 1
 push this 2 // size
 push constant 2
 add
 pop this 2 // size =
+push pointer 0 // Square (this)
 call Square.draw 1
 
 label ELSE_incSize_0 // else
@@ -106,12 +109,14 @@ gt
 if-goto IF_decSize_0 // enter if
 goto ELSE_decSize_0 // exit if or enter else
 label IF_decSize_0 // start if
+push pointer 0 // Square (this)
 call Square.erase 1
 push this 2 // size
 push constant 2
 neg
 add
 pop this 2 // size =
+push pointer 0 // Square (this)
 call Square.draw 1
 
 label ELSE_decSize_0 // else

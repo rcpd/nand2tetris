@@ -405,37 +405,48 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
     while input_list[j][1] != ";":
         if input_list[j][0] == "identifier":
             # call // identify "do class.func();" or "do func();"
-            class_func = (input_list[j+1][1] == "." and input_list[j+2][0] == "identifier" and
+            class_call = (input_list[j+1][1] == "." and input_list[j+2][0] == "identifier" and
                           input_list[j+3][1] == "(")
-            if class_func or input_list[j+1][1] == "(":
-                # parse function params
-                if class_func:
-                    # push implicit "this" argument for class methods
-                    var = None
-                    if input_list[j][1] in class_dict[class_name][func_name]["args"]:  # local
+            local_call = False
+            if not class_call and input_list[j][1] in class_dict[class_name]:
+                local_call = True
+            if class_call or input_list[j+1][1] == "(":
+                # determine parent of callee function
+                var = None
+                if local_call:
+                    var = class_dict[class_name][input_list[j][1]]
+                if class_call:
+                    call_obj = input_list[j][1] + "." + input_list[j+2][1]
+                    if input_list[j][1] in class_dict[class_name][func_name]["args"]:  # local obj
                         var = class_dict[class_name][func_name]["args"][input_list[j][1]]
-                    elif input_list[j][1] in class_dict[class_name]["args"]:  # class attr
+                    elif input_list[j][1] in class_dict[class_name]["args"]:  # class attr obj
                         var = class_dict[class_name]["args"][input_list[j][1]]
+                    elif input_list[j+2][1] in class_dict[class_name]:  # class func
+                        var = class_dict[class_name][input_list[j+2][1]]
                     else:  # non-local call
-                        call_type = input_list[j][1] + input_list[j+1][1] + input_list[j+2][1]
-                        store_pcode(pcode, "// static call %s " % call_type)
+                        store_pcode(pcode, "// external call %s" % call_obj)
 
-                    if var is not None:
-                        if var["kind"] == "field":
-                            store_pcode(pcode, "push %s %s // %s (implicit this push)" % ("this", var["index"],
-                                                                                          input_list[i][1]))
-                        else:
-                            store_pcode(pcode, "push %s %s // %s (implicit this push)" % (var["kind"], var["index"],
-                                                                                          input_list[i][1]))
+                if var is not None:
+                    # push implicit "this" argument for class methods
+                    if var["kind"] == "field":
+                        # FIXME: should check callee is method
+                        store_pcode(pcode, "push %s %s // %s (this)" % ("this", var["index"], input_list[j][1]))
+                    elif var["kind"] == "method":
+                        store_pcode(pcode, "push pointer 0 // %s (this)" % class_name)
+                    elif var["kind"] in ("function", "constructor"):
+                        store_pcode(pcode, "// function call %s" % call_obj)
+                    else:
+                        store_pcode(pcode, "push %s %s // %s (this)" % (var["kind"], var["index"],
+                                                                        input_list[j][1]))
+                if class_call and input_list[j+4][1] != ")":
+                    pcode, proc = compile_expression(pcode, input_list, j+4, class_dict, class_name, func_name)
 
-                    if input_list[j+4][1] != ")":
-                        pcode, proc = compile_expression(pcode, input_list, j+4, class_dict, class_name, func_name)
                 else:
                     if input_list[j+2][1] != ")":
                         pcode, proc = compile_expression(pcode, input_list, j+4, class_dict, class_name, func_name)
 
                 # count params for call
-                if class_func:
+                if class_call:
                     k = j+4
                 else:
                     k = j+2
@@ -448,17 +459,17 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                     k += 1
 
                 # compile call
-                if class_func:
+                if class_call:
                     # lookup class for object (func table > class table > assume external/static)
                     try:
                         obj_type = class_dict[class_name][func_name]["args"][input_list[j][1]]["type"]
-                        # FIXME: potentially unsafe, might be function but not in dict yet
+                        # FIXME: might be function but might not be in dict
                         # TODO: need to roll all files into pre-scan
                         num_params += 1  # inc for implicit this
                     except KeyError:
                         try:
                             obj_type = class_dict[class_name]["args"][input_list[j][1]]["type"]
-                            # FIXME: potentially unsafe, might be function but not in dict yet
+                            # FIXME: might be function but might not be in dict
                             # TODO: need to roll all files into pre-scan
                             num_params += 1  # inc for implicit this
                         except KeyError:
@@ -466,7 +477,7 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                     store_pcode(pcode, "call %s.%s %s" % (obj_type, input_list[j+2][1], num_params))
                 else:
                     # convert local calls to be fully qualified to current class scope
-                    # FIXME: potentially unsafe, probably should check is method
+                    # FIXME: should check callee is method before inc params
                     store_pcode(pcode, "call %s.%s %s" % (class_name, input_list[j][1], num_params+1))
                 return pcode, class_dict
             else:
