@@ -1120,7 +1120,12 @@ if __name__ == '__main__':
         r"..\11\Square\Main.jack",  # compiled / tested
         r"..\11\Square\Square.jack",  # compiled / tested
         r"..\11\Square\SquareGame.jack",  # compiled / tested
-        r"..\11\Average\Main.jack",  # partially compiled/tested
+        r"..\11\Average\Main.jack",  # compiled / tested
+
+        r"..\11\Pong\Ball.jack",
+        r"..\11\Pong\Bat.jack",
+        r"..\11\Pong\Main.jack",
+        r"..\11\Pong\PongGame.jack",
     ]
 
     for _filepath in jack_filepaths:
