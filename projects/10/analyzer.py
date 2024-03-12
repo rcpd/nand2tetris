@@ -53,7 +53,7 @@ def main(debug=False):
 
             # TODO: debug
             try:
-                if input_list[i-2][1] == "(" and input_list[i-1][1] == "x" and input_list[i][1] == ",":
+                if input_list[i-1][1] == "*" and input_list[i][1] == "(":
                     print("bp")
             except IndexError:
                 pass
@@ -206,17 +206,29 @@ def main(debug=False):
 
                 # open expression/expressionList
                 elif (input_list[i][0] == "symbol" and input_list[i][1] == "=") \
-                    or (parent.tag in ("term", "letStatement", "whileStatement", "doStatement", "ifStatement")
+                    or (parent.tag in ("expression", "term", "letStatement", "whileStatement", "doStatement", "ifStatement")
                         and input_list[i][0] == "symbol" and input_list[i][1] in ("(", "[")):
-                    # insert current token
-                    child = ET.SubElement(parent, input_tuple[0])
-                    child.text = " %s " % input_tuple[1]
 
-                    if parent.tag not in ("letStatement", "whileStatement", "ifStatement") and input_list[i][1] != "[":
-                        parent = ET.SubElement(parent, "expressionList")
+                    if parent.tag != "expression":
+                        # insert current token
+                        child = ET.SubElement(parent, input_tuple[0])
+                        child.text = " %s " % input_tuple[1]
 
-                    # insert new token and update parent
-                    parent = ET.SubElement(parent, "expression")
+                        if parent.tag not in ("letStatement", "whileStatement", "ifStatement") and input_list[i][1] != "[":
+                            parent = ET.SubElement(parent, "expressionList")
+
+                        # insert new token and update parent
+                        parent = ET.SubElement(parent, "expression")
+                    else:
+                        # insert new token and update parent
+                        parent = ET.SubElement(parent, "term")
+
+                        # insert current token
+                        child = ET.SubElement(parent, input_tuple[0])
+                        child.text = " %s " % input_tuple[1]
+
+                        # insert new token and update parent
+                        parent = ET.SubElement(parent, "expression")
 
                 # open expression (return)
                 elif parent.tag == "returnStatement" and input_tuple != ("keyword", "return"):
