@@ -39,7 +39,7 @@ def main(debug=False):
 
             # TODO: debug
             try:
-                if input_list[i-1][1] == "HOW MANY NUMBERS?":
+                if input_list[i-2][1] == "HOW MANY NUMBERS?":
                     print("bp")
             except IndexError:
                 pass
@@ -73,7 +73,7 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                # close term/expression/expressionList ()
+                # close term/expression/expressionList )
                 elif parent.tag in ("term", "expression", "expressionList") \
                     and input_list[i][0] == "symbol" and input_list[i][1] == ")":
                     # revert parent until all tags closed
@@ -85,13 +85,12 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                # close term (symbols except ".")
-                elif parent.tag == "term" and input_list[i][0] == "symbol" \
-                    and (input_list[i][1] != "." and input_list[i][1] != "("):
-                    # revert parent then insert current token
-                    parent = find_parent(output_root, parent)
-                    child = ET.SubElement(parent, input_tuple[0])
-                    child.text = " %s " % input_tuple[1]
+                # # close letStatement ;
+                # elif parent.tag == "letStatement" and input_list[i][0] == "symbol" and input_list[i][1] == ";":
+                #     # insert current token and revert parent
+                #     child = ET.SubElement(parent, input_tuple[0])
+                #     child.text = " %s " % input_tuple[1]
+                #     parent = find_parent(output_root, parent)
 
                 # close term/expression/letStatement ;
                 elif parent.tag in ("term", "expression") and input_list[i][0] == "symbol" and input_list[i][1] == ";":
@@ -108,12 +107,13 @@ def main(debug=False):
                     if parent.tag == "letStatement":  #
                         parent = find_parent(output_root, parent)
 
-                # close letStatement ;
-                elif parent.tag == "letStatement" and input_list[i][0] == "symbol" and input_list[i][1] == ";":
-                    # insert current token and revert parent
+                # close term: symbols except "." and "("
+                elif parent.tag == "term" and input_list[i][0] == "symbol" \
+                    and (input_list[i][1] != "." and input_list[i][1] != "("):
+                    # revert parent then insert current token
+                    parent = find_parent(output_root, parent)
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
-                    parent = find_parent(output_root, parent)
 
                 # open expression
                 elif (input_list[i][0] == "symbol" and input_list[i][1] == "=") \
