@@ -39,7 +39,7 @@ def main(debug=False):
 
             # TODO: debug
             try:
-                if input_list[i-2][1] == "HOW MANY NUMBERS?":
+                if input_list[i-3][1] == "|":
                     print("bp")
             except IndexError:
                 pass
@@ -49,15 +49,10 @@ def main(debug=False):
 
             # process tokens
             try:
-                # close varDec/term/expression/letStatement/doStatement/returnStatement/classVarDec ;
+                # close decs/expressions/statements ;
+                # varDec/classVarDec, term/expression, letStatement/doStatement/returnStatement
                 if input_list[i][0] == "symbol" and input_list[i][1] == ";":
-                    if parent.tag == "varDec":
-                        # insert current token and close parent
-                        child = ET.SubElement(parent, input_tuple[0])
-                        child.text = " %s " % input_tuple[1]
-                        parent = find_parent(output_root, parent)
-
-                    elif parent.tag in ("term", "expression"):
+                    if parent.tag in ("term", "expression"):
                         # close parent until all desired tags closed
                         for tag in ("term", "expression"):
                             if tag == parent.tag:
@@ -71,20 +66,7 @@ def main(debug=False):
                         if parent.tag in ("letStatement", "doStatement"):
                             parent = find_parent(output_root, parent)
 
-                    elif parent.tag == "doStatement":
-                        # insert current token and close parent
-                        child = ET.SubElement(parent, input_tuple[0])
-                        child.text = " %s " % input_tuple[1]
-                        parent = find_parent(output_root, parent)
-
-                    elif parent.tag == "returnStatement":
-                        # insert current token and close parent
-                        child = ET.SubElement(parent, input_tuple[0])
-                        child.text = " %s " % input_tuple[1]
-                        parent = find_parent(output_root, parent)
-
-                    elif parent.tag == "classVarDec":
-                        # insert current token and close parent
+                    elif parent.tag in ("varDec", "classVarDec", "doStatement", "returnStatement"):
                         child = ET.SubElement(parent, input_tuple[0])
                         child.text = " %s " % input_tuple[1]
                         parent = find_parent(output_root, parent)
@@ -123,21 +105,28 @@ def main(debug=False):
                     child.text = " %s " % input_tuple[1]
 
                 # close statements/whileStatement/subroutineBody/subroutineDec }
-                elif parent.tag in ("statements", "whileStatement", "subroutineBody") and input_list[i][0] == "symbol" \
-                    and input_list[i][1] == "}":
+                elif parent.tag in ("statements", "whileStatement", "ifStatement", "subroutineBody") \
+                    and input_list[i][0] == "symbol" and input_list[i][1] == "}":
+
                     if parent.tag == "statements":
                         # close parent and insert current token
                         parent = find_parent(output_root, parent)
                         child = ET.SubElement(parent, input_tuple[0])
                         child.text = " %s " % input_tuple[1]
 
-                    if parent.tag in ("whileStatement", "subroutineBody"):
+                    if parent.tag == "ifStatement":
+                        # don't close if } followed by else
+                        if not (input_list[j][0] == "keyword" and input_list[j][1] == "else"):
+                            parent = find_parent(output_root, parent)
+
+                    if parent.tag == "whileStatement":
                         # close parent
                         parent = find_parent(output_root, parent)
 
-                    if parent.tag == "subroutineDec":
-                        # close parent and insert current token
+                    if parent.tag == "subroutineBody":
+                        # close parent(s)
                         parent = find_parent(output_root, parent)
+                        parent = find_parent(output_root, parent)  # subroutineDec
 
                 # close expression (nested in term)
                 elif parent.tag == "term" and input_list[i][0] == "symbol" and input_list[i][1] in "]" \
@@ -173,26 +162,17 @@ def main(debug=False):
 
                 # open expression/expressionList
                 elif (input_list[i][0] == "symbol" and input_list[i][1] == "=") \
-                    or (parent.tag in ("term", "letStatement", "whileStatement", "doStatement")
+                    or (parent.tag in ("term", "letStatement", "whileStatement", "doStatement", "ifStatement")
                         and input_list[i][0] == "symbol" and input_list[i][1] in ("(", "[")):
                     # insert current token
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    if parent.tag not in ("letStatement", "whileStatement") and input_list[i][1] != "[":
+                    if parent.tag not in ("letStatement", "whileStatement", "ifStatement") and input_list[i][1] != "[":
                         parent = ET.SubElement(parent, "expressionList")
 
                     # insert new token and update parent
                     parent = ET.SubElement(parent, "expression")
-
-                # open returnStatement
-                elif input_tuple == ("keyword", "return"):
-                    # insert new token and update parent
-                    parent = ET.SubElement(parent, "returnStatement")
-
-                    # insert current token
-                    child = ET.SubElement(parent, input_tuple[0])
-                    child.text = " %s " % input_tuple[1]
 
                 # open term
                 elif parent.tag == "expression" and \
@@ -204,8 +184,8 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                # open letStatement/doStatement/whileStatement
-                elif input_list[i][0] == "keyword" and input_list[i][1] in ("let", "do", "while"):
+                # open statements (letStatement/doStatement/whileStatement/ifStatement)
+                elif input_list[i][0] == "keyword" and input_list[i][1] in ("let", "do", "while", "if", "return"):
                     # if required insert statements & update parent
                     if parent.tag != "statements":
                         # insert new token and update parent
