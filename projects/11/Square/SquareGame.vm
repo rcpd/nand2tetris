@@ -37,9 +37,10 @@ push this 1 // direction
 push constant 1
 eq
 
-if-goto IF_moveSquare_0 // enter if
-goto ELSE_moveSquare_0 // exit if or enter else
-label IF_moveSquare_0 // start if
+if-goto IF_moveSquare_0 // jump to start if (true)
+goto ELSE_moveSquare_0 // jump to else/end (false)
+
+label IF_moveSquare_0 // start if (true)
 push this 0 // square (this)
 call Square.moveUp 1
 pop temp 0 // discard return on do call
@@ -47,50 +48,57 @@ pop temp 0 // discard return on do call
 label ELSE_moveSquare_0 // else
 label IF_END_moveSquare_0 // exit if
 
+
 // if <expression>
 push this 1 // direction
 push constant 2
 eq
 
-if-goto IF_moveSquare_0 // enter if
-goto ELSE_moveSquare_0 // exit if or enter else
-label IF_moveSquare_0 // start if
+if-goto IF_moveSquare_1 // jump to start if (true)
+goto ELSE_moveSquare_1 // jump to else/end (false)
+
+label IF_moveSquare_1 // start if (true)
 push this 0 // square (this)
 call Square.moveDown 1
 pop temp 0 // discard return on do call
 
-label ELSE_moveSquare_0 // else
-label IF_END_moveSquare_0 // exit if
+label ELSE_moveSquare_1 // else
+label IF_END_moveSquare_1 // exit if
+
 
 // if <expression>
 push this 1 // direction
 push constant 3
 eq
 
-if-goto IF_moveSquare_0 // enter if
-goto ELSE_moveSquare_0 // exit if or enter else
-label IF_moveSquare_0 // start if
+if-goto IF_moveSquare_2 // jump to start if (true)
+goto ELSE_moveSquare_2 // jump to else/end (false)
+
+label IF_moveSquare_2 // start if (true)
 push this 0 // square (this)
 call Square.moveLeft 1
 pop temp 0 // discard return on do call
 
-label ELSE_moveSquare_0 // else
-label IF_END_moveSquare_0 // exit if
+label ELSE_moveSquare_2 // else
+label IF_END_moveSquare_2 // exit if
+
 
 // if <expression>
 push this 1 // direction
 push constant 4
 eq
 
-if-goto IF_moveSquare_0 // enter if
-goto ELSE_moveSquare_0 // exit if or enter else
-label IF_moveSquare_0 // start if
+if-goto IF_moveSquare_3 // jump to start if (true)
+goto ELSE_moveSquare_3 // jump to else/end (false)
+
+label IF_moveSquare_3 // start if (true)
 push this 0 // square (this)
 call Square.moveRight 1
 pop temp 0 // discard return on do call
 
-label ELSE_moveSquare_0 // else
-label IF_END_moveSquare_0 // exit if
+label ELSE_moveSquare_3 // else
+label IF_END_moveSquare_3 // exit if
+
 // external call Sys.wait
 push constant 5
 call Sys.wait 1
@@ -106,21 +114,23 @@ pop pointer 0 // update 'this' to object for method call
 push constant 0 // false
 pop local 1 // exit =
 
-label WHILE_TEST_run_0 // while <expression>
+label WHILE_TEST_run_0 // test while <expression>
 push local 1 // exit
 not
 
-if-goto WHILE_TRUE_run_0 // enter while
-goto WHILE_FALSE_run_0 // exit while
+if-goto WHILE_TRUE_run_0 // jump to start while (true)
+goto WHILE_FALSE_run_0 // jump to exit while (false)
+
 label WHILE_TRUE_run_0 // start while
 
-label WHILE_TEST_run_1 // while <expression>
+label WHILE_TEST_run_1 // test while <expression>
 push local 0 // key
 push constant 0
 eq
 
-if-goto WHILE_TRUE_run_1 // enter while
-goto WHILE_FALSE_run_1 // exit while
+if-goto WHILE_TRUE_run_1 // jump to start while (true)
+goto WHILE_FALSE_run_1 // jump to exit while (false)
+
 label WHILE_TRUE_run_1 // start while
 // external call Keyboard.keyPressed
 call Keyboard.keyPressed 0
@@ -128,7 +138,6 @@ pop local 0 // key =
 push pointer 0 // SquareGame (this)
 call SquareGame.moveSquare 1
 pop temp 0 // discard return on do call
-
 goto WHILE_TEST_run_1 // loop or exit
 label WHILE_FALSE_run_1 // exit while
 
@@ -138,9 +147,10 @@ push local 0 // key
 push constant 81
 eq
 
-if-goto IF_run_0 // enter if
-goto ELSE_run_0 // exit if or enter else
-label IF_run_0 // start if
+if-goto IF_run_0 // jump to start if (true)
+goto ELSE_run_0 // jump to else/end (false)
+
+label IF_run_0 // start if (true)
 push constant 1
 neg // true
 pop local 1 // exit =
@@ -148,114 +158,126 @@ pop local 1 // exit =
 label ELSE_run_0 // else
 label IF_END_run_0 // exit if
 
+
 // if <expression>
 push local 0 // key
 push constant 90
 eq
 
-if-goto IF_run_0 // enter if
-goto ELSE_run_0 // exit if or enter else
-label IF_run_0 // start if
+if-goto IF_run_1 // jump to start if (true)
+goto ELSE_run_1 // jump to else/end (false)
+
+label IF_run_1 // start if (true)
 push this 0 // square (this)
 call Square.decSize 1
 pop temp 0 // discard return on do call
 
-label ELSE_run_0 // else
-label IF_END_run_0 // exit if
+label ELSE_run_1 // else
+label IF_END_run_1 // exit if
+
 
 // if <expression>
 push local 0 // key
 push constant 88
 eq
 
-if-goto IF_run_0 // enter if
-goto ELSE_run_0 // exit if or enter else
-label IF_run_0 // start if
+if-goto IF_run_2 // jump to start if (true)
+goto ELSE_run_2 // jump to else/end (false)
+
+label IF_run_2 // start if (true)
 push this 0 // square (this)
 call Square.incSize 1
 pop temp 0 // discard return on do call
 
-label ELSE_run_0 // else
-label IF_END_run_0 // exit if
+label ELSE_run_2 // else
+label IF_END_run_2 // exit if
+
 
 // if <expression>
 push local 0 // key
 push constant 131
 eq
 
-if-goto IF_run_0 // enter if
-goto ELSE_run_0 // exit if or enter else
-label IF_run_0 // start if
+if-goto IF_run_3 // jump to start if (true)
+goto ELSE_run_3 // jump to else/end (false)
+
+label IF_run_3 // start if (true)
 push constant 1
 pop this 1 // direction =
 
-label ELSE_run_0 // else
-label IF_END_run_0 // exit if
+label ELSE_run_3 // else
+label IF_END_run_3 // exit if
+
 
 // if <expression>
 push local 0 // key
 push constant 133
 eq
 
-if-goto IF_run_0 // enter if
-goto ELSE_run_0 // exit if or enter else
-label IF_run_0 // start if
+if-goto IF_run_4 // jump to start if (true)
+goto ELSE_run_4 // jump to else/end (false)
+
+label IF_run_4 // start if (true)
 push constant 2
 pop this 1 // direction =
 
-label ELSE_run_0 // else
-label IF_END_run_0 // exit if
+label ELSE_run_4 // else
+label IF_END_run_4 // exit if
+
 
 // if <expression>
 push local 0 // key
 push constant 130
 eq
 
-if-goto IF_run_0 // enter if
-goto ELSE_run_0 // exit if or enter else
-label IF_run_0 // start if
+if-goto IF_run_5 // jump to start if (true)
+goto ELSE_run_5 // jump to else/end (false)
+
+label IF_run_5 // start if (true)
 push constant 3
 pop this 1 // direction =
 
-label ELSE_run_0 // else
-label IF_END_run_0 // exit if
+label ELSE_run_5 // else
+label IF_END_run_5 // exit if
+
 
 // if <expression>
 push local 0 // key
 push constant 132
 eq
 
-if-goto IF_run_0 // enter if
-goto ELSE_run_0 // exit if or enter else
-label IF_run_0 // start if
+if-goto IF_run_6 // jump to start if (true)
+goto ELSE_run_6 // jump to else/end (false)
+
+label IF_run_6 // start if (true)
 push constant 4
 pop this 1 // direction =
 
-label ELSE_run_0 // else
-label IF_END_run_0 // exit if
+label ELSE_run_6 // else
+label IF_END_run_6 // exit if
 
-label WHILE_TEST_run_1 // while <expression>
+
+label WHILE_TEST_run_2 // test while <expression>
 push local 0 // key
 push constant 0
 eq
 not
 
-if-goto WHILE_TRUE_run_1 // enter while
-goto WHILE_FALSE_run_1 // exit while
-label WHILE_TRUE_run_1 // start while
+if-goto WHILE_TRUE_run_2 // jump to start while (true)
+goto WHILE_FALSE_run_2 // jump to exit while (false)
+
+label WHILE_TRUE_run_2 // start while
 // external call Keyboard.keyPressed
 call Keyboard.keyPressed 0
 pop local 0 // key =
 push pointer 0 // SquareGame (this)
 call SquareGame.moveSquare 1
 pop temp 0 // discard return on do call
+goto WHILE_TEST_run_2 // loop or exit
+label WHILE_FALSE_run_2 // exit while
 
 goto WHILE_TEST_run_1 // loop or exit
 label WHILE_FALSE_run_1 // exit while
-
-
-goto WHILE_TEST_run_0 // loop or exit
-label WHILE_FALSE_run_0 // exit while
 
 push constant 0 // void return
 return
