@@ -85,6 +85,7 @@ def main(debug=False):
         r"..\09\Square\Main.jack",
         r"..\09\Square\Square.jack",
         r"..\09\Square\SquareGame.jack",
+
         r"..\10\ArrayTest\Main.jack",
         r"..\10\ExpressionLessSquare\Main.jack",
         r"..\10\ExpressionLessSquare\Square.jack",
@@ -92,8 +93,18 @@ def main(debug=False):
         r"..\10\Square\Main.jack",
         r"..\10\Square\Square.jack",
         r"..\10\Square\SquareGame.jack",
-        r"..\11\Seven\Main.jack",
+
+        r"..\11\Average\Main.jack",
+        r"..\11\ComplexArrays\Main.jack",
         r"..\11\ConvertToBin\Main.jack",
+        r"..\11\Pong\Ball.jack",
+        r"..\11\Pong\Bat.jack",
+        r"..\11\Pong\Main.jack",
+        r"..\11\Pong\PongGame.jack",
+        r"..\11\Seven\Main.jack",
+        r"..\11\Square\Main.jack",
+        r"..\11\Square\Square.jack",
+        r"..\11\Square\SquareGame.jack",
     ]
 
     for filepath in jack_filepaths:
