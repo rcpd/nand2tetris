@@ -65,7 +65,7 @@ M=D
 M=M-1
 
 // (-15) call Sys.main 0
-(sys.Sys.main.6837)
+(sys.Sys.main.1)
 
 // (-17) push constant 9999 // if no args, create a space on the stack for the return
 @9999
@@ -75,7 +75,7 @@ A=M
 M=D
 @SP
 M=M+1
-@sys.Sys.main.6837 // create the RIP pointer and push it to the stack
+@sys.Sys.main.1 // create the RIP pointer and push it to the stack
 D=A
 @SP
 A=M
@@ -370,8 +370,8 @@ M=D
 M=M+1
 
 // (-62) call Sys.add12 1
-(sys.Sys.add12.2027)
-@sys.Sys.add12.2027 // create the RIP pointer and push it to the stack
+(sys.Sys.add12.2)
+@sys.Sys.add12.2 // create the RIP pointer and push it to the stack
 D=A
 @SP
 A=M

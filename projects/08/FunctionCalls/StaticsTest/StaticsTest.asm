@@ -25,8 +25,8 @@ M=D
 M=M+1
 
 // (-11) call Class1.set 2
-(sys.Class1.set.9067)
-@sys.Class1.set.9067 // create the RIP pointer and push it to the stack
+(sys.Class1.set.1)
+@sys.Class1.set.1 // create the RIP pointer and push it to the stack
 D=A
 @SP
 A=M
@@ -130,8 +130,8 @@ M=D
 M=M+1
 
 // (-20) call Class2.set 2
-(sys.Class2.set.8943)
-@sys.Class2.set.8943 // create the RIP pointer and push it to the stack
+(sys.Class2.set.2)
+@sys.Class2.set.2 // create the RIP pointer and push it to the stack
 D=A
 @SP
 A=M
@@ -217,7 +217,7 @@ M=D
 M=M-1
 
 // (-25) call Class1.get 0
-(sys.Class1.get.6455)
+(sys.Class1.get.3)
 
 // (-27) push constant 9999 // if no args, create a space on the stack for the return
 @9999
@@ -227,7 +227,7 @@ A=M
 M=D
 @SP
 M=M+1
-@sys.Class1.get.6455 // create the RIP pointer and push it to the stack
+@sys.Class1.get.3 // create the RIP pointer and push it to the stack
 D=A
 @SP
 A=M
@@ -293,7 +293,7 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 0;JMP // jump into EIP (*func)
 
 // (-30) call Class2.get 0
-(sys.Class2.get.2224)
+(sys.Class2.get.4)
 
 // (-32) push constant 9999 // if no args, create a space on the stack for the return
 @9999
@@ -303,7 +303,7 @@ A=M
 M=D
 @SP
 M=M+1
-@sys.Class2.get.2224 // create the RIP pointer and push it to the stack
+@sys.Class2.get.4 // create the RIP pointer and push it to the stack
 D=A
 @SP
 A=M
@@ -391,7 +391,7 @@ M=D
 M=M+1
 
 // (-44) pop static 0
-@16 // static + src segment offset (FunctionCalls\StaticsTest\Class1.vm)
+@16 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
 D=A
 @0
 D=D+A
@@ -423,7 +423,7 @@ M=D
 M=M+1
 
 // (-48) pop static 1
-@16 // static + src segment offset (FunctionCalls\StaticsTest\Class1.vm)
+@16 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
 D=A
 @1
 D=D+A
@@ -517,7 +517,7 @@ A=M // d = [LCL-5] (*LCL)
 (Class1.get)
 
 // (-59) push static 0
-@16 // static + src segment offset (FunctionCalls\StaticsTest\Class1.vm)
+@16 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
 D=A
 @0
 A=D+A
@@ -529,7 +529,7 @@ M=D
 M=M+1
 
 // (-61) push static 1
-@16 // static + src segment offset (FunctionCalls\StaticsTest\Class1.vm)
+@16 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
 D=A
 @1
 A=D+A
@@ -630,7 +630,7 @@ M=D
 M=M+1
 
 // (-74) pop static 0
-@18 // static + src segment offset (FunctionCalls\StaticsTest\Class2.vm)
+@18 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
 D=A
 @0
 D=D+A
@@ -662,7 +662,7 @@ M=D
 M=M+1
 
 // (-78) pop static 1
-@18 // static + src segment offset (FunctionCalls\StaticsTest\Class2.vm)
+@18 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
 D=A
 @1
 D=D+A
@@ -756,7 +756,7 @@ A=M // d = [LCL-5] (*LCL)
 (Class2.get)
 
 // (-89) push static 0
-@18 // static + src segment offset (FunctionCalls\StaticsTest\Class2.vm)
+@18 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
 D=A
 @0
 A=D+A
@@ -768,7 +768,7 @@ M=D
 M=M+1
 
 // (-91) push static 1
-@18 // static + src segment offset (FunctionCalls\StaticsTest\Class2.vm)
+@18 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
 D=A
 @1
 A=D+A

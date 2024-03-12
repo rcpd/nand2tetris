@@ -1,46 +1,15 @@
 """
 VM to HACK Assembly Translator
 """
-import random
 import os
 
-'''
-address_labels = {
-    "SP": 0,  # segmented by function
-    "LCL": 1,  # segmented by function
-    "ARG": 2,  # segmented by function
-    "THIS": 3,  # segmented by function
-    "THAT": 4,  # segmented by function
-    "TEMP": 5,  # 5-12 incl (volatile)
-    "R13": 13,  # volatile?
-    "R14": 14,  # volatile?
-    "R15": 15,  # volatile?
-    "STATIC": 16,  # 16-255 incl (segmented by source)
-    "STACK": 256,  # 256-2047 incl (persistent)
-    "HEAP: 2048,  # 2048-16383 incl (persistent)
-    "IO": 16384,  # 16384-24576 incl (persistent)
-    "UNUSED": 24577,  # 24577-32767 incl
-}
-'''
 
-comment_count = -1
-guids = []
-local_dict = {}
-static_dict = {}
-offset_list = []
-
-
-def push(cmd, vm_segment, asm_segment, value):
+def push(asm, cmd, vm_segment, asm_segment, value, static_dict, offset_list, vm_filepath, comment_count, debug=False):
     """
     push a new value onto the stack (either constant or segment+offset)
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
     comment_count -= 2
-    asm = '\n// (%s) %s\n' % (comment_count, cmd)
+    asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     # push an arbitrary value onto the stack
     if vm_segment == "constant":
@@ -61,9 +30,9 @@ def push(cmd, vm_segment, asm_segment, value):
             asm += "@3\n"  # *asm_segment
             asm += "D=A\n"  # d = *asm_segment
         elif vm_segment == "static":
-            pos = static_dict[test_file][0]
+            pos = static_dict[vm_filepath][0]
             offset = 16 + (offset_list[pos])
-            asm += "@%s // static + src segment offset (%s)\n" % (offset, test_file)  # *asm_segment
+            asm += "@%s // static + src segment offset (%s)\n" % (offset, vm_filepath)  # *asm_segment
             asm += "D=A\n"  # d = *asm_segment
         else:
             # normal segment resolution
@@ -79,20 +48,15 @@ def push(cmd, vm_segment, asm_segment, value):
         asm += "@SP\n"  # *esp
         asm += "M=M+1\n"  # *esp++
 
-    return asm
+    return asm, comment_count
 
 
-def pop(cmd, vm_segment, asm_segment, value):
+def pop(asm, cmd, vm_segment, asm_segment, value, static_dict, offset_list, vm_filepath, comment_count, debug=False):
     """
     pop a value onto the stack into a segment+offset
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
     comment_count -= 2
-    asm = '\n// (%s) %s\n' % (comment_count, cmd)
+    asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     # pop a value from the stack and store it in segment+offset
     # (copy from src to dst and dec esp)
@@ -105,9 +69,9 @@ def pop(cmd, vm_segment, asm_segment, value):
         asm += "@3\n"  # *asm_segment
         asm += "D=A\n"  # d = *asm_segment
     elif vm_segment == "static":
-        pos = static_dict[test_file][0]
+        pos = static_dict[vm_filepath][0]
         offset = 16 + (offset_list[pos])
-        asm += "@%s // static + src segment offset (%s)\n" % (offset, test_file)  # *asm_segment
+        asm += "@%s // static + src segment offset (%s)\n" % (offset, vm_filepath)  # *asm_segment
         asm += "D=A\n"  # d = *asm_segment
     else:
         asm += "@%s\n" % asm_segment  # *asm_segment
@@ -139,20 +103,15 @@ def pop(cmd, vm_segment, asm_segment, value):
     asm += "@SP\n"  # *esp
     asm += "M=M-1\n"  # *esp-- // *src
 
-    return asm
+    return asm, comment_count
 
 
-def add(cmd):
+def add(asm, cmd, comment_count, debug=False):
     """
     pop 2 values from the stack and push the result of their sum
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
     comment_count -= 2
-    asm = '\n// (%s) %s\n' % (comment_count, cmd)
+    asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     # add two values, push result, dec esp
     asm += "@SP\n"  # *esp
@@ -166,20 +125,15 @@ def add(cmd):
     asm += "@SP\n"  # *esp
     asm += "M=M+1\n"  # *esp++
 
-    return asm
+    return asm, comment_count
 
 
-def sub(cmd):
+def sub(asm, cmd, comment_count, debug=False):
     """
     pop 2 values from the stack and push the result of their difference
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
     comment_count -= 2
-    asm = '\n// (%s) %s\n' % (comment_count, cmd)
+    asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     # eval two values, push result, dec esp
     asm += "@SP\n"  # *esp
@@ -193,22 +147,16 @@ def sub(cmd):
     asm += "@SP\n"  # *esp
     asm += "M=M+1\n"  # *esp++
 
-    return asm
+    return asm, comment_count
 
 
-def eq(cmd):
+def eq(asm, cmd, guids, comment_count, debug=False):
     """
     pop 2 values from the stack and push -1 if they are the same or 0 if not
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
-    guid = generate_guid()
-    
+    guid, guids = generate_guid(guids, debug=debug)
     comment_count -= 2
-    asm = '\n// (%s) %s\n' % (comment_count, cmd)
+    asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     asm += "@SP // *esp\n"
     asm += "M=M-1 // *esp-- (*val2)\n"
@@ -243,37 +191,26 @@ def eq(cmd):
     asm += "@SP // *esp\n"
     asm += "M=M+1 // *esp++\n"
 
-    return asm
+    return asm, guids, comment_count
 
 
-def generate_guid():
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-    global guids
-
+def generate_guid(guids, debug=False):
     # generate a guid
-    guid = str(random.random())[2:6]
-    guids.append(guid)
+    guid = 1
     while guid in guids:
-        guid = str(random.random())[2:6]
-    return guid
+        guid += 1
+    guids.append(guid)
+
+    return guid, guids
 
 
-def lt(cmd):
+def lt(asm, cmd, guids, comment_count, debug=False):
     """
     pop 2 values from the stack and push -1 if val1 < val2 or 0 if not
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
-    guid = generate_guid()
-
+    guid, guids = generate_guid(guids, debug=debug)
     comment_count -= 2
-    asm = '\n// (%s) %s\n' % (comment_count, cmd)
+    asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     asm += "@SP // *esp\n"
     asm += "M=M-1 // *esp-- (*val2)\n"
@@ -308,22 +245,17 @@ def lt(cmd):
     asm += "@SP // *esp\n"
     asm += "M=M+1 // *esp++\n"
 
-    return asm
+    return asm, guids, comment_count
 
 
-def gt(cmd):
+def gt(asm, cmd, guids, comment_count, debug=False):
     """
     pop 2 values from the stack and push -1 if val1 > val2 or 0 if not
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
-    guid = generate_guid()
+    guid, guids = generate_guid(guids, debug=debug)
 
     comment_count -= 2
-    asm = '\n// (%s) %s\n' % (comment_count, cmd)
+    asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     asm += "@SP // *esp\n"
     asm += "M=M-1 // *esp-- (*val2)\n"
@@ -358,20 +290,15 @@ def gt(cmd):
     asm += "@SP // *esp\n"
     asm += "M=M+1 // *esp++\n"
 
-    return asm
+    return asm, guids, comment_count
 
 
-def _and(cmd):
+def _and(asm, cmd, comment_count, debug=False):
     """
     pop 2 values from the stack, push the AND result
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
     comment_count -= 2
-    asm = '\n// (%s) %s\n' % (comment_count, cmd)
+    asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     # eval two values, push result, dec esp
     asm += "@SP\n"  # *esp
@@ -385,20 +312,15 @@ def _and(cmd):
     asm += "@SP\n"  # *esp
     asm += "M=M+1\n"  # *esp++
 
-    return asm
+    return asm, comment_count
 
 
-def _or(cmd):
+def _or(asm, cmd, comment_count, debug=False):
     """
     pop 2 values from the stack, push the OR result
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
     comment_count -= 2
-    asm = '\n// (%s) %s\n' % (comment_count, cmd)
+    asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     # eval two values, push result, dec esp
     asm += "@SP\n"  # *esp
@@ -412,20 +334,15 @@ def _or(cmd):
     asm += "@SP\n"  # *esp
     asm += "M=M+1\n"  # *esp++
 
-    return asm
+    return asm, comment_count
 
 
-def _not(cmd):
+def _not(asm, cmd, comment_count, debug=False):
     """
     pop a value from the stack, push the NOT result
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
     comment_count -= 2
-    asm = '\n// (%s) %s\n' % (comment_count, cmd)
+    asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     # eval one value, push result
     asm += "@SP\n"  # *esp
@@ -435,20 +352,15 @@ def _not(cmd):
     asm += "@SP\n"  # *esp
     asm += "M=M+1\n"  # *esp++
 
-    return asm
+    return asm, comment_count
 
 
-def neg(cmd):
+def neg(asm, cmd, comment_count, debug=False):
     """
     pop 2 values from the stack, push the AND result
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
     comment_count -= 2
-    asm = '\n// (%s) %s\n' % (comment_count, cmd)
+    asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     # eval one value, push result
     asm += "@SP\n"  # *esp
@@ -458,10 +370,10 @@ def neg(cmd):
     asm += "@SP\n"  # *esp
     asm += "M=M+1\n"  # *esp++
 
-    return asm
+    return asm, comment_count
 
 
-def label(cmd, src):
+def label(asm, cmd, src, guids, comment_count, debug=False):
     """
     translate labels and adjust debug line count
 
@@ -471,65 +383,50 @@ def label(cmd, src):
 
     anything injecting labels needs to dec commen_count
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
     if cmd.startswith('label'):
         comment_count -= 2  # normally handled by the calling function
 
     # normal label resolution
-    asm = '\n// (%s) %s\n' % (comment_count, cmd)
+    asm += '\n// (%s) %s\n' % (comment_count, cmd)
     asm_label = cmd.split(" ")[1]
 
     if cmd.startswith('function'):
         asm += "(%s)\n" % asm_label
     elif cmd.startswith('call'):
-        asm += "(%s.%s.%s)\n" % (src, asm_label, generate_guid())
+        guid, guids = generate_guid(guids, debug=debug)
+        asm += "(%s.%s.%s)\n" % (src, asm_label, guid)
     elif cmd.startswith('label'):
         asm += "(%s.%s)\n" % (src, asm_label)
         comment_count -= 1  # post-adjust for label
 
-    return asm
+    return asm, guids, comment_count
 
 
-def goto(cmd, src):
+def goto(asm, cmd, src, comment_count, debug=False):
     """
     unconditional jump
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
     comment_count -= 2
 
     asm_label = cmd.split(" ")[1]
     asm_label = "%s.%s" % (src, asm_label)
 
-    asm = '\n// (%s) %s\n' % (comment_count, cmd)
+    asm += '\n// (%s) %s\n' % (comment_count, cmd)
     asm += "@%s\n" % asm_label
     asm += "0;JMP // unconditional jump\n"
 
-    return asm
+    return asm, comment_count
 
 
-def if_goto(cmd, src):
+def if_goto(asm, cmd, src, comment_count, debug=False):
     """
     jump if true
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
     comment_count -= 2
-
     asm_label = cmd.split(" ")[1]
     asm_label = "%s.%s" % (src, asm_label)
 
-    asm = '\n// (%s) %s\n' % (comment_count, cmd)
+    asm += '\n// (%s) %s\n' % (comment_count, cmd)
 
     asm += "@0 // push a zero onto the stack\n"  # literal
     asm += "D=A\n"  # d = literal
@@ -551,33 +448,28 @@ def if_goto(cmd, src):
     asm += "@%s\n" % asm_label
     asm += "D;JNE // jump if not zero\n"  # true = -1 on VM eval so hopefully this is alright
 
-    return asm
+    return asm, comment_count
 
 
-def call(cmd, src):
+def call(asm, cmd, src, guids, local_dict, static_dict, offset_list, vm_filepath, comment_count, debug=False):
     """
     save the caller stack frame and initialize the callee ARG/LCL segments
     """
-    global comment_count
-    global local_dict
-    global static_dict
-    global offset_list
-    global test_file
-
     comment_count -= 3  # always injects a label first
     prologue_size = 64  # the number of instructions required to realign RIP pointer
 
     num_args = int(cmd.split(" ")[2])
     func_label = cmd.split(" ")[1]  # function EIP
-    asm = label(cmd, src)  # generate function RIP label
+    asm, guids, comment_count = label(asm, cmd, src, guids, comment_count, debug=debug)  # generate function RIP label
     rip_label = asm.strip().split("\n")[-1].split("(")[-1].split(")")[0]
 
     # stack frame before call = <args>...<SP>
     # stack frame after call = <args>...<RIP><LCL><ARG><THIS><THAT><locals>...<SP>
 
     if num_args == 0:
-        asm += push("push constant 9999 // if no args, create a space on the stack for the return",
-                    "constant", "constant", 9999)
+        asm, comment_count = push(asm, "push constant 9999 // if no args, create a space on the stack for the return",
+                                  "constant", "constant", 9999, static_dict, offset_list, vm_filepath, comment_count,
+                                  debug=debug)
         prologue_size += 7  # 7 instructions added by conditional push for return placeholder
         num_args = 1
 
@@ -621,12 +513,12 @@ def call(cmd, src):
     asm += "@SP\n"  # *esp
     asm += "M=M+1\n"  # *esp = *esp++
 
-    # TODO: this could have been parsed from the function definiton
     current_function = cmd.split(" ")[1]
     if current_function in local_dict:
         num_locals = local_dict[current_function]
         for i in range(0, num_locals):
-            asm += push("push constant 0 // local(%s) init" % i, "constant", "constant", 0)
+            asm, comment_count = push(asm, "push constant 0 // local(%s) init" % i, "constant", "constant", 0,
+                                      static_dict, offset_list, vm_filepath, comment_count, debug=debug)
             prologue_size += 7
     else:
         num_locals = 0
@@ -665,45 +557,35 @@ def call(cmd, src):
     asm += "@%s // *func (parsed from call <label> <num_args>)\n" % func_label
     asm += "0;JMP // jump into EIP (*func)\n"
 
-    return asm
+    return asm, guids, comment_count
 
 
-def function(cmd, src):
+def function(asm, cmd, src, guids, comment_count, debug=False):
     """
     define a function label (eip)
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
     comment_count -= 2
 
-    asm = label(cmd, src)
+    asm, guids, comment_count = label(asm, cmd, src, guids, comment_count, debug=debug)
     comment_count -= 1  # post-adjust for label
 
-    return asm
+    return asm, guids, comment_count
 
 
-def _return(cmd, src):
+def _return(asm, cmd, static_dict, offset_list, vm_filepath, comment_count, debug=False):
     """
     restore caller stack, pop result & jump to RIP
     """
-    global comment_count
-    global static_dict
-    global offset_list
-    global test_file
-
     comment_count -= 2
 
     # stack frame before return = <args>...<RIP><LCL><ARG><THIS><THAT><locals>...<result><SP>
     # stack frame after return = <result><SP> // ...<RIP><LCL><ARG><THIS><THAT><locals>
     # jump to RIP
 
-    asm = '\n// (%s) %s\n' % (comment_count, cmd)
-
-    asm += pop("pop argument 0 // function return: move result to ARG[0] (soon to be last stack item)",
-               "argument", "ARG", 0)
+    asm += '\n// (%s) %s\n' % (comment_count, cmd)
+    asm, comment_count = pop(asm, "pop argument 0 // function return: move result to ARG[0] (soon to be last stack "
+                             "item)", "argument", "ARG", 0, static_dict, offset_list, vm_filepath, comment_count,
+                             debug=debug)
 
     asm += "@ARG // *ARG[0] // function return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1\n"
     asm += "D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter\n"
@@ -752,20 +634,16 @@ def _return(cmd, src):
     asm += "A=M // d = [LCL-5] (*LCL)\n"
     asm += "0;JMP // return (jump to RIP)\n"
 
-    return asm
+    return asm, comment_count
 
 
-def parse_asm(test_file, asm=""):
+def parse_asm(vm_filepath, asm, guids, local_dict, static_dict, offset_list, comment_count, debug=False):
     """
     translate the vm commands into a single asm file
     """
-    global comment_count
-    global static_dict
-    global offset_list
+    src = vm_filepath.split('\\')[-1].split('.vm')[0]
 
-    src = test_file.split('\\')[-1].split('.vm')[0]
-
-    with open(test_file) as vm_file:
+    with open(vm_filepath) as vm_file:
         vm_contents = vm_file.readlines()
 
     for cmd in vm_contents:
@@ -781,6 +659,9 @@ def parse_asm(test_file, asm=""):
         if len(parsed_cmd) >= 3:
             vm_segment = parsed_cmd[1]
             value = parsed_cmd[2]
+        else:
+            vm_segment = None
+            value = None
 
         # map asm to HACK globals
         if vm_segment == "local":
@@ -795,55 +676,61 @@ def parse_asm(test_file, asm=""):
             asm_segment = "ARG"
         elif vm_segment == "temp":
             asm_segment = "TEMP"
+        else:
+            asm_segment = None
 
-        # print(cmd)
+        if type(comment_count) != int:
+            raise Exception("last command was bad")
+
+        if debug:
+            print(cmd)
 
         # parse commands
         if cmd.startswith("push"):
-            asm += push(cmd, vm_segment, asm_segment, value)
+            asm, comment_count = push(asm, cmd, vm_segment, asm_segment, value, static_dict, offset_list, vm_filepath,
+                                      comment_count, debug=debug)
         elif cmd.startswith("pop"):
-            asm += pop(cmd, vm_segment, asm_segment, value)
+            asm, comment_count = pop(asm, cmd, vm_segment, asm_segment, value, static_dict, offset_list, vm_filepath,
+                                     comment_count, debug=debug)
         elif cmd.startswith("add"):
-            asm += add(cmd)
+            asm, comment_count = add(asm, cmd, comment_count, debug=debug)
         elif cmd.startswith("sub"):
-            asm += sub(cmd)
+            asm, comment_count = sub(asm, cmd, comment_count, debug=debug)
         elif cmd.startswith("eq"):
-            asm += eq(cmd)
+            asm, guids, comment_count = eq(asm, cmd, comment_count, guids, debug=debug)
         elif cmd.startswith("lt"):
-            asm += lt(cmd)
+            asm, guids, comment_count = lt(asm, cmd, guids, comment_count, debug=debug)
         elif cmd.startswith("gt"):
-            asm += gt(cmd)
+            asm, guids, comment_count = gt(asm, cmd, guids, comment_count, debug=debug)
         elif cmd.startswith("and"):
-            asm += _and(cmd)
+            asm, comment_count = _and(asm, cmd, comment_count, debug=debug)
         elif cmd.startswith("or"):
-            asm += _or(cmd)
+            asm, comment_count = _or(asm, cmd, comment_count, debug=debug)
         elif cmd.startswith("not"):
-            asm += _not(cmd)
+            asm, comment_count = _not(asm, cmd, comment_count, debug=debug)
         elif cmd.startswith("neg"):
-            asm += neg(cmd)
+            asm, comment_count = neg(asm, cmd, comment_count, debug=debug)
         elif cmd.startswith("label"):
-            asm += label(cmd, src)
+            asm, guids, comment_count = label(asm, cmd, src, guids, comment_count, debug=debug)
         elif cmd.startswith("goto"):
-            asm += goto(cmd, src)
+            asm, comment_count = goto(asm, cmd, src, comment_count, debug=debug)
         elif cmd.startswith("if-goto"):
-            asm += if_goto(cmd, src)
+            asm, comment_count = if_goto(asm, cmd, src, comment_count, debug=debug)
         elif cmd.startswith("function"):
-            asm += function(cmd, src)
+            asm, guids, comment_count = function(asm, cmd, src, guids, comment_count, debug=debug)
         elif cmd.startswith("return"):
-            asm += _return(cmd, src)
+            asm, comment_count = _return(asm, cmd, static_dict, offset_list, vm_filepath, comment_count, debug=debug)
         elif cmd.startswith("call"):
-            asm += call(cmd, src)
+            asm, guids, comment_count = call(asm, cmd, src, guids, local_dict, static_dict, offset_list, vm_filepath,
+                                             comment_count, debug=debug)
+        else:
+            raise RuntimeError("Translator: Unexpected command %s")
 
-    return asm
+    return asm, guids, comment_count
 
 
-def parse_static(test_file):
-    global comment_count
-    global local_dict
-    global static_dict
-    global offset_list
-
-    with open(test_file) as vm_file:
+def parse_static(vm_filepath, local_dict, static_dict, debug=False):
+    with open(vm_filepath) as vm_file:
         vm_content = vm_file.readlines()
 
     for cmd in vm_content:
@@ -856,89 +743,93 @@ def parse_static(test_file):
 
         # parse command
         parsed_cmd = cmd.split(" ")
+        value = None
         if len(parsed_cmd) >= 3:
-            vm_segment = parsed_cmd[1]
-            try:
-                value = int(parsed_cmd[2])
-            except ValueError:
-                print("Warning: Value not parsed: %s" % cmd)
+            # exclude commands that don't have a value to parse
+            if not any(x in parsed_cmd[0] for x in ["goto", "lt", "label", "add"]):
+                try:
+                    value = int(parsed_cmd[2])
+                except ValueError:
+                    raise RuntimeError("Translator: No value to parse, add to exclude or fix code: %s" % cmd)
 
-        # TODO: this could have been parsed from the function definiton
         # update local dictionary
         if cmd.startswith("function"):
-            current_function = cmd.split(" ")[1]
-        if cmd.startswith("pop local") or cmd.startswith("push local"):
-            if current_function in local_dict:
-                if value > local_dict[current_function]:
-                    # if new max > max, update max
-                    local_dict[current_function] = value
-            else:
-                # if first occurrence add to dict
-                local_dict[current_function] = value
+            current_function = parsed_cmd[1]
+            local_dict[current_function] = value
 
         # update static dictionary
         if cmd.startswith("pop static") or cmd.startswith("push static"):
-            if test_file in static_dict:
-                if value > static_dict[test_file][1]:
+            if vm_filepath in static_dict:
+                if value > static_dict[vm_filepath][1]:
                     # if new max > max, update max
-                    static_dict[test_file][1] = value
+                    static_dict[vm_filepath][1] = value
             else:
                 # if first occurrence add to dict
-                static_dict[test_file] = [len(static_dict), value]
+                static_dict[vm_filepath] = [len(static_dict), value]
 
-    for func in local_dict:
-        local_dict[func] += 1  # inc by 1 as it starts at zero
-    if test_file in static_dict:
-        static_dict[test_file][1] += 1  # inc by 1 as it starts at zero
+    if vm_filepath in static_dict:
+        static_dict[vm_filepath][1] += 1  # inc by 1 as it starts at zero
 
-def main():
+    return local_dict, static_dict
+
+
+def translate(debug=False):
     """
     parse all the vm files/dirs
     """
-    global comment_count
-    global offset_list
-    global static_dict
-    global test_file
-
-    test_files = [
+    vm_filelist = [
         r'..\08\ProgramFlow\BasicLoop\BasicLoop.vm',
         r'..\08\ProgramFlow\FibonacciSeries\FibonacciSeries.vm',
         r'..\08\FunctionCalls\SimpleFunction\SimpleFunction.vm',
     ]
 
-    test_dirs = [
+    vm_dirlist = [
         r'..\08\FunctionCalls\FibonacciElement',
         r'..\08\FunctionCalls\NestedCall',
         r'..\08\FunctionCalls\StaticsTest'
     ]
 
-    # parse the regular tests
-    for test_file in test_files:
-        comment_count = -1
-        print(test_file)
-        asm = parse_asm(test_file)
-        with open(test_file.replace('.vm', '.asm'), 'w') as asm_file:
-            asm_file.write(asm)
-
-    # parse the multi-file tests
-    for test_dir in test_dirs:
+    # parse the single file VM programs
+    for vm_filepath in vm_filelist:
+        guids = []
+        local_dict = {}
+        static_dict = {}
+        offset_list = []
         comment_count = -1
         asm = ""
+        if debug:
+            print(vm_filepath)
 
-        test_files = [
-            os.path.join(test_dir, 'sys.vm'),
-            os.path.join(test_dir, 'main.vm'),
-            os.path.join(test_dir, test_dir.split('\\')[-1]+'.vm'),
-            os.path.join(test_dir, 'Class1.vm'),
-            os.path.join(test_dir, 'Class2.vm'),
+        asm, guids, comment_count = parse_asm(vm_filepath, asm, guids, local_dict, static_dict, offset_list,
+                                              comment_count, debug=debug)
+        with open(vm_filepath.replace('.vm', '.asm'), 'w') as asm_file:
+            asm_file.write(asm)
+
+        print("Translated VM file to ASM: %s" % vm_filepath)
+
+    # parse the multi-file VM programs
+    for vm_dir in vm_dirlist:
+        vm_dir_filelist = []
+        comment_count = -1
+        asm = ""
+        guids = []
+        local_dict = {}
+        static_dict = {}
+        offset_list = []
+
+        vm_filelist = [
+            os.path.join(vm_dir, 'sys.vm'),
+            os.path.join(vm_dir, 'main.vm'),
+            os.path.join(vm_dir, vm_dir.split('\\')[-1]+'.vm'),
+            os.path.join(vm_dir, 'Class1.vm'),
+            os.path.join(vm_dir, 'Class2.vm'),
         ]
-        
-        for test_file in test_files:
-            if os.path.exists(test_file):
-                parse_static(test_file)
+
+        for vm_filepath in vm_filelist:
+            if os.path.exists(vm_filepath):
+                local_dict, static_dict = parse_static(vm_filepath, local_dict, static_dict, debug=debug)
 
         # initialize offset array
-        offset_list = []
         for i in range(0, len(static_dict)):
             offset_list.append(-1)
 
@@ -947,19 +838,22 @@ def main():
             offset_list[i] = static_dict[key][1]
 
         # add each element to the previous one
-        old_value = new_value = 0
+        new_value = 0
         for i in range(0, len(offset_list)):
             old_value = offset_list[i]
             offset_list[i] = new_value
             new_value = old_value + new_value
 
-        for test_file in test_files:
-            if os.path.exists(test_file):
-                print(test_file)
-                asm += parse_asm(test_file)
-                
+        for vm_filepath in vm_filelist:
+            if os.path.exists(vm_filepath):
+                if debug:
+                    print(vm_filepath)
+                asm, guids, comment_count = parse_asm(vm_filepath, asm, guids, local_dict, static_dict, offset_list,
+                                                      comment_count, debug=debug)
+                vm_dir_filelist.append(vm_filepath)
+
         # write asm_file
-        asm_path = os.path.join(test_dir, test_dir.split('\\')[-1]+'.asm')
+        asm_path = os.path.join(vm_dir, vm_dir.split('\\')[-1]+'.asm')
         with open(asm_path, 'w') as asm_file:
             bootstrap = "@261 // bootstrap: initialize SP as 261\n"  # test scripts do not conform to spec (256) >:|
             bootstrap += "D=A\n"
@@ -967,6 +861,12 @@ def main():
             bootstrap += "M=D\n"
             asm_file.write(bootstrap+asm)
 
+        print("Translated VM file(s) in directory: %s" % vm_dir)
+        for vm_filepath in vm_dir_filelist:
+            print("\t%s" % vm_filepath)
+
 
 if __name__ == "__main__":
-    main()
+    debug_runs = [True, False]
+    for _debug in debug_runs:
+        translate(debug=_debug)
