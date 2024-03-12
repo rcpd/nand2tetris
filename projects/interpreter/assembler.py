@@ -249,17 +249,22 @@ def assemble(asm_filepath, debug=False):
 
     else:
         # no solution file, just write the result
-        for (bin_line, in_line) in zip(binary_file, asm_content_stripped):
-            if debug:
-                print('%s / %s' % (in_line, bin_line))
-                print('map  : ' + 'ixx a cccccc ddd jjj')
-                print('code : ' + bin_line[0:3] + " " + bin_line[3] + " " + bin_line[4:10] +
-                      " " + bin_line[10:13] + " " + bin_line[13:])
-        print('Assembler: %s Complete (no errors / no solution file = not storing binary)' % asm_filepath)
+        with open(asm_filepath.replace(".asm", ".hack"), "w") as output_file:
+            for (bin_line, in_line) in zip(binary_file, asm_content_stripped):
+                if debug:
+                    print('%s / %s' % (in_line, bin_line))
+                    print('map  : ' + 'ixx a cccccc ddd jjj')
+                    print('code : ' + bin_line[0:3] + " " + bin_line[3] + " " + bin_line[4:10] +
+                          " " + bin_line[10:13] + " " + bin_line[13:])
+                output_file.write(bin_line + '\n')
+        print('Assembler: %s Complete (no errors / no solution file)' % asm_filepath)
 
 
 if __name__ == '__main__':
     _asm_filepaths = [
+        "../04/fill/fill.asm",
+        "../04/mult/mult.asm",
+
         "../06/add/add.asm",
         "../06/max/max.asm",
         "../06/max/maxL.asm",
