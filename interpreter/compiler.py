@@ -1306,6 +1306,8 @@ if __name__ == '__main__':
          r"..\projects\12\SysTest\Sys.jack"],
         [r"..\projects\12\ArrayTest\Main.jack",
          r"..\projects\12\ArrayTest\Array.jack"],
+        [r"..\projects\12\KeyboardTest\Main.jack",
+         r"..\projects\12\KeyboardTest\Keyboard.jack"],
     ]
 
     # matched to course compiler
@@ -1332,6 +1334,8 @@ if __name__ == '__main__':
         r"..\projects\12\SysTest\Sys.vm": 83,
         r"..\projects\12\ArrayTest\Main.vm": 131,
         r"..\projects\12\ArrayTest\Array.vm": 23,
+        r"..\projects\12\KeyboardTest\Main.vm": 949,
+        r"..\projects\12\KeyboardTest\Keyboard.vm": 102,
 
     }
 

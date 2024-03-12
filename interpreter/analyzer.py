@@ -374,6 +374,8 @@ if __name__ == '__main__':
         r"..\projects\12\SysTest\Sys.jack",
         r"..\projects\12\ArrayTest\Main.jack",
         r"..\projects\12\ArrayTest\Array.jack",
+        r"..\projects\12\KeyboardTest\Main.jack",
+        r"..\projects\12\KeyboardTest\Keyboard.jack",
     ]
 
     for _filepath in jack_filepaths:

@@ -1,6 +1,9 @@
 """"
 Python bindings & test framework for Nand2Tetris HACK Assembly language
 """
+import warnings
+import traceback
+
 import assembler
 import tester
 import translator
@@ -415,6 +418,8 @@ if __name__ == '__main__':
         r"..\projects\12\SysTest\Sys.jack",
         r"..\projects\12\ArrayTest\Main.jack",
         r"..\projects\12\ArrayTest\Array.jack",
+        r"..\projects\12\KeyboardTest\Main.jack",
+        r"..\projects\12\KeyboardTest\Keyboard.jack",
     ]
 
     # compiler
@@ -452,6 +457,8 @@ if __name__ == '__main__':
          r"..\projects\12\SysTest\Sys.jack"],
         [r"..\projects\12\ArrayTest\Main.jack",
          r"..\projects\12\ArrayTest\Array.jack"],
+        [r"..\projects\12\KeyboardTest\Main.jack",
+         r"..\projects\12\KeyboardTest\Keyboard.jack"],
     ]
 
     # enforce matching of compiler against course compiler
@@ -480,6 +487,8 @@ if __name__ == '__main__':
         r"..\projects\12\SysTest\Sys.vm": 83,
         r"..\projects\12\ArrayTest\Main.vm": 131,
         r"..\projects\12\ArrayTest\Array.vm": 23,
+        r"..\projects\12\KeyboardTest\Main.vm": 949,
+        r"..\projects\12\KeyboardTest\Keyboard.vm": 102,
     }
 
     # VM programs (translator only, interpreted below) # TODO: projects 1-11 accounted for, included in translator
@@ -512,7 +521,8 @@ if __name__ == '__main__':
 
         # TODO: Project 12
         r"..\projects\12\SysTest",
-        r"..\projects\12\ArrayTest",  # interactive test (passed manually on VMEmulator)
+        r"..\projects\12\ArrayTest",
+        r"..\projects\12\KeyboardTest",
     ]
 
     # VM programs # TODO: projects 1-11 accounted for, included in translator
@@ -568,22 +578,25 @@ if __name__ == '__main__':
         # r"..\projects\08\ProgramFlow\BasicLoop\BasicLoop.asm",
         # r"..\projects\08\ProgramFlow\FibonacciSeries\FibonacciSeries.asm",
 
-        # exceeds limit of 32k instructions (interpreter not affected by instruction/address limits)
+        # exceeds ROM limit of 32k instructions
         r'..\projects\09\Average\Average.asm',
         r'..\projects\09\Fraction\Fraction.asm',
         r'..\projects\09\HelloWorld\HelloWorld.asm',
         r'..\projects\09\List\List.asm',
         r'..\projects\09\Square\Square.asm',
         r'..\projects\10\ArrayTest\ArrayTest.asm',
-        r'..\projects\10\Square\Square.asm',  # too large, generates 17 bit addresses (different Main.jack to 9/11)
+        r'..\projects\10\Square\Square.asm',  # 17 bit addresses (different Main.jack to 9/11)
         r'..\projects\11\Average\Average.asm',
-        r'..\projects\11\ComplexArrays\ComplexArrays.asm',  # too large, generates 17 bit addresses
+        r'..\projects\11\ComplexArrays\ComplexArrays.asm',  # 17 bit addresses
         r'..\projects\11\ConvertToBin\ConvertToBin.asm',
-        r'..\projects\11\Pong\Pong.asm',  # too large, generates 17 bit addresses
+        r'..\projects\11\Pong\Pong.asm',  # 17 bit addresses
         r'..\projects\11\Seven\Seven.asm',
         r'..\projects\11\Square\Square.asm',
 
+        # TODO: Project 12
         r"..\projects\12\SysTest\SysTest.asm",
+        r"..\projects\12\ArrayTest\ArrayTest.asm",
+        r"..\projects\12\KeyboardTest\KeyboardTest.asm",  # 17 bit addresses
     ]
 
     # HDL tests (HardwareSimulator): project 1-12 accounted for, not included in tester/python_hdl!
@@ -661,7 +674,12 @@ if __name__ == '__main__':
         r'..\projects\08\ProgramFlow\FibonacciSeries\FibonacciSeriesVME.tst',
 
         # TODO: Project 12
+        # interactively tested / no test files
+        # r'..\projects\12\SysTest
+        # r'..\projects\12\KeyboardTest
+
         r'..\projects\12\ArrayTest\ArrayTest.tst',
+
         # r'..\projects\12\MathTest\MathTest.tst',
         # r'..\projects\12\MemoryTest\MemoryTest.tst',
         # r'..\projects\12\MemoryTest\MemoryDiag.tst'
@@ -695,10 +713,16 @@ if __name__ == '__main__':
         _asm_filepaths = vm_asm_filepaths + binary_asm_filepaths
         for _asm_filepath in _asm_filepaths:
             assembler.assemble(_asm_filepath, debug=False)
+        warnings.simplefilter("default")  # reset warning filter
 
         # load & execute modules without test scripts
         for _asm_filepath in binary_asm_filepaths:
-            run(_asm_filepath, debug=False)
+            try:
+                run(_asm_filepath, debug=False)
+            except IndexError:
+                warnings.warn("Interpreter: Probable memory access violation captured during execution of %s"
+                              % _asm_filepath)
+                traceback.print_exc()
 
         # load & execute modules with test scripts
         for _asm_filepath in vm_asm_filepaths:
