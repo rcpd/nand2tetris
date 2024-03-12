@@ -90,8 +90,7 @@ sys_func = {
 # function: global to all instantiations of the class (a constructor is a function)
 
 types = ['int', 'boolean', 'char', 'void']
-# TODO: Fraction is not a built-in, supplementary modules should be added at runtime
-objects = ['Math', 'Memory', 'String', 'Array', 'Output', 'Screen', 'Keyboard', 'Sys', 'Fraction']
+objects = ['Math', 'Memory', 'String', 'Array', 'Output', 'Screen', 'Keyboard', 'Sys', 'Fraction', 'List']
 kinds = ['class', 'constructor', 'method', 'function', 'static', 'field', 'var']
 
 
@@ -735,8 +734,8 @@ def main(filepath, file_list):
                             var_type = keyword
 
                         # local var passed as param
-                        elif identifier in class_dict[class_name][func_name]['args'] or identifier in \
-                                class_dict[class_name]['args']:
+                        elif func_name and (identifier in class_dict[class_name][func_name]['args']
+                                            or identifier in class_dict[class_name]['args']):
                             continue  # already processed
 
                         # external or built-in types
@@ -1007,7 +1006,7 @@ def main(filepath, file_list):
                                            class_dict[class_name][func_name]['args'][lhs_var_name]['index'],
                                            lhs_var_name))
                 else:
-                    raise NotImplementedError
+                    raise NotImplementedError  # FIXME: array in rhs expression
 
                 # mark the start of a new expression
                 pcode, exp_buffer, parent_obj, child_func = \
@@ -1123,22 +1122,23 @@ if __name__ == '__main__':
         [r"..\11\Seven\Main.jack"],
         [r"..\11\ConvertToBin\Main.jack"],
         [r"..\11\Average\Main.jack"],
-
-        # wip
         [r"..\09\Fraction\Main.jack",
          r"..\09\Fraction\Fraction.jack"],
+        [r"..\09\HelloWorld\Main.jack"],
 
-        # r"..\09\HelloWorld\Main.jack",
-        # r"..\09\List\Main.jack",
-        # r"..\09\List\List.jack",
+        # wip
+        [r"..\09\List\Main.jack",  # FIXME: wip
+         r"..\09\List\List.jack"],  # FIXME: wip
+
         # r"..\09\Square\Main.jack",
         # r"..\09\Square\Square.jack",
         # r"..\09\Square\SquareGame.jack",
-        #
-        # r"..\10\ArrayTest\Main.jack",
+        # [r"..\10\ArrayTest\Main.jack"],  # FIXME: while labels
+
         # r"..\10\ExpressionLessSquare\Main.jack",
         # r"..\10\ExpressionLessSquare\Square.jack",
         # r"..\10\ExpressionLessSquare\SquareGame.jack",
+
         # r"..\10\Square\Main.jack",
         # r"..\10\Square\Square.jack",
         # r"..\10\Square\SquareGame.jack",
@@ -1146,8 +1146,9 @@ if __name__ == '__main__':
         # r"..\11\Square\Main.jack",
         # r"..\11\Square\Square.jack",
         # r"..\11\Square\SquareGame.jack",
-        #
-        # r"..\11\ComplexArrays\Main.jack",
+
+        # [r"..\11\ComplexArrays\Main.jack"],  # FIXME: array in rhs expression
+
         # r"..\11\Pong\Ball.jack",
         # r"..\11\Pong\Bat.jack",
         # r"..\11\Pong\Main.jack",
@@ -1163,7 +1164,7 @@ if __name__ == '__main__':
         r"..\11\Average\Main.vm": 149,
         r"..\09\Fraction\Main.vm": 18,
         r"..\09\Fraction\Fraction.vm": 116,
-        # wip
+        r"..\09\HelloWorld\Main.vm": 33,
     }
 
     for file_list in jack_filepaths:
@@ -1196,3 +1197,5 @@ if __name__ == '__main__':
                     print("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
+
+    # TODO: Fraction/List is not a built-in, supplementary modules should be added at runtime
