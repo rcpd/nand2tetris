@@ -79,7 +79,7 @@ sys_func = {
 
 # primitives & keywords
 # class, constructor, method, function
-# int, boolean, char, void
+# int, boolean, char, void, Array
 # var, static, field
 # let, do, if, else, while, return
 # true, false, null, this
@@ -90,7 +90,7 @@ sys_func = {
 # method: operates on a specific instantiation of a class object
 # function: global to all instantiations of the class (a constructor is a function)
 
-types = ['int', 'boolean', 'char', 'void']
+types = ['int', 'boolean', 'char', 'void', 'Array']
 
 
 def find_parent(tree, node):
@@ -166,7 +166,6 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
     # don't emit pcode on pre-scan
     if not prescan:
         store_pcode(pcode, "\nfunction %s.%s %s" % (class_name, func_name, num_vars))
-        store_pcode(pcode, "\n// param this argument 0")
 
         if func_kind == "constructor":
             # allocate space on heap
@@ -176,6 +175,7 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
 
         elif func_kind == "method":
             # move pointer to current object (implicit "this" argument)
+            store_pcode(pcode, "\n// param this argument 0")
             store_pcode(pcode, "push argument 0")
             store_pcode(pcode, "pop pointer 0 // update 'this' to object for method call")
 
@@ -258,6 +258,11 @@ def compile_vardec(pcode, class_dict, class_name, func_name, var_kind, var_type,
         class_dict[class_name][func_name]['index_dict'][var_kind] = index
 
     elif not prescan:
+        if not var_type:
+            raise RuntimeError("unexpected var_type '%s' (%s.%s.%s)" % (var_type, class_name, func_name, var_name))
+        if var_type == var_name:
+            raise RuntimeError("unexpected var_name '%s' (%s.%s.%s)" % (var_type, class_name, func_name, var_name))
+
         if var_kind == 'local':
             store_pcode(pcode, "// var %s %s (%s %s)" %
                         (var_type, var_name,  var_kind, class_dict[class_name][func_name]['args'][var_name]['index']))
@@ -497,10 +502,29 @@ def main(filepath):
                     pcode, class_dict = compile_function(pcode, func_name, var_type, func_kind, class_dict, class_name)
 
                 elif statement in ('var', 'param'):
+                    if not var_type:
+                        # param in function declaration
+                        if keyword in types:
+                            var_type = keyword
+
+                        # local var passed as param
+                        elif identifier in class_dict[class_name][func_name]['args']:
+                            continue  # already processed
+
+                        # built-in types like 'Array'
+                        elif identifier in types:
+                            if identifier != 'Array':
+                                raise RuntimeError()  # debug
+                            var_type = identifier
+                            continue  # process on next loop
+
+                        if not var_type:
+                            raise RuntimeError()
+
                     pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
                         compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
                                           class_name=class_name, func_name=func_name, var_type=var_type,
-                                          var_name=identifier)
+                                          var_name=identifier, prescan=True)
 
             elif elem.tag == 'varDec':
                 statement = 'var'
@@ -564,9 +588,21 @@ def main(filepath):
 
                     # var declaration (local or function parameter)
                     elif statement in ('var', 'param'):
-                        # catch param case where type is only keyword
-                        if not var_type and keyword in types:
-                            var_type = keyword
+                        # catch param case where type is only keyword (not a vardec so not in pre-scan)
+                        if not var_type:
+                            try:
+                                var_type = class_dict[class_name][func_name]['args'][identifier]['type']
+                            except KeyError:
+                                pass
+
+                        if not var_type:
+                            # built-in library types like 'Array'
+                            if identifier in types:
+                                var_type = identifier
+                                continue  # process on next loop
+                            else:
+                                raise RuntimeError("No type found for '%s'" % identifier)
+
                         pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
                             compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
                                               class_name=class_name, func_name=func_name, var_type=var_type,
@@ -805,4 +841,4 @@ if __name__ == '__main__':
                     print("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
-    # TODO: next test program
+    # TODO: stringConstant (Average)
