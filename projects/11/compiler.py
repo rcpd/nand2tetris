@@ -270,7 +270,12 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
         cmd, proc, i = compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_name,
                                               sub=True, proc=proc)
         sub_xps.append(cmd)
-        i += 1
+
+        # FIXME: some functions advance one additional symbol
+        if input_list[i][1] not in (";", "{", "="):
+            i += 1
+        else:
+            break
 
     for sub_xp in sub_xps:
         for cmd in sub_xp:
