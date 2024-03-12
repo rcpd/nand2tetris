@@ -158,13 +158,9 @@ if __name__ == '__main__':
         "../08/ProgramFlow/FibonacciSeries/FibonacciSeriesVME.tst",
         "../08/ProgramFlow/BasicLoop/BasicLoopVME.tst",
     ]
-
-    for _tst_filepath in tst_filepaths:
-        _cmp_filepath = _tst_filepath.replace("VME", "").replace(".tst", ".cmp")
-        _tst_params = load_tst(_tst_filepath, debug=True)
-        _tst_params["compare"] = load_cmp(_cmp_filepath, debug=True)  # ignore pep
-
-    for _tst_filepath in tst_filepaths:
-        _cmp_filepath = _tst_filepath.replace("VME", "").replace(".tst", ".cmp")
-        _tst_params = load_tst(_tst_filepath, debug=False)
-        _tst_params["compare"] = load_cmp(_cmp_filepath, debug=False)  # ignore pep
+    debug_runs = [True, False]
+    for debug in debug_runs:
+        for _tst_filepath in tst_filepaths:
+            _cmp_filepath = _tst_filepath.replace("VME", "").replace(".tst", ".cmp")
+            _tst_params = load_tst(_tst_filepath, debug=debug)
+            _tst_params["compare"] = load_cmp(_cmp_filepath, debug=debug)  # ignore pep

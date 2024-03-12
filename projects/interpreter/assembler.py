@@ -282,8 +282,7 @@ if __name__ == '__main__':
         "../08/ProgramFlow/FibonacciSeries/FibonacciSeries.asm",
     ]
 
-    for _asm_filepath in file_list:
-        assemble(_asm_filepath, debug=True)
-
-    for _asm_filepath in file_list:
-        assemble(_asm_filepath, debug=False)
+    debug_runs = [True, False]
+    for debug in debug_runs:
+        for _asm_filepath in file_list:
+            assemble(_asm_filepath, debug=debug)
