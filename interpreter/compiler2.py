@@ -143,7 +143,11 @@ def compile_statement(pcode, statement, class_dict, class_name, func_name, call_
 
     elif statement == "var":
         # update class/func dict
-        pcode, class_dict = compile_vardec(pcode, class_dict, class_name, func_name, var_type, var_name)
+        pcode, class_dict = compile_vardec(pcode, class_dict, class_name, func_name, 'local', var_type, var_name)
+
+    elif statement == "param":
+        # update class/func dict
+        pcode, class_dict = compile_vardec(pcode, class_dict, class_name, func_name, 'argument', var_type, var_name)
 
     else:
         raise RuntimeError("Unexpected statement type '%s'" % statement)
@@ -157,22 +161,28 @@ def compile_lhs_statement(class_dict, class_name, func_name, var_name):
     return "pop %s %s // %s" % (lhs_kind, lhs_index, var_name)
 
 
-def compile_vardec(pcode, class_dict, class_name, func_name, var_type, var_name):
+def compile_vardec(pcode, class_dict, class_name, func_name, var_kind, var_type, var_name):
     """
     add var to the class dict, print a comment in pcode
     """
     # don't emit pcode during pre-scan
     if var_name not in class_dict[class_name][func_name]['args']:
-        if "local" not in class_dict[class_name][func_name]['index_dict']:
+        if var_kind not in class_dict[class_name][func_name]['index_dict']:
             index = 0
         else:
-            index = class_dict[class_name][func_name]['index_dict']['local'] + 1
+            index = class_dict[class_name][func_name]['index_dict'][var_kind] + 1
 
-        class_dict[class_name][func_name]['args'][var_name] = {'kind': 'local', 'type': var_type, 'index': index}
-        class_dict[class_name][func_name]['index_dict']['local'] = index
+        class_dict[class_name][func_name]['args'][var_name] = {'kind': var_kind, 'type': var_type, 'index': index}
+        class_dict[class_name][func_name]['index_dict'][var_kind] = index
     else:
-        store_pcode(pcode, "// var %s %s (local %s)" %
-                    (var_type, var_name,  class_dict[class_name][func_name]['args'][var_name]['index']))
+        if var_kind == 'local':
+            store_pcode(pcode, "// var %s %s (%s %s)" %
+                        (var_type, var_name,  var_kind, class_dict[class_name][func_name]['args'][var_name]['index']))
+        elif var_kind == 'argument':
+            store_pcode(pcode, "// param %s %s (%s %s)" %
+                        (var_type, var_name, var_kind, class_dict[class_name][func_name]['args'][var_name]['index']))
+        else:
+            raise RuntimeError("unexpected var_kind '%s'" % var_kind)
 
     return pcode, class_dict
 
@@ -250,7 +260,7 @@ def main(filepath, debug=False):
                 elif not _type:
                     _type = elem.text  # preserved for later
 
-            if elem.tag == 'identifier':
+            elif elem.tag == 'identifier':
                 identifier = elem.text
                 if keyword == 'class':
                     class_name = identifier  # preserved for later
@@ -263,10 +273,21 @@ def main(filepath, debug=False):
                         raise RuntimeError("undefined function kind for '%s.%s'" % (class_name, func_name))
                     pcode, class_dict = compile_function(pcode, func_name, _type, func_kind, class_dict, class_name)
 
-                elif keyword == 'var':
+                elif statement in ('var', 'param'):
                     pcode, class_dict, num_args, exp_buffer = \
-                        compile_statement(pcode, 'var', class_dict, class_name, func_name,
+                        compile_statement(pcode, statement, class_dict, class_name, func_name,
                                           None, None, _type, identifier, num_args, exp_buffer)
+
+            elif elem.tag == 'varDec':
+                statement = 'var'
+            elif elem.tag == 'parameterList':
+                statement = 'param'
+            elif elem.tag == 'doStatement':
+                statement = 'do'
+            elif elem.tag == 'letStatement':
+                statement = 'let'
+            elif elem.tag == 'returnStatement':
+                statement = 'return'
 
         # persist through loop scope
         parent = 'class'
@@ -316,12 +337,12 @@ def main(filepath, debug=False):
                             raise RuntimeError("undefined function kind for %s.%s" % (class_name, func_name))
                         pcode, class_dict = compile_function(pcode, func_name, _type, func_kind, class_dict, class_name)
 
-                    elif keyword == 'var':
+                    elif statement in ('var', 'param'):
                         pcode, class_dict, num_args, exp_buffer = \
                             compile_statement(pcode, statement, class_dict, class_name, func_name,
                                               None, None, _type, identifier, num_args, exp_buffer)
 
-                    elif keyword == 'do' or statement == 'do':
+                    elif statement == 'do':
                         # "do" compilation is deferred until ";"
                         if not call_class:
                             call_class = identifier  # preserved for later
@@ -395,6 +416,8 @@ def main(filepath, debug=False):
 
             elif elem.tag == 'varDec':
                 statement = 'var'
+            elif elem.tag == 'parameterList':
+                statement = 'param'
             elif elem.tag == 'doStatement':
                 statement = 'do'
             elif elem.tag == 'letStatement':
@@ -409,7 +432,7 @@ def main(filepath, debug=False):
                             num_args += 1
 
             # ignore the tags only used for grouping
-            elif elem.tag in ('subroutineDec', 'subroutineBody', 'parameterList', 'statements', 'expression', 'term'):
+            elif elem.tag in ('subroutineDec', 'subroutineBody', 'statements', 'expression', 'term'):
                 pass
 
             else:
@@ -457,4 +480,4 @@ if __name__ == '__main__':
                 if org_file.read() != cur_file.read():
                     raise RuntimeError("Strict file did not match: %s" % match)
 
-    # TODO: arg(s) [psuedo vardec] in function declaration (parameterList)
+    # TODO: let loop = true;
