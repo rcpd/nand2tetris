@@ -87,6 +87,8 @@ push constant 2
 add
 pop this 2 // size =
 call Square.draw 0
+
+label ELSE_incSize_0 // else
 label IF_END_incSize_0 // exit if
 push constant 0 // void return
 return
@@ -110,6 +112,8 @@ neg
 add
 pop this 2 // size =
 call Square.draw 0
+
+label ELSE_decSize_0 // else
 label IF_END_decSize_0 // exit if
 push constant 0 // void return
 return
@@ -163,6 +167,8 @@ push this 1 // y
 push constant 1
 add
 call Screen.drawRectangle 4
+
+label ELSE_moveUp_0 // else
 label IF_END_moveUp_0 // exit if
 push constant 0 // void return
 return
@@ -217,6 +223,8 @@ push this 1 // y
 push this 2 // size
 add
 call Screen.drawRectangle 4
+
+label ELSE_moveDown_0 // else
 label IF_END_moveDown_0 // exit if
 push constant 0 // void return
 return
@@ -270,6 +278,8 @@ push this 1 // y
 push this 2 // size
 add
 call Screen.drawRectangle 4
+
+label ELSE_moveLeft_0 // else
 label IF_END_moveLeft_0 // exit if
 push constant 0 // void return
 return
@@ -324,6 +334,8 @@ push this 1 // y
 push this 2 // size
 add
 call Screen.drawRectangle 4
+
+label ELSE_moveRight_0 // else
 label IF_END_moveRight_0 // exit if
 push constant 0 // void return
 return

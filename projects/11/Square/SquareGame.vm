@@ -39,6 +39,8 @@ goto ELSE_moveSquare_0 // exit if or enter else
 label IF_moveSquare_0 // start if
 push this 0 // square (implicit this push)
 call square.moveUp 0
+
+label ELSE_moveSquare_0 // else
 label IF_END_moveSquare_0 // exit if
 
 // if <expression>
@@ -51,6 +53,8 @@ goto ELSE_moveSquare_0 // exit if or enter else
 label IF_moveSquare_0 // start if
 push this 0 // square (implicit this push)
 call square.moveDown 0
+
+label ELSE_moveSquare_0 // else
 label IF_END_moveSquare_0 // exit if
 
 // if <expression>
@@ -63,6 +67,8 @@ goto ELSE_moveSquare_0 // exit if or enter else
 label IF_moveSquare_0 // start if
 push this 0 // square (implicit this push)
 call square.moveLeft 0
+
+label ELSE_moveSquare_0 // else
 label IF_END_moveSquare_0 // exit if
 
 // if <expression>
@@ -75,6 +81,8 @@ goto ELSE_moveSquare_0 // exit if or enter else
 label IF_moveSquare_0 // start if
 push this 0 // square (implicit this push)
 call square.moveRight 0
+
+label ELSE_moveSquare_0 // else
 label IF_END_moveSquare_0 // exit if
 // static call Sys.wait 
 push constant 5
@@ -126,6 +134,8 @@ label IF_run_0 // start if
 push constant 1
 neg // true
 pop local 1 // exit =
+
+label ELSE_run_0 // else
 label IF_END_run_0 // exit if
 
 // if <expression>
@@ -138,6 +148,8 @@ goto ELSE_run_0 // exit if or enter else
 label IF_run_0 // start if
 push this 0 // square (implicit this push)
 call square.decSize 0
+
+label ELSE_run_0 // else
 label IF_END_run_0 // exit if
 
 // if <expression>
@@ -150,6 +162,8 @@ goto ELSE_run_0 // exit if or enter else
 label IF_run_0 // start if
 push this 0 // square (implicit this push)
 call square.incSize 0
+
+label ELSE_run_0 // else
 label IF_END_run_0 // exit if
 
 // if <expression>
@@ -162,6 +176,8 @@ goto ELSE_run_0 // exit if or enter else
 label IF_run_0 // start if
 push constant 1
 pop this 1 // direction =
+
+label ELSE_run_0 // else
 label IF_END_run_0 // exit if
 
 // if <expression>
@@ -174,6 +190,8 @@ goto ELSE_run_0 // exit if or enter else
 label IF_run_0 // start if
 push constant 2
 pop this 1 // direction =
+
+label ELSE_run_0 // else
 label IF_END_run_0 // exit if
 
 // if <expression>
@@ -186,6 +204,8 @@ goto ELSE_run_0 // exit if or enter else
 label IF_run_0 // start if
 push constant 3
 pop this 1 // direction =
+
+label ELSE_run_0 // else
 label IF_END_run_0 // exit if
 
 // if <expression>
@@ -198,6 +218,8 @@ goto ELSE_run_0 // exit if or enter else
 label IF_run_0 // start if
 push constant 4
 pop this 1 // direction =
+
+label ELSE_run_0 // else
 label IF_END_run_0 // exit if
 
 label WHILE_TEST_run_1 // while <expression>
