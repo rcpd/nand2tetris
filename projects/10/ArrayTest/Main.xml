@@ -45,7 +45,7 @@
               <expressionList>
                 <expression>
                   <term>
-                    <stringConstant> HOW MANY NUMBERS?  </stringConstant>
+                    <stringConstant> HOW MANY NUMBERS? </stringConstant>
                   </term>
                 </expression>
               </expressionList>
