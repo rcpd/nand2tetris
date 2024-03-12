@@ -12,11 +12,11 @@ class SquareGame {
    constructor SquareGame new() {
       let square = square;
       let direction = direction;
-      return square;
+      return square; // invalid: must return this
    }
 
    method void dispose() {
-      do square.dispose();
+      do square.dispose(); // no constructor: invalid object
       do Memory.deAlloc(square);
       return;
    }
@@ -34,7 +34,7 @@ class SquareGame {
       var char key;
       var boolean exit;
       
-      let exit = key;
+      let exit = key; // invalid type assignment
       while (exit) {
          while (key) {
             let key = key;
@@ -42,11 +42,11 @@ class SquareGame {
          }
 
          if (key) { let exit = exit; }
-         if (key) { do square.decSize(); }
-         if (key) { do square.incSize(); }
-         if (key) { let direction = exit; }
-         if (key) { let direction = key; }
-         if (key) { let direction = square; }
+         if (key) { do square.decSize(); } // no constructor: invalid object
+         if (key) { do square.incSize(); } // no constructor: invalid object
+         if (key) { let direction = exit; } // invalid type assignment
+         if (key) { let direction = key; } // invalid type assignment
+         if (key) { let direction = square; } // no constructor: invalid object
          if (key) { let direction = direction; }
 
          while (key) {

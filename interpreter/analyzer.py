@@ -338,9 +338,9 @@ if __name__ == '__main__':
         r"..\09\Square\SquareGame.jack",
 
         r"..\10\ArrayTest\Main.jack",
-        r"..\10\ExpressionLessSquare\Main.jack",  # static compilation testing only
-        r"..\10\ExpressionLessSquare\Square.jack",  # nonsense code that doesn't / shouldn't compile or run
-        r"..\10\ExpressionLessSquare\SquareGame.jack",  # nonsense code that doesn't / shouldn't compile or run
+        # r"..\10\ExpressionLessSquare\Main.jack",  # nonsense code that doesn't / shouldn't compile or run
+        # r"..\10\ExpressionLessSquare\Square.jack",  # nonsense code that doesn't / shouldn't compile or run
+        # r"..\10\ExpressionLessSquare\SquareGame.jack",  # nonsense code that doesn't / shouldn't compile or run
         r"..\10\Square\Main.jack",
         r"..\10\Square\Square.jack",
         r"..\10\Square\SquareGame.jack",
