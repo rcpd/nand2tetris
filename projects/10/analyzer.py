@@ -73,9 +73,9 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                # close term/expression/expressionList )
+                # close term/expression/expressionList ) or ]
                 elif parent.tag in ("term", "expression", "expressionList") \
-                    and input_list[i][0] == "symbol" and input_list[i][1] == ")":
+                    and input_list[i][0] == "symbol" and input_list[i][1] in (")", "]"):
                     # revert parent until all tags closed
                     for k in range(0, 3):
                         if parent.tag in ("term", "expression", "expressionList"):
@@ -84,13 +84,6 @@ def main(debug=False):
                     # insert current token
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
-
-                # # close letStatement ;
-                # elif parent.tag == "letStatement" and input_list[i][0] == "symbol" and input_list[i][1] == ";":
-                #     # insert current token and revert parent
-                #     child = ET.SubElement(parent, input_tuple[0])
-                #     child.text = " %s " % input_tuple[1]
-                #     parent = find_parent(output_root, parent)
 
                 # close term/expression/letStatement ;
                 elif parent.tag in ("term", "expression") and input_list[i][0] == "symbol" and input_list[i][1] == ";":
@@ -117,7 +110,8 @@ def main(debug=False):
 
                 # open expression
                 elif (input_list[i][0] == "symbol" and input_list[i][1] == "=") \
-                    or (parent.tag == "whileStatement" and input_list[i][0] == "symbol" and input_list[i][1] == "("):
+                    or (parent.tag in ("letStatement", "whileStatement")
+                        and input_list[i][0] == "symbol" and input_list[i][1] in ("(", "[")):
                     # insert current token
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
