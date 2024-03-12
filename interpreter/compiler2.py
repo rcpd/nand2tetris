@@ -3,6 +3,7 @@ Compile a JACK program into a VM program (pcode) from the token stream initially
 by tokenizer/analyzer.
 """
 
+import os
 import xml.etree.ElementTree as Et
 
 op_map = {"+": "add", "-": "sub", "*": "call Math.multiply 2", "/": "call Math.divide 2", "&": "and", "|": "or",
@@ -90,7 +91,7 @@ sys_func = {
 # function: global to all instantiations of the class (a constructor is a function)
 
 types = ['int', 'boolean', 'char', 'void']
-objects = ['Math', 'Memory', 'String', 'Array', 'Output', 'Screen', 'Keyboard', 'Sys', 'Fraction', 'List']
+objects = ['Math', 'Memory', 'String', 'Array', 'Output', 'Screen', 'Keyboard', 'Sys']
 kinds = ['class', 'constructor', 'method', 'function', 'static', 'field', 'var']
 
 
@@ -1119,40 +1120,41 @@ if __name__ == '__main__':
     jack_filepaths = [
         # compiled / tested
         [r"..\09\Average\Main.jack"],
+        [r"..\11\Average\Main.jack"],
         [r"..\11\Seven\Main.jack"],
         [r"..\11\ConvertToBin\Main.jack"],
-        [r"..\11\Average\Main.jack"],
         [r"..\09\Fraction\Main.jack",
          r"..\09\Fraction\Fraction.jack"],
         [r"..\09\HelloWorld\Main.jack"],
 
         # wip
-        [r"..\09\List\Main.jack",  # FIXME: wip
-         r"..\09\List\List.jack"],  # FIXME: wip
+        [r"..\09\List\Main.jack",  # FIXME: misc
+         r"..\09\List\List.jack"],
 
-        # r"..\09\Square\Main.jack",
-        # r"..\09\Square\Square.jack",
-        # r"..\09\Square\SquareGame.jack",
+        # [r"..\09\Square\Main.jack",  # FIXME: unexpected identifier
+        #  r"..\09\Square\Square.jack",
+        #  r"..\09\Square\SquareGame.jack"],
+
+        # [r"..\10\Square\Main.jack",  # FIXME: unexpected identifier
+        #  r"..\10\Square\Square.jack",
+        #  r"..\10\Square\SquareGame.jack"],
+
+        # [r"..\11\Square\Main.jack",  # FIXME: unexpected identifier
+        #  r"..\11\Square\Square.jack",
+        #  r"..\11\Square\SquareGame.jack"],
+
+        # [r"..\10\ExpressionLessSquare\Main.jack",  # FIXME: unexpected identifier
+        #  r"..\10\ExpressionLessSquare\Square.jack",
+        #  r"..\10\ExpressionLessSquare\SquareGame.jack"],
+
         # [r"..\10\ArrayTest\Main.jack"],  # FIXME: while labels
-
-        # r"..\10\ExpressionLessSquare\Main.jack",
-        # r"..\10\ExpressionLessSquare\Square.jack",
-        # r"..\10\ExpressionLessSquare\SquareGame.jack",
-
-        # r"..\10\Square\Main.jack",
-        # r"..\10\Square\Square.jack",
-        # r"..\10\Square\SquareGame.jack",
-        #
-        # r"..\11\Square\Main.jack",
-        # r"..\11\Square\Square.jack",
-        # r"..\11\Square\SquareGame.jack",
 
         # [r"..\11\ComplexArrays\Main.jack"],  # FIXME: array in rhs expression
 
-        # r"..\11\Pong\Ball.jack",
-        # r"..\11\Pong\Bat.jack",
-        # r"..\11\Pong\Main.jack",
-        # r"..\11\Pong\PongGame.jack",
+        # [r"..\11\Pong\Ball.jack",  # FIXME: unexpected identifier
+        #  r"..\11\Pong\Bat.jack",
+        #  r"..\11\Pong\Main.jack",
+        #  r"..\11\Pong\PongGame.jack"],
     ]
 
     # matched to course compiler
@@ -1168,6 +1170,11 @@ if __name__ == '__main__':
     }
 
     for file_list in jack_filepaths:
+        # check external modules at runtime
+        for _filepath in file_list:
+            if os.path.basename(_filepath).replace(".jack", "") not in objects:
+                objects.append(os.path.basename(_filepath).replace(".jack", ""))
+
         for _filepath in file_list:
             pcode = main(_filepath, file_list)
 
@@ -1194,8 +1201,6 @@ if __name__ == '__main__':
                         break
                 index += 1
                 if strict_matches[match] and index < strict_matches[match]:
-                    print("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
+                    raise RuntimeError("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
-
-    # TODO: Fraction/List is not a built-in, supplementary modules should be added at runtime
