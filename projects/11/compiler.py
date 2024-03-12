@@ -286,6 +286,134 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
     return pcode, proc
 
 
+def compile_call_or_var(sub_xps, cmd, input_list, i, k, class_dict, class_name, func_name, sub=False, proc=None,
+                        stat=None):
+    # call or var
+    var = None
+    call_obj = None
+    # check if call // identify "do class.func();" or "do func();"
+    class_call = (input_list[i+1][1] == "." and input_list[i+2][0] == "identifier" and
+                  input_list[i+3][1] == "(")
+    local_call = False
+    if not class_call and input_list[i][1] in class_dict[class_name]:
+        local_call = True
+    if class_call or local_call:
+        # determine parent of callee function
+        if local_call:
+            var = class_dict[class_name][input_list[i][1]]
+        elif class_call:
+            call_obj = input_list[i][1] + "." + input_list[i+2][1]
+            if input_list[i][1] in class_dict[class_name][func_name]["args"]:  # local obj
+                var = class_dict[class_name][func_name]["args"][input_list[i][1]]
+            elif input_list[i][1] in class_dict[class_name]["args"]:  # class attr obj
+                var = class_dict[class_name]["args"][input_list[i][1]]
+            elif input_list[i+2][1] in class_dict[class_name]:  # class func
+                var = class_dict[class_name][input_list[i+2][1]]
+            else:
+                pass  # external call
+
+    else:  # function arg
+        if input_list[i][1] in class_dict[class_name][func_name]["args"]:  # local arg
+            var = class_dict[class_name][func_name]["args"][input_list[i][1]]
+        elif input_list[i][1] in class_dict[class_name]["args"]:  # class attr
+            var = class_dict[class_name]["args"][input_list[i][1]]
+
+    if var is not None:
+        # push implicit "this" argument for class methods
+        # TODO: should not assume callee is method when pushing this
+        if var["kind"] == "field":
+            if input_list[i+1][1] == "[":
+                cmd.append("push %s %s // %s (array)" % ("this", var["index"], input_list[i][1]))
+            else:
+                cmd.append("push this %s // %s" % (var["index"], input_list[i][1]))
+
+        elif var["kind"] == "method":
+            cmd.append("push pointer 0 // %s (this)" % class_name)
+
+        elif var["kind"] in ("function", "constructor"):
+            cmd.append("// function call %s" % call_obj)
+
+        else:
+            if input_list[i+1][1] == "[":
+                cmd.append("push %s %s // %s (array)" % (var["kind"], var["index"], input_list[i][1]))
+            else:
+                cmd.append("push %s %s // %s (arg)" % (var["kind"], var["index"], input_list[i][1]))
+
+    proc.append(i)
+    k += 1
+
+    sub_cmd = []
+    j = 0
+    if class_call and input_list[i+4][1] != ")":
+        # process call expression
+        j = i+4  # move over bracket
+    elif local_call and input_list[i+2][1] != ")":
+        j = i+2
+
+    if j:
+        # process expression in () for call
+        while input_list[j][1] not in (";", "{"):  # ) short-circuits on nested
+            # get expression result for []
+            _cmd, proc, j = compile_sub_expression(sub_xps, input_list, j, class_dict, class_name,
+                                                   func_name, sub=True, proc=proc)
+            for _c in _cmd:
+                sub_cmd.append(_c)  # preserve sub-sub commands
+
+            if input_list[j][1] not in (";", "{"):  # ) short-circuits on nested
+                j += 1
+            else:
+                break
+
+        for c in sub_cmd:
+            cmd.append(c)  # roll sub-sub back into sub
+
+    # count params for call
+    p = 0
+    num_params = 0
+    if class_call:
+        p = i+4
+    elif local_call:
+        p = i+2
+    if p:
+        if input_list[p][1] != ")":
+            num_params = 1
+        while input_list[p][1] != ";":
+            if input_list[p][1] == ",":
+                num_params += 1
+            p += 1
+
+    # compile call
+    if class_call:
+        # lookup class for object (func table > class table > assume external)
+        try:
+            class_obj = class_dict[class_name][func_name]["args"][input_list[i][1]]["type"]
+            # TODO: might be function but might not be in dict
+            # TODO: need to roll all files into pre-scan
+            num_params += 1  # inc for implicit this
+        except KeyError:
+            try:
+                class_obj = class_dict[class_name]["args"][input_list[i][1]]["type"]
+                # TODO: might be function but might not be in dict
+                # TODO: need to roll all files into pre-scan
+                num_params += 1  # inc for implicit this
+            except KeyError:
+                class_obj = input_list[i][1]  # external must be function
+
+        cmd.append("call %s.%s %s" % (class_obj, input_list[i+2][1], num_params))
+        if stat == "do":
+            cmd.append("pop temp 0 // discard return on do call")
+
+    elif local_call:
+        # convert local calls to be fully qualified to current class scope
+        # TODO: should check callee is method before inc params
+        cmd.append("call %s.%s %s" % (class_name, input_list[i][1], num_params+1))
+        if stat == "do":
+            cmd.append("pop temp 0 // discard return on do call")
+
+    # exit condition for calls
+    return cmd, proc, p, local_call, class_call, j, k
+
+
 def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_name, sub=False, proc=None, stat=None):
     cmd = []
     # process expression
@@ -302,129 +430,8 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
             k += 1
 
         elif input_list[i][0] == "identifier":
-            # call or var
-            var = None
-            call_obj = None
-            # check if call // identify "do class.func();" or "do func();"
-            class_call = (input_list[i+1][1] == "." and input_list[i+2][0] == "identifier" and
-                          input_list[i+3][1] == "(")
-            local_call = False
-            if not class_call and input_list[i][1] in class_dict[class_name]:
-                local_call = True
-            if class_call or local_call:
-                # determine parent of callee function
-                if local_call:
-                    var = class_dict[class_name][input_list[i][1]]
-                elif class_call:
-                    call_obj = input_list[i][1] + "." + input_list[i+2][1]
-                    if input_list[i][1] in class_dict[class_name][func_name]["args"]:  # local obj
-                        var = class_dict[class_name][func_name]["args"][input_list[i][1]]
-                    elif input_list[i][1] in class_dict[class_name]["args"]:  # class attr obj
-                        var = class_dict[class_name]["args"][input_list[i][1]]
-                    elif input_list[i+2][1] in class_dict[class_name]:  # class func
-                        var = class_dict[class_name][input_list[i+2][1]]
-                    else:
-                        pass  # external call
-
-            else:  # function arg
-                if input_list[i][1] in class_dict[class_name][func_name]["args"]:  # local arg
-                    var = class_dict[class_name][func_name]["args"][input_list[i][1]]
-                elif input_list[i][1] in class_dict[class_name]["args"]:  # class attr
-                    var = class_dict[class_name]["args"][input_list[i][1]]
-
-            if var is not None:
-                # push implicit "this" argument for class methods
-                # TODO: should not assume callee is method when pushing this
-                if var["kind"] == "field":
-                    if input_list[i+1][1] == "[":
-                        cmd.append("push %s %s // %s (array)" % ("this", var["index"], input_list[i][1]))
-                    else:
-                        cmd.append("push this %s // %s" % (var["index"], input_list[i][1]))
-
-                elif var["kind"] == "method":
-                    cmd.append("push pointer 0 // %s (this)" % class_name)
-
-                elif var["kind"] in ("function", "constructor"):
-                    cmd.append("// function call %s" % call_obj)
-
-                else:
-                    if input_list[i+1][1] == "[":
-                        cmd.append("push %s %s // %s (array)" % (var["kind"], var["index"], input_list[i][1]))
-                    else:
-                        cmd.append("push %s %s // %s (arg)" % (var["kind"], var["index"], input_list[i][1]))
-
-            proc.append(i)
-            k += 1
-
-            sub_cmd = []
-            j = 0
-            if class_call and input_list[i+4][1] != ")":
-                # process call expression
-                j = i+4  # move over bracket
-            elif local_call and input_list[i+2][1] != ")":
-                j = i+2
-
-            if j:
-                # process expression in () for call
-                while input_list[j][1] not in (";", "{"):  # ) short-circuits on nested
-                    # get expression result for []
-                    _cmd, proc, j = compile_sub_expression(sub_xps, input_list, j, class_dict, class_name,
-                                                           func_name, sub=True, proc=proc)
-                    for _c in _cmd:
-                        sub_cmd.append(_c)  # preserve sub-sub commands
-
-                    if input_list[j][1] not in (";", "{"):  # ) short-circuits on nested
-                        j += 1
-                    else:
-                        break
-
-                for c in sub_cmd:
-                    cmd.append(c)  # roll sub-sub back into sub
-
-            # count params for call
-            p = 0
-            num_params = 0
-            if class_call:
-                p = i+4
-            elif local_call:
-                p = i+2
-            if p:
-                if input_list[p][1] != ")":
-                    num_params = 1
-                while input_list[p][1] != ";":
-                    if input_list[p][1] == ",":
-                        num_params += 1
-                    p += 1
-
-            # compile call
-            if class_call:
-                # lookup class for object (func table > class table > assume external)
-                try:
-                    class_obj = class_dict[class_name][func_name]["args"][input_list[i][1]]["type"]
-                    # TODO: might be function but might not be in dict
-                    # TODO: need to roll all files into pre-scan
-                    num_params += 1  # inc for implicit this
-                except KeyError:
-                    try:
-                        class_obj = class_dict[class_name]["args"][input_list[i][1]]["type"]
-                        # TODO: might be function but might not be in dict
-                        # TODO: need to roll all files into pre-scan
-                        num_params += 1  # inc for implicit this
-                    except KeyError:
-                        class_obj = input_list[i][1]  # external must be function
-
-                cmd.append("call %s.%s %s" % (class_obj, input_list[i+2][1], num_params))
-                if stat == "do":
-                    cmd.append("pop temp 0 // discard return on do call")
-
-            elif local_call:
-                # convert local calls to be fully qualified to current class scope
-                # TODO: should check callee is method before inc params
-                cmd.append("call %s.%s %s" % (class_name, input_list[i][1], num_params+1))
-                if stat == "do":
-                    cmd.append("pop temp 0 // discard return on do call")
-
-            # exit condition for calls
+            cmd, proc, p, local_call, class_call, j, k = compile_call_or_var(sub_xps, cmd, input_list, i, k, class_dict,
+                                                                             class_name, func_name, sub, proc, stat)
             if local_call or class_call:
                 return cmd, proc, p
 
@@ -1127,6 +1134,8 @@ if __name__ == '__main__':
         r"..\11\Square\Square.jack",  # compiled / tested
         r"..\11\Square\SquareGame.jack",  # compiled / tested
         r"..\11\Average\Main.jack",  # compiled / tested
+
+        r"..\11\ComplexArrays\Main.jack",
 
         # r"..\11\Pong\Ball.jack",
         # r"..\11\Pong\Bat.jack",
