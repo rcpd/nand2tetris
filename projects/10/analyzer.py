@@ -115,11 +115,20 @@ def main(debug=False):
 
                 # close term: symbols except "." and "("
                 elif parent.tag == "term" and input_list[i][0] == "symbol" \
-                    and (input_list[i][1] != "." and input_list[i][1] != "("):
+                    and input_list[i][1] not in (".", "(", "["):
                     # close parent then insert current token
                     parent = find_parent(output_root, parent)
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
+
+                # open expression (nested in term)
+                elif input_list[i][0] == "symbol" and input_list[i][1] == "[" and parent.tag == "term":
+                    # insert current token
+                    child = ET.SubElement(parent, input_tuple[0])
+                    child.text = " %s " % input_tuple[1]
+
+                    # insert new token and update parent
+                    parent = ET.SubElement(parent, "expression")
 
                 # open expression
                 elif (input_list[i][0] == "symbol" and input_list[i][1] == "=") \
