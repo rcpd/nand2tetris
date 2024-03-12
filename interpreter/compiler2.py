@@ -373,10 +373,10 @@ def main(filepath, debug=False):
         exp_buffer = []
         class_dict = {}
         num_args = 0
-        class_name = func_kind = call_class = call_func = statement = func_name = keyword = _type = identifier = ''
+        class_name = func_kind = call_class = call_func = statement = func_name = keyword = var_type = identifier = ''
         func_type = symbol = lhs_var_name = rhs_parent = rhs_child = ''
 
-        # pre-process tree for function vars
+        # pre-process tree for class/function/var decs
         for elem in tree.iter():
             elem.tag = (elem.tag or '').strip()
             elem.text = (elem.text or '').strip()
@@ -386,13 +386,13 @@ def main(filepath, debug=False):
 
             if elem:  # has children
                 parent = elem.tag  # preserved for later
-                keyword = _type = ''  # reset tag context on depth change
+                keyword = var_type = ''  # reset tag context on depth change
 
             if elem.tag == 'keyword':
                 if not keyword:
                     keyword = elem.text  # preserved for later
-                elif not _type:
-                    _type = elem.text  # preserved for later
+                elif not var_type:
+                    var_type = elem.text  # preserved for later
 
             elif elem.tag == 'identifier':
                 identifier = elem.text
@@ -406,12 +406,12 @@ def main(filepath, debug=False):
                     func_kind = keyword  # preserved for later
                     if not func_kind:
                         raise RuntimeError("undefined function kind for '%s.%s'" % (class_name, func_name))
-                    pcode, class_dict = compile_function(pcode, func_name, _type, func_kind, class_dict, class_name)
+                    pcode, class_dict = compile_function(pcode, func_name, var_type, func_kind, class_dict, class_name)
 
                 elif statement in ('var', 'param'):
                     pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
                         compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
-                                          class_name=class_name, func_name=func_name, var_type=_type,
+                                          class_name=class_name, func_name=func_name, var_type=var_type,
                                           var_name=identifier)
 
             elif elem.tag == 'varDec':
@@ -429,7 +429,7 @@ def main(filepath, debug=False):
         parent = 'class'
         exp_buffer = []
         num_args = while_count = if_count = 0
-        class_name = func_kind = call_class = call_func = statement = func_name = keyword = _type = identifier = ''
+        class_name = func_kind = call_class = call_func = statement = func_name = keyword = var_type = identifier = ''
         func_type = symbol = lhs_var_name = rhs_parent = rhs_child = ''
 
         # dump tree
@@ -444,17 +444,17 @@ def main(filepath, debug=False):
                 parent = elem.tag
                 # reset tag context on depth change
                 # exlcusion: class_name, func_kind, call_class, call_func, statement, func_name, lhs_var_name
-                keyword = _type = identifier = func_type = symbol = ''
+                keyword = var_type = identifier = func_type = symbol = ''
 
             if elem.tag == 'keyword':
                 if elem.text in ('true', 'false'):
                     exp_buffer = compile_boolean(elem.text, exp_buffer)
                 elif not keyword:
                     keyword = elem.text  # preserved for later
-                elif not _type:
-                    _type = elem.text  # preserved for later
+                elif not var_type:
+                    var_type = elem.text  # preserved for later
                 else:
-                    raise RuntimeError("unexpected keywords '%s' '%s' '%s'" % (keyword, _type, elem.text))
+                    raise RuntimeError("unexpected keywords '%s' '%s' '%s'" % (keyword, var_type, elem.text))
 
             elif elem.tag == 'identifier':
                 if keyword or statement:
@@ -468,15 +468,15 @@ def main(filepath, debug=False):
                         func_kind = 'function'  # preserved for later
                         if not func_kind:
                             raise RuntimeError("undefined function kind for %s.%s" % (class_name, func_name))
-                        pcode, class_dict = compile_function(pcode, func_name, _type, func_kind, class_dict, class_name)
+                        pcode, class_dict = compile_function(pcode, func_name, var_type, func_kind, class_dict, class_name)
 
                     elif statement in ('var', 'param'):
                         # catch param case where type is only keyword
-                        if not _type and keyword in types:
-                            _type = keyword
+                        if not var_type and keyword in types:
+                            var_type = keyword
                         pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
                             compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
-                                              class_name=class_name, func_name=func_name, var_type=_type,
+                                              class_name=class_name, func_name=func_name, var_type=var_type,
                                               var_name=identifier)
 
                     elif statement == 'do':
