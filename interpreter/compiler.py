@@ -94,6 +94,8 @@ types = ['int', 'boolean', 'char', 'void']
 objects = ['Math', 'Memory', 'String', 'Array', 'Output', 'Screen', 'Keyboard', 'Sys']
 kinds = ['class', 'constructor', 'method', 'function', 'static', 'field', 'var']
 
+debug = False
+
 
 def find_parent(tree, node):
     """
@@ -103,10 +105,11 @@ def find_parent(tree, node):
     return parent_map[node]
 
 
-def store_pcode(pcode, cmd, debug=True):
+def store_pcode(pcode, cmd):
     """
     optionally dynamically print the pcode with additional debug information, store for later file output
     """
+    global debug
 
     if debug:
         # TODO: for performance reasons this should not be persistent not called every time
@@ -722,6 +725,7 @@ def main(filepath, file_list):
         -- tag scope is defined by tree depth, some need to be carried forward, others cleared on depth change
         - call compile functions once enough information is parsed
     """
+    global debug
     pcode = []
     class_dict = {}
 
@@ -840,7 +844,10 @@ def main(filepath, file_list):
     lhs_var_name = lhs_array = parent_obj = child_func = func_kind = ''
 
     # walk AST
-    print("Parsing: %s\n" % filepath)
+    print("Parsing AST: %s" % filepath)
+    if debug:
+        print()  # formatting
+
     tree = Et.parse(filepath.replace(".jack", "_out.xml"))
     for elem in tree.iter():
         elem.tag = (elem.tag or '')
@@ -1209,6 +1216,7 @@ def _compile(jack_filepaths, strict_matches):
         - write pcode to output file
         - where possible, enforce match to course compiled programs
     """
+    global debug
 
     for file_list in jack_filepaths:
         # check external modules at runtime
@@ -1221,7 +1229,10 @@ def _compile(jack_filepaths, strict_matches):
 
             # strip debug for result comparison
             with open(_filepath.replace(".jack", "_out.vm"), "w") as f:
-                print("\nWriting: %s" % _filepath.replace(".jack", "_out.vm"))
+                if debug:
+                    print()  # formatting
+
+                print("Compiling: %s" % _filepath.replace(".jack", "_out.vm"))
                 for line in pcode:
                     comment = line.find("//")
                     if line.startswith("//"):
@@ -1243,7 +1254,8 @@ def _compile(jack_filepaths, strict_matches):
                 if strict_matches[match] and index < strict_matches[match]:
                     raise RuntimeError("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
 
-    print("\nAll compilation results match solution!")
+    if debug:
+        print("\nAll compilation results match solution!")
 
 
 if __name__ == '__main__':
@@ -1276,7 +1288,6 @@ if __name__ == '__main__':
         [r"..\projects\11\Square\Main.jack",
          r"..\projects\11\Square\Square.jack",
          r"..\projects\11\Square\SquareGame.jack"],
-        # TODO: add Project 12 test programs
     ]
 
     # matched to course compiler
@@ -1301,4 +1312,5 @@ if __name__ == '__main__':
         r"..\projects\11\ComplexArrays\Main.vm": 702,
     }
 
+    debug = True  # default True if run from main, otherwise False if called externally
     _compile(jack_filepaths, strict_matches)
