@@ -470,17 +470,19 @@ if __name__ == '__main__':
         r"..\projects\09\Fraction\Fraction.asm",
         r"..\projects\09\HelloWorld\HelloWorld.asm",
         r"..\projects\09\List\List.asm",
-        r"..\projects\09\Square\Square.asm",
         r"..\projects\10\ArrayTest\ArrayTest.asm",
-        r"..\projects\10\Square\Square.asm",
         r"..\projects\11\ConvertToBin\ConvertToBin.asm",
         r"..\projects\11\Average\Average.asm",
         r"..\projects\11\Seven\Seven.asm",
-        r"..\projects\11\Square\Square.asm",
 
         # r"..\projects\10\ExpressionLessSquare\ExpressionLessSquare.asm",  # nonsense code that shouldn't compile/run
-        # r"..\projects\11\ComplexArrays\ComplexArrays.asm",  # too large, generates 17 bit addresses
-        # r"..\projects\11\Pong\Pong.asm",  # too large, generates 17 bit addresses
+
+        # too large, generates 17 bit addresses
+        # r"..\projects\11\ComplexArrays\ComplexArrays.asm",
+        # r"..\projects\11\Pong\Pong.asm",
+        # r"..\projects\09\Square\Square.asm",
+        # r"..\projects\10\Square\Square.asm",
+        # r"..\projects\11\Square\Square.asm",
     ]
 
     # week 1-5 HDL test files (HardwareSimulator)
