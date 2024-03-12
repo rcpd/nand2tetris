@@ -102,7 +102,7 @@ call Memory.poke 2
 pop temp 0
 push argument 1
 push constant 1
-neg
+sub
 pop argument 1
 push argument 0
 push constant 1

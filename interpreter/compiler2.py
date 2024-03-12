@@ -93,6 +93,14 @@ sys_func = {
 types = ['int', 'boolean', 'char', 'void']
 
 
+def find_parent(tree, node):
+    """
+    Draw a map of the tree and yield the parent from node
+    """
+    parent_map = {child: parent for parent in tree.iter() for child in parent}
+    return parent_map[node]
+
+
 def store_pcode(pcode, cmd, debug=True):
     """
     optionally dynamically print the pcode with additional debug information, store for later file output
@@ -454,7 +462,6 @@ def main(filepath, debug=False):
         tree = Et.parse(filepath.replace(".jack", "_out.xml"))
 
         # persist through loop scope
-        parent = 'class'
         exp_buffer = []
         class_dict = {}
         num_args = 0
@@ -470,7 +477,6 @@ def main(filepath, debug=False):
                 continue
 
             if elem:  # has children
-                parent = elem.tag  # preserved for later
                 keyword = var_type = ''  # reset tag context on depth change
 
             if elem.tag == 'keyword':
@@ -511,7 +517,6 @@ def main(filepath, debug=False):
                 statement = 'return'
 
         # persist through loop scope
-        parent = 'class'
         exp_buffer = []
         block = []
         num_args = while_count = if_count = 0
@@ -528,7 +533,6 @@ def main(filepath, debug=False):
 
             # has children
             if elem:
-                parent = elem.tag
                 # reset select tag contexts on depth change
                 keyword = var_type = identifier = func_type = symbol = ''
 
@@ -615,7 +619,7 @@ def main(filepath, debug=False):
 
                 if symbol in ".":
                     pass
-                elif symbol == "=" and parent == 'letStatement':
+                elif symbol == "=" and find_parent(tree, elem).tag == 'letStatement':
                     pass  # ignore first '=' in let statement (expressions will have different parent)
                 elif symbol == "{":
                     if exp_buffer:
@@ -703,7 +707,7 @@ def main(filepath, debug=False):
                     lhs_var_name = rhs_parent = rhs_child = ''
 
                 elif symbol in op_map:
-                    if symbol == "-" and parent == "term":
+                    if symbol == "-" and find_parent(tree, elem).tag == "term":
                         exp_buffer.append("neg")  # not "sub"
                     else:
                         exp_buffer.append(op_map[symbol])
@@ -771,7 +775,7 @@ if __name__ == '__main__':
     # matched to course compiler
     strict_matches = {
         r"..\11\Seven\Main.vm": 10,  # all
-        r"..\11\ConvertToBin\Main.vm": 72,  # wip
+        r"..\11\ConvertToBin\Main.vm": 114,  # all
     }
 
     for _filepath in jack_filepaths:
