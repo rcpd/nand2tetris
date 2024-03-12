@@ -567,7 +567,7 @@ def main(filepath, debug=False):
                         pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
                             compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
                                               class_name=class_name, func_name=func_name, var_type=var_type,
-                                              var_name=identifier, if_count=if_count)
+                                              var_name=identifier, while_count=while_count, if_count=if_count)
 
                     # collect class/func for call, compile when paired
                     elif statement == 'do':
@@ -584,7 +584,7 @@ def main(filepath, debug=False):
                             pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
                                 compile_statement(pcode=pcode, statement=statement, class_dict=class_dict,
                                                   class_name=class_name, func_name=func_name, var_name=identifier,
-                                                  exp_buffer=exp_buffer, if_count=if_count)
+                                                  exp_buffer=exp_buffer, while_count=while_count, if_count=if_count)
                         else:
                             pcode, exp_buffer, parent_obj, child_func = \
                                 expression_handler(pcode, statement, exp_buffer, class_dict=class_dict,
@@ -653,12 +653,17 @@ def main(filepath, debug=False):
                             block.pop()
                             # FIXME: how to handle if-without-else ?
                             if_count -= 1
+
                         elif block[-1] == 'if':
                             store_pcode(pcode, "\ngoto IF_END%s // end if_true_block" % (if_count-1))
                             block.pop()
 
                         elif block[-1] == 'while':
-                            pass
+                            # TODO: compile_while_end
+                            store_pcode(pcode, "\ngoto WHILE_EXP%s // loop to start of while_block" % (while_count-1))
+                            store_pcode(pcode, "\nlabel WHILE_END%s // end while_block" % (while_count-1))
+                            block.pop()
+
                         else:
                             raise RuntimeError("unexpected block '%s'" % block[-1])
 
@@ -687,7 +692,8 @@ def main(filepath, debug=False):
                         # TODO: if returning a value it needs to be processed before this
                         pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
                             compile_statement(pcode=pcode, class_dict=class_dict, class_name=class_name,
-                                              func_name=func_name, statement=statement, if_count=if_count)
+                                              func_name=func_name, statement=statement, while_count=while_count,
+                                              if_count=if_count)
 
                     if exp_buffer:
                         raise RuntimeError("unparsed expressions still in buffer: %s" % exp_buffer)
@@ -794,4 +800,4 @@ if __name__ == '__main__':
                     print("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
-    # TODO: end_while
+    # TODO: return value
