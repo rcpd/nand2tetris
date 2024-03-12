@@ -5,27 +5,14 @@ function Main.main 4
 // var int length (local 1)
 // var int i (local 2)
 // var int sum (local 3)
-push constant 1
+push constant 3
 pop local 1 // length =
 // external call Array.new
 push local 1 // length
 call Array.new 1
 pop local 0 // a =
-push constant 0
-pop local 2 // i =
-
-label WHILE_TEST_main_0 // test while <expression>
-push local 2 // i
-push local 1 // length
-lt
-
-if-goto WHILE_TRUE_main_0 // jump to start while (true)
-goto WHILE_FALSE_main_0 // jump to exit while (false)
-
-label WHILE_TRUE_main_0 // start while
 push local 0 // a (array)
-// [index]
-push local 2 // i
+push constant 0
 add // offset = array + [index]
 pop pointer 1 // *that = array[index]
 // result
@@ -33,20 +20,38 @@ push constant 1
 pop that 0 // array[index] = result
 
 push local 0 // a (array)
-// [index]
-push local 2 // i
+push constant 1
+add // offset = array + [index]
+pop pointer 1 // *that = array[index]
+// result
+push constant 2
+pop that 0 // array[index] = result
+
+push local 0 // a (array)
+push constant 2
+add // offset = array + [index]
+pop pointer 1 // *that = array[index]
+// result
+push constant 15
+pop that 0 // array[index] = result
+
+push local 0 // a (array)
+push local 0 // a (array)
+push local 0 // a (array)
+push constant 0
+add // offset = array + [index]
+pop pointer 1 // *that = array[index]
+push that 0 // array[index]
+
+add // offset = array + [index]
+pop pointer 1 // *that = array[index]
+push that 0 // array[index]
+
 add // offset = array + [index]
 pop pointer 1 // *that = array[index]
 push that 0 // array[index]
 
 pop local 3 // sum =
-push local 2 // i
-push constant 1
-add
-pop local 2 // i =
-goto WHILE_TEST_main_0 // loop or exit
-label WHILE_FALSE_main_0 // exit while
-
 // external call Output.printInt
 push local 3 // sum
 push local 1 // length
