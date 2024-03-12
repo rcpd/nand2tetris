@@ -9,10 +9,10 @@ call Fraction.new 2
 pop local 1
 push local 0
 push local 1
-call Fraction.plus 1
+call Fraction.plus 2
 pop local 2
 push local 2
-call Fraction.print 0
+call Fraction.print 1
 pop temp 0
 push constant 0
 return
