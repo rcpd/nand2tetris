@@ -571,6 +571,14 @@
 <integerConstant> 1 </integerConstant>
 <symbol> ; </symbol>
 <symbol> } </symbol>
+<keyword> else </keyword>
+<symbol> { </symbol>
+<keyword> let </keyword>
+<identifier> exit </identifier>
+<symbol> = </symbol>
+<identifier> exit </identifier>
+<symbol> ; </symbol>
+<symbol> } </symbol>
 <symbol> } </symbol>
 <keyword> let </keyword>
 <identifier> batWidth </identifier>

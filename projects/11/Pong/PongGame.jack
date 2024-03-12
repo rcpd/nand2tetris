@@ -123,6 +123,7 @@ class PongGame {
                     if (ballRight < (batLeft + 10)) { let bouncingDirection = -1; }
                     else {
                         if (ballLeft > (batRight - 10)) { let bouncingDirection = 1; }
+                        else { let exit = exit; }
                     }
 
                     let batWidth = batWidth - 2;
