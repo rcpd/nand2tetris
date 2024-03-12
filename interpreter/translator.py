@@ -803,6 +803,10 @@ def translate(vm_dir, vm_bootstrap_paths=(), debug=False):
     static_dict = {}
     offset_list = []
 
+    # TODO: this should probably be a glob pattern w/ logic to preserve order where it matters (sys.vm)
+    # TODO: _out.vm files not processed
+    # spec dictates that Sys.init() is first function to run on boot which then calls Main.main()
+    # so functionally anything after sys.vm doesn't matter other than changing compilation order
     vm_filelist = [
         os.path.join(vm_dir, 'sys.vm'),
         os.path.join(vm_dir, 'main.vm'),
