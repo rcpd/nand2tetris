@@ -4,7 +4,6 @@
 
 // (-6) push local 0
 @LCL // push local 0 // function SimpleFunction.test 2
-
 D=M
 @0
 A=D+A

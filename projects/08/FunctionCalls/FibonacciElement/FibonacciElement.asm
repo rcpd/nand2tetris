@@ -8,7 +8,6 @@ M=D
 
 // (-6) push constant 4
 @4 // push constant 4 // function Sys.init 0
-
 D=A
 @SP
 A=M
@@ -94,7 +93,6 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 
 // (-19) push argument 0
 @ARG // push argument 0 // function Main.fibonacci 0
-
 D=M
 @0
 A=D+A

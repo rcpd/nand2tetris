@@ -8,7 +8,6 @@ M=D
 
 // (-6) push constant 4000 // test THIS and THAT context save
 @4000 // push constant 4000 // test THIS and THAT context save // function Sys.init 0
-
 D=A
 @SP
 A=M
@@ -217,7 +216,6 @@ M=M-1
 
 // (-39) push constant 4001
 @4001 // push constant 4001 // function Sys.main 5
-
 D=A
 @SP
 A=M
@@ -631,7 +629,6 @@ A=M // d = [LCL-5] (*LCL)
 
 // (-91) push constant 4002
 @4002 // push constant 4002 // function Sys.add12 0
-
 D=A
 @SP
 A=M

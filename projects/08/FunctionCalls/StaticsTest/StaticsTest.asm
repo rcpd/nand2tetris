@@ -8,7 +8,6 @@ M=D
 
 // (-6) push constant 6
 @6 // push constant 6 // function Sys.init 0
-
 D=A
 @SP
 A=M
@@ -380,7 +379,6 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 
 // (-42) push argument 0
 @ARG // push argument 0 // function Class1.set 0
-
 D=M
 @0
 A=D+A
@@ -517,8 +515,7 @@ A=M // d = [LCL-5] (*LCL)
 (Class1.get) // function Class1.get 0
 
 // (-59) push static 0
-@16 // push static 0 // function Class1.get 0
- // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
+@16 // push static 0 // function Class1.get 0 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
 D=A
 @0
 A=D+A
@@ -619,7 +616,6 @@ A=M // d = [LCL-5] (*LCL)
 
 // (-72) push argument 0
 @ARG // push argument 0 // function Class2.set 0
-
 D=M
 @0
 A=D+A
@@ -756,8 +752,7 @@ A=M // d = [LCL-5] (*LCL)
 (Class2.get) // function Class2.get 0
 
 // (-89) push static 0
-@18 // push static 0 // function Class2.get 0
- // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
+@18 // push static 0 // function Class2.get 0 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
 D=A
 @0
 A=D+A
