@@ -35,3 +35,77 @@ pop local 1 // position
 push local 0 // mask
 call Main.nextMask 1
 pop local 0 // mask
+
+// if <expression>
+push local 1 // position
+push constant 16
+gt
+not
+if-goto IF_TRUE_convert
+goto IF_FALSE_convert
+label IF_TRUE_convert
+
+// if <expression>
+push argument 0 // value
+push local 0 // mask
+and
+push constant 0
+eq
+not
+if-goto IF_TRUE_convert
+goto IF_FALSE_convert
+label IF_TRUE_convert
+push constant 8000
+push local 1 // position
+add
+push constant 1
+call Memory.poke 2
+
+// else
+label IF_FALSE_convert
+push constant 8000
+push local 1 // position
+add
+push constant 0
+call Memory.poke 2
+
+// else
+label IF_FALSE_convert
+push constant 0
+pop local 2 // loop
+
+// end_while
+label WHILE_END_convert
+return
+
+function Main.nextMask 1
+
+// if <expression>
+push argument 0 // mask
+push constant 0
+eq
+if-goto IF_TRUE_nextMask
+goto IF_FALSE_nextMask
+label IF_TRUE_nextMask
+push constant 1
+return
+
+// else
+label IF_FALSE_nextMask
+push argument 0 // mask
+push constant 2
+call Math.multiply 2
+return
+
+function Main.fillMemory 3
+
+// while <expression>
+push argument 1 // length
+push constant 0
+gt
+if-goto WHILE_START_fillMemory
+goto WHILE_END_fillMemory
+label WHILE_START_fillMemory
+push argument 0 // startAddress
+push argument 2 // value
+call Memory.poke 2
