@@ -258,20 +258,16 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
             pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
         store_pcode(pcode, "return")
     elif input_list[i][1] == "while":
-        store_pcode(pcode, "\n// while <expression>")
-        while input_list[i][1] != "(":
-            i += 1  # increment i to first term in expression
-        pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
         class_dict, while_index = label_index(class_dict, class_name, func_name, "while")
-        store_pcode(pcode, "if-goto WHILE_START_%s_%s" % (func_name, while_index))
-        store_pcode(pcode, "goto WHILE_END_%s_%s" % (func_name, while_index))
-        store_pcode(pcode, "label WHILE_START_%s_%s" % (func_name, while_index))
-    elif input_list[i][1] == "if":
-        store_pcode(pcode, "\n// if <expression>")
-        while input_list[i][1] != "(":
-            i += 1  # increment i to first term in expression
+        store_pcode(pcode, "\nlabel WHILE_TEST_%s_%s // while <expression>" % (func_name, while_index))
         pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
+        store_pcode(pcode, "if-goto WHILE_TRUE_%s_%s" % (func_name, while_index))
+        store_pcode(pcode, "goto WHILE_FALSE_%s_%s" % (func_name, while_index))
+        store_pcode(pcode, "label WHILE_TRUE_%s_%s" % (func_name, while_index))
+    elif input_list[i][1] == "if":
         class_dict, if_index = label_index(class_dict, class_name, func_name, "if")
+        store_pcode(pcode, "\n// if <expression>")
+        pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
         store_pcode(pcode, "if-goto IF_TRUE_%s_%s" % (func_name, if_index))
         store_pcode(pcode, "goto IF_FALSE_%s_%s" % (func_name, if_index))
         store_pcode(pcode, "label IF_TRUE_%s_%s" % (func_name, if_index))
@@ -486,7 +482,8 @@ def main(debug=False):
                         parent = find_parent(output_root, parent)
                         store_pcode(pcode, "\n// end_while")
                         while_index = class_dict[class_name][func_name]["label_dict"]["while"]
-                        store_pcode(pcode, "label WHILE_END_%s_%s" % (func_name, while_index))
+                        store_pcode(pcode, "goto WHILE_TEST_%s_%s" % (func_name, while_index))
+                        store_pcode(pcode, "label WHILE_FALSE_%s_%s" % (func_name, while_index))
                         class_dict[class_name][func_name]["label_dict"]["while"] -= 1
 
                     if parent.tag == "subroutineBody":
