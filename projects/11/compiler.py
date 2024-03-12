@@ -325,7 +325,8 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
                     elif input_list[i+2][1] in class_dict[class_name]:  # class func
                         var = class_dict[class_name][input_list[i+2][1]]
                     else:
-                        cmd.append("// external call %s" % call_obj)
+                        pass  # external call
+
             else:  # function arg
                 if input_list[i][1] in class_dict[class_name][func_name]["args"]:  # local arg
                     var = class_dict[class_name][func_name]["args"][input_list[i][1]]
@@ -452,9 +453,9 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
 
         elif input_list[i][1] == "]":
             # add base + offset
-            cmd.append("add // offset = array + [index]")
-            cmd.append("pop pointer 1 // *that = array[index]")
-            cmd.append("push that 0 // array[index]")
+            cmd.append("add // offset = *array + [index]")
+            cmd.append("pop pointer 1 // that = *array[index]")
+            cmd.append("push that 0 // array[index] (deref)")
             proc.append(i)
             return cmd, proc, i
 
@@ -495,6 +496,25 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
                 proc.append(i+1)
                 k += 2
 
+                if input_list[i+2][1] == "[":
+                    # array[x] // where x is expression and array is already pushed
+                    j = i+2  # move over bracket
+                    sub_cmd = []
+                    while input_list[j][1] not in ("]", ";", "{"):
+                        # get expression result for []
+                        _cmd, proc, j = compile_sub_expression(sub_xps, input_list, j, class_dict, class_name,
+                                                               func_name, sub=True, proc=proc)
+                        for _c in _cmd:
+                            sub_cmd.append(_c)  # preserve sub-sub commands
+
+                        if input_list[j][1] not in ("]", ";", "{"):
+                            j += 1
+                        else:
+                            break
+
+                    for c in sub_cmd:
+                        cmd.append(c)  # roll sub-sub back into sub
+
             if input_list[i][1] == "-":
                 cmd.append("neg")  # comes after the value being neg'd
                 proc.append(i)
@@ -521,14 +541,15 @@ def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_
             k += 1
 
         elif input_list[i][0] == "stringConstant":
+            # FIXME: tokenizer will break if single char string constant
             cmd.append("push constant %s // strlen" % (len(input_list[i][1])+1))
             cmd.append("call String.new 1 // \"%s\"" % input_list[i][1])
             for c, char in enumerate(input_list[i][1]):
                 compile_char(char, cmd)
-                cmd.append("call String.appendChar 2")  # TODO: why 2?
+                cmd.append("call String.appendChar 2")
             # pad with space  # TODO: find where padding stripped
             compile_char(" ", cmd)
-            cmd.append("call String.appendChar 2 // padding space")  # TODO: why 2?
+            cmd.append("call String.appendChar 2 // padding space\n")
             k += 1
 
         else:
@@ -590,14 +611,10 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
             pcode, proc = compile_expression(pcode, input_list, i+3, class_dict, class_name, func_name)
             # FIXME: expression should be lhs/rhs aware to execute this itself / prevent duplication
             store_pcode(pcode, "pop temp 0 // discard expression push")
-            store_pcode(pcode, "push pointer 1 // retrieve array pointer")
-            store_pcode(pcode, "pop temp 0 // store array pointer")
 
             store_pcode(pcode, "\n// compute result")
             pcode, proc = compile_expression(pcode, input_list, equals+1, class_dict, class_name, func_name)
-            store_pcode(pcode, "push temp 0 // retrieve array[index] pointer")
-            store_pcode(pcode, "pop pointer 1 // set array[index] pointer")
-            store_pcode(pcode, "pop that 0 // array[index] = result\n")
+            store_pcode(pcode, "pop that 0 // array[index] = result (deref)\n")
             return pcode, class_dict
             # else: fall through to var=x case
 
@@ -613,9 +630,9 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
                 except KeyError:
                     var = class_dict[class_name]["args"][input_list[i+1][1]]
                 if var["kind"] != "field":
-                    store_pcode(pcode, "pop %s %s // %s =" % (var["kind"], var["index"], input_list[i+1][1]))
+                    store_pcode(pcode, "pop %s %s // %s =\n" % (var["kind"], var["index"], input_list[i+1][1]))
                 else:
-                    store_pcode(pcode, "pop %s %s // %s =" % ("this", var["index"], input_list[i+1][1]))
+                    store_pcode(pcode, "pop %s %s // %s =\n" % ("this", var["index"], input_list[i+1][1]))
             else:
                 raise RuntimeError(input_list[i+1])
         else:
