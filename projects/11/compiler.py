@@ -83,7 +83,7 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
     j = i
     if pre:
         # define function symbol
-        if input_list[j-2][1] in ("function", "method"):
+        if input_list[j-2][1] in ("function", "method", "constructor"):
             if input_list[j][1] not in class_dict[class_name]:
                 class_dict[class_name][input_list[j][1]] = {"kind": input_list[j-2][1], "type": input_list[j-1][1],
                                                             "args": {}, "index_dict": {}, "label_dict": {}}
@@ -106,9 +106,6 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
                         j += 2
             else:
                 raise RuntimeError
-
-        elif input_list[i-2][1] == "constructor":
-            pass
         else:
             raise RuntimeError
 
@@ -121,15 +118,11 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
     return pcode, class_dict, func_name
 
 
-# def compile_classvardec(pcode, input_list, i, class_dict):
-#     return pcode, class_dict
-
-
 def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=False):
     """
-    input_list[i][0] == "keyword" and input_list[i][1] == "var":
+    input_list[i][0] == "keyword" and input_list[i][1] in ("var", "field", "static"):
     """
-    if input_list[i+1][0] == "keyword" and input_list[i+2][0] == "identifier":
+    if input_list[i+1][0] in ("keyword", "identifier") and input_list[i+2][0] == "identifier":
         j = i
         while input_list[j+2][1] != ";":
             # var <type> <name> // var <type> <name>, <name>, ...
@@ -139,22 +132,44 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=
                 j += 1
                 continue
 
-            # update func/local index
             if pre:
-                if "local" not in class_dict[class_name][func_name]["index_dict"]:
-                    class_dict[class_name][func_name]["index_dict"]["local"] = 0
+                if input_list[i][1] == "var":
+                    # update func/local index
+                    if "local" not in class_dict[class_name][func_name]["index_dict"]:
+                        class_dict[class_name][func_name]["index_dict"]["local"] = 0
+                    else:
+                        class_dict[class_name][func_name]["index_dict"]["local"] += 1
+
+                    # add var to func/args
+                    class_dict[class_name][func_name]["args"][input_list[j+2][1]] = \
+                        {"kind": "local", "type": input_list[i+1][1],
+                         "index": class_dict[class_name][func_name]["index_dict"]["local"]}
+
+                elif input_list[i][1] in ("field", "static"):
+                    # update class/<field/static> index
+                    if input_list[i][1] not in class_dict[class_name]["index_dict"]:
+                        class_dict[class_name]["index_dict"][input_list[i][1]] = 0
+                    else:
+                        class_dict[class_name]["index_dict"][input_list[i][1]] += 1
+
+                    # add var to class/args
+                    class_dict[class_name]["args"][input_list[j+2][1]] = \
+                        {"kind": input_list[i][1], "type": input_list[i+1][1],
+                         "index": class_dict[class_name]["index_dict"][input_list[i][1]]}
                 else:
-                    class_dict[class_name][func_name]["index_dict"]["local"] += 1
+                    raise RuntimeError("Unexpected kind in var dec")
 
-                # add var to func/args
-                class_dict[class_name][func_name]["args"][input_list[j+2][1]] = \
-                    {"kind": "local", "type": input_list[i+1][1],
-                     "index": class_dict[class_name][func_name]["index_dict"]["local"]}
-
-            if not pre:
-                store_pcode(pcode, "// var %s %s (local %s)" %
-                            (input_list[i+1][1], input_list[j+2][1],
-                             class_dict[class_name][func_name]["args"][input_list[j+2][1]]["index"]))
+            else:
+                if input_list[i][1] == "var":
+                    store_pcode(pcode, "// var %s %s (local %s)" %
+                                (input_list[i+1][1], input_list[j+2][1],
+                                 class_dict[class_name][func_name]["args"][input_list[j+2][1]]["index"]))
+                elif input_list[i][1] in ("field", "static"):
+                    store_pcode(pcode, "// %s %s %s (local %s)" % (input_list[i][1],
+                                input_list[i+1][1], input_list[j+2][1],
+                                class_dict[class_name][func_name]["args"][input_list[j+2][1]]["index"]))
+                else:
+                    raise RuntimeError("Unexpected kind in var dec")
 
             j += 1
 
@@ -187,7 +202,11 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
             proc.append(i)
             k += 1
         elif input_list[i][0] == "identifier":
-            var = class_dict[class_name][func_name]["args"][input_list[i][1]]
+            try:
+                var = class_dict[class_name][func_name]["args"][input_list[i][1]]
+            except KeyError:
+                var = class_dict[class_name]["args"][input_list[i][1]]
+
             store_pcode(pcode, "push %s %s // %s" % (var["kind"], var["index"], input_list[i][1]))
             proc.append(i)
             k += 1
@@ -197,7 +216,10 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
                 proc.append(i+1)
                 k += 1
             elif input_list[i+1][0] == "identifier":
-                var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
+                try:
+                    var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
+                except KeyError:
+                    var = class_dict[class_name]["args"][input_list[i+1][1]]
                 store_pcode(pcode, "push %s %s // %s" % (var["kind"], var["index"], input_list[i+1][1]))
                 proc.append(i+1)
                 k += 1
@@ -246,7 +268,10 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
 
             if input_list[i+1][0] == "identifier":
                 # pop result into destination segment
-                var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
+                try:
+                    var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
+                except KeyError:
+                    var = class_dict[class_name]["args"][input_list[i+1][1]]
                 store_pcode(pcode, "pop %s %s // %s" % (var["kind"], var["index"], input_list[i+1][1]))
             else:
                 raise RuntimeError(input_list[i+1])
@@ -346,11 +371,11 @@ def main(filepath, debug=False):
             if token[1] == "class" and input_list[i+1][0] == "identifier":
                 pcode, class_dict, class_name = compile_class(pcode, input_list, i+1, class_dict, pre=True)
                 store_pcode(pcode, "", write=filepath)
-            elif token[1] in ("function", "method") and input_list[i+2][0] == "identifier":
+            elif token[1] in ("function", "method", "constructor") and input_list[i+2][0] == "identifier":
                 pcode, class_dict, func_name = \
                     compile_function(pcode, input_list, i+2, class_dict, class_name, pre=True)
                 store_pcode(pcode, "", write=filepath)
-            elif token[1] == "var" and input_list[i+1][0] == "keyword":
+            elif token[1] in ("var", "field", "static") and input_list[i][0] == "keyword":
                 pcode, class_dict = compile_vardec(pcode, input_list, i, class_dict, class_name, func_name,
                                                    pre=True)
                 store_pcode(pcode, "", write=filepath)
@@ -406,7 +431,7 @@ def main(filepath, debug=False):
                 child = ET.SubElement(parent, input_tuple[0])
                 child.text = " %s " % input_tuple[1]
 
-                if input_list[j][0] == "keyword" and input_list[j+1][0] == "identifier":
+                if input_list[j][0] in ("keyword", "identifier") and input_list[j+1][0] == "identifier":
                     pcode, class_dict, func_name = compile_function(pcode, input_list, j+1, class_dict, class_name)
                     store_pcode(pcode, "", write=filepath)
 
@@ -421,8 +446,9 @@ def main(filepath, debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    # pcode, class_dict = compile_classvardec(pcode, input_list, i, class_dict)
-                    # store_pcode(pcode, "", write=filepath)
+                    pcode, class_dict = compile_vardec(pcode, input_list, i, class_dict, class_name, func_name,
+                                                       pre=True)
+                    store_pcode(pcode, "", write=filepath)
 
             # open varDec
             elif input_list[i][0] == "keyword" and input_list[i][1] == "var":
@@ -625,11 +651,12 @@ def main(filepath, debug=False):
     print("Writing: %s" % output_filepath)
 
     with open(output_filepath, "w") as output_file:
-            output_file.writelines(pcode)
+        output_file.writelines(pcode)
 
 
 if __name__ == '__main__':
     jack_filepaths = [
+        # TODO: integration test
         # r"..\09\Average\Main.jack",
         # r"..\09\Fraction\Main.jack",
         # r"..\09\Fraction\Fraction.jack",
@@ -647,8 +674,12 @@ if __name__ == '__main__':
         # r"..\10\Square\Square.jack",
         # r"..\10\Square\SquareGame.jack",
 
-        r"..\11\Seven\Main.jack",
-        r"..\11\ConvertToBin\Main.jack",
+        r"..\11\Seven\Main.jack",  # compiled
+        r"..\11\ConvertToBin\Main.jack",  # compiled
+
+        r"..\11\Square\Main.jack",
+        r"..\11\Square\Square.jack",
+        # r"..\11\Square\SquareGame.jack",
     ]
 
     for _filepath in jack_filepaths:
