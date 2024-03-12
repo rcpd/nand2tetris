@@ -1,0 +1,12 @@
+// class Main
+
+function Main.main 1
+// var SquareGame game (local 0)
+// static call SquareGame.new 
+call SquareGame.new 0
+pop local 0 // game =
+push local 0 // game (implicit this push)
+call SquareGame.run 0
+push local 0 // game (implicit this push)
+call SquareGame.dispose 0
+return

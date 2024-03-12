@@ -204,88 +204,119 @@ def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=
 
 
 def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, sub=False, proc=None):
+    """
+    Notes:
+    - Previous iteration terminated prematurely if ) in chunk
+    - recursing on "," flips the push order (not easily reversed)
+    - recursing on ")" processes values outside brackets first
+    - passing over ")" means brackets always first which disrupts param order
+    """
+
     if not sub:
         proc = []
-    j = i  # i = start pos, j = search pos
-    # recurse until all brackets unpacked
-    while input_list[j][1] not in (";", "{"):
-        if input_list[j][1] == "(" and input_list[j+1][1] != ")":
-            pcode, proc = compile_expression(pcode, input_list, j+1, class_dict, class_name, func_name, sub=True,
-                                             proc=proc)
-        j += 1
+    sub_xps = []
 
+    # always try to parse first
+    cmd, proc, i = compile_sub_expression(pcode, input_list, i, class_dict, class_name, func_name, sub=True,
+                                          proc=proc)
+    sub_xps.append(cmd)
+
+    while input_list[i][1] not in (";", "{"):
+        # recurse until all brackets unpacked (if any)
+        cmd, proc, i = compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_name,
+                                              sub=True, proc=proc)
+        sub_xps.append(cmd)
+        i += 1
+
+    for sub_xp in sub_xps:
+        for cmd in sub_xp:
+            store_pcode(pcode, cmd)
+
+    return pcode, proc
+
+
+def compile_sub_expression(sub_xps, input_list, i, class_dict, class_name, func_name, sub=False, proc=None):
+    cmd = []
     # process expression
-    while input_list[i][1] not in (")", ";", "{"):
+    while input_list[i][1] not in ("(", ")", ",", ";", "{"):
         if i in proc:
-            return pcode, proc
+            raise RuntimeError()
+            # return cmd, proc
 
         k = 0
         # parse x <op> y expressions
         if input_list[i][0] == "integerConstant":
-            store_pcode(pcode, "push constant %s" % input_list[i][1])
+            cmd.append("push constant %s" % input_list[i][1])
             proc.append(i)
             k += 1
+
         elif input_list[i][0] == "identifier":
             try:
                 var = class_dict[class_name][func_name]["args"][input_list[i][1]]
             except KeyError:
                 var = class_dict[class_name]["args"][input_list[i][1]]
 
-            store_pcode(pcode, "push %s %s // %s" % (var["kind"], var["index"], input_list[i][1]))
+            cmd.append("push %s %s // %s" % (var["kind"], var["index"], input_list[i][1]))
             proc.append(i)
             k += 1
+
         elif input_list[i][1] in operators:
-            if input_list[i+1][0] == "integerConstant":
-                store_pcode(pcode, "push constant %s" % input_list[i+1][1])
+            j = None
+            if input_list[i+1][1] == "(":
+                j = i+2  # move over bracket
+                sub_cmd = []
+                while input_list[j][1] != ")":
+                    # get expression result then parse operator
+                    _cmd, proc, j = compile_sub_expression(sub_xps, input_list, j, class_dict, class_name,
+                                                           func_name, sub=True, proc=proc)
+                    j += 1
+                    for _c in _cmd:
+                        sub_cmd.append(_c)  # preserve sub-sub commands
+                for c in sub_cmd:
+                    cmd.append(c)  # roll sub-sub back into sub
+
+            elif input_list[i+1][0] == "integerConstant":
+                cmd.append("push constant %s" % input_list[i+1][1])
                 proc.append(i+1)
-                k += 1
+                k += 2
+
             elif input_list[i+1][0] == "identifier":
                 try:
                     var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
                 except KeyError:
                     var = class_dict[class_name]["args"][input_list[i+1][1]]
-                store_pcode(pcode, "push %s %s // %s" % (var["kind"], var["index"], input_list[i+1][1]))
+                cmd.append("push %s %s // %s" % (var["kind"], var["index"], input_list[i+1][1]))
                 proc.append(i+1)
-                k += 1
+                k += 2
 
             if input_list[i][1] == "-":
-                store_pcode(pcode, "neg")  # comes after the value being neg'd
+                cmd.append("neg")  # comes after the value being neg'd
                 proc.append(i)
-                k += 1
-
                 if input_list[i-1][1] not in (",", "("):
-                    store_pcode(pcode, "add")  # x-y == -y+x
-
+                    cmd.append("add")  # x-y == -y+x
             else:
-                store_pcode(pcode, "%s" % op_map[input_list[i][1]])  # parse op
+                cmd.append("%s" % op_map[input_list[i][1]])  # parse op
                 proc.append(i)
-                k += 1
-        elif input_list[i][1] == "(":
-            if sub and k == 0:
-                # if "(" returned on first pos seek past previous expression
-                while input_list[i+k][1] != ")":
-                    k += 1  # lands on ")"
-                k += 1  # step into next expression
-            else:
-                return pcode, proc  # else terminate current level of recursion
-        elif input_list[i][1] == ",":
-            k += 1
+
+            if input_list[i+1][1] == "(":
+                i = j  # return to pos where sub-sub processed
+
         elif input_list[i][0] == "keyword" and input_list[i][1] == "this":
-            store_pcode(pcode, "push pointer 0 // this")
+            cmd.append("push pointer 0 // this")
             k += 1
         elif input_list[i][0] == "keyword" and input_list[i][1] in ("true", "false"):
             if input_list[i][1] == "true":
-                store_pcode(pcode, "push constant 1")
-                store_pcode(pcode, "neg // true")
+                cmd.append("push constant 1")
+                cmd.append("neg // true")
             else:
-                store_pcode(pcode, "push constant 0 // false")
+                cmd.append("push constant 0 // false")
             k += 1
         else:
             raise RuntimeError(input_list[i])
 
         i += k
 
-    return pcode, proc
+    return cmd, proc, i
 
 
 def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
