@@ -238,6 +238,9 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
         store_pcode(pcode, "if-goto IF_TRUE_%s" % func_name)  # TODO: label_dict
         store_pcode(pcode, "goto IF_FALSE_%s" % func_name)
         store_pcode(pcode, "label IF_TRUE_%s" % func_name)
+    elif input_list[i][1] == "else":
+        store_pcode(pcode, "\n// else")
+        store_pcode(pcode, "label IF_FALSE_%s" % func_name)
     else:
         raise RuntimeError(input_list[i])
     return pcode, class_dict
@@ -263,7 +266,7 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                 pcode = compile_expression(pcode, input_list, j, class_dict, class_name, func_name)
                 return pcode, class_dict
 
-        elif input_list[j][0] == "keyword" and input_list[j][1] in ("true" or "false"):
+        elif input_list[j][0] == "keyword" and input_list[j][1] in ("true", "false"):
             if input_list[j][1] == "true":
                 store_pcode(pcode, "push constant 1")
                 store_pcode(pcode, "neg")
@@ -437,11 +440,13 @@ def main(debug=False):
                         # don't close if } followed by else
                         if not (input_list[j][0] == "keyword" and input_list[j][1] == "else"):
                             parent = find_parent(output_root, parent)
+                            store_pcode(pcode, "\n// end_if")
                             store_pcode(pcode, "label IF_FALSE_%s" % func_name)  # TODO: label_dict
 
                     if parent.tag == "whileStatement":
                         # close parent
                         parent = find_parent(output_root, parent)
+                        store_pcode(pcode, "\n// end_while")
                         store_pcode(pcode, "label WHILE_END_%s" % func_name)  # TODO: label_dict
 
                     if parent.tag == "subroutineBody":
