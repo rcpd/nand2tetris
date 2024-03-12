@@ -74,6 +74,7 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
     # input_list[i][0] == "keyword" and input_list[i][1] in ("function", "method", "constructor")
     # if input_list[j][0] == "keyword" and input_list[j+1][0] == "identifier":
     """
+    # TODO: correct func def for num vars not just args?
     func_name = input_list[i][1]
     j = i
     # define function symbol
@@ -223,12 +224,16 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
         store_pcode(pcode, "return")
     elif input_list[i][1] == "while":
         store_pcode(pcode, "\n// while <expression>")
+        while input_list[i][1] != "(":
+            i += 1  # increment i to first term in expression
         pcode, compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
         store_pcode(pcode, "if-goto WHILE_START_%s" % func_name)  # TODO: label_dict
         store_pcode(pcode, "goto WHILE_END_%s" % func_name)
         store_pcode(pcode, "label WHILE_START_%s" % func_name)
     elif input_list[i][1] == "if":
         store_pcode(pcode, "\n// if <expression>")
+        while input_list[i][1] != "(":
+            i += 1  # increment i to first term in expression
         pcode, compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
         store_pcode(pcode, "if-goto IF_TRUE_%s" % func_name)  # TODO: label_dict
         store_pcode(pcode, "goto IF_FALSE_%s" % func_name)
