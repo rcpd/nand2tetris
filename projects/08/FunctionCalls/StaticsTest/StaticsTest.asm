@@ -7,14 +7,14 @@ M=D
 (Sys.init) // function Sys.init 0
 
 // (-6) push constant 6
-@6 // push constant 6
+@6 // push constant 6 // function Sys.init 0
+
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-
 // (-8) push constant 8
 @8 // push constant 8
 D=A
@@ -26,7 +26,7 @@ M=M+1
 
 // (-11) call Class1.set 2
 (sys.Class1.set.1) // call Class1.set 2
-@sys.Class1.set.1 // create the RIP pointer and push it to the stack
+@sys.Class1.set.1 // call Class1.set // push RIP
 D=A
 @SP
 A=M
@@ -131,7 +131,7 @@ M=M+1
 
 // (-20) call Class2.set 2
 (sys.Class2.set.2) // call Class2.set 2
-@sys.Class2.set.2 // create the RIP pointer and push it to the stack
+@sys.Class2.set.2 // call Class2.set // push RIP
 D=A
 @SP
 A=M
@@ -219,15 +219,15 @@ M=M-1
 // (-25) call Class1.get 0
 (sys.Class1.get.3) // call Class1.get 0
 
-// (-27) push constant 9999 // call: if no args, create a space on the stack for the return
-@9999 // push constant 9999 // call: if no args, create a space on the stack for the return
+// (-27) push constant 9999 // call Class1.get // if no args, create a space on the stack for the return
+@9999 // push constant 9999 // call Class1.get // if no args, create a space on the stack for the return
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-@sys.Class1.get.3 // create the RIP pointer and push it to the stack
+@sys.Class1.get.3 // push RIP
 D=A
 @SP
 A=M
@@ -295,15 +295,15 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 // (-30) call Class2.get 0
 (sys.Class2.get.4) // call Class2.get 0
 
-// (-32) push constant 9999 // call: if no args, create a space on the stack for the return
-@9999 // push constant 9999 // call: if no args, create a space on the stack for the return
+// (-32) push constant 9999 // call Class2.get // if no args, create a space on the stack for the return
+@9999 // push constant 9999 // call Class2.get // if no args, create a space on the stack for the return
 D=A
 @SP
 A=M
 M=D
 @SP
 M=M+1
-@sys.Class2.get.4 // create the RIP pointer and push it to the stack
+@sys.Class2.get.4 // push RIP
 D=A
 @SP
 A=M
@@ -379,7 +379,8 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 (Class1.set) // function Class1.set 0
 
 // (-42) push argument 0
-@ARG // push argument 0
+@ARG // push argument 0 // function Class1.set 0
+
 D=M
 @0
 A=D+A
@@ -389,7 +390,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 // (-44) pop static 0
 @16 // pop static 0 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
 D=A
@@ -476,19 +476,19 @@ M=M-1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
 M=D // [esp] = *ARG[0]+1
-@LCL // *LCL // function return: restore caller stack (THAT)
+@LCL // *LCL // return: restore caller stack (THAT)
 A=M-1 // *LCL-1 (**THAT)
 D=M // d = [LCL-1] (*THAT)
 @THAT
 M=D // [THAT] = [LCL-1] (*THAT)
-@2 // function return: restore caller stack (THIS)
+@2 // return: restore caller stack (THIS)
 D=A // d=2
 @LCL // *LCL 
 A=M-D // *LCL-2 (**THIS)
 D=M // d = [LCL-2] (*THIS)
 @THIS
 M=D // [THIS] = [LCL-2] (*THIS)
-@3 // function return: restore caller stack (ARG)
+@3 // return: restore caller stack (ARG)
 D=A // d=3
 @LCL // *LCL 
 A=M-D // *LCL-3 (**ARG)
@@ -499,14 +499,14 @@ M=D // [ARG] = [LCL-3] (*ARG)
 D=M // d = [LCL]
 @R13 // *R13
 M=D // [R13] = [LCL]
-@4 // function return: restore caller stack (LCL)
+@4 // return: restore caller stack (LCL)
 D=A // d=4
 @LCL // *LCL 
 A=M-D // *LCL-4 (**LCL)
 D=M // d = [LCL-4] (*LCL)
 @LCL
 M=D // [LCL] = [LCL-4] (*LCL)
-@5 // unconditional jump to LCL-5 (RIP)
+@5 // return: unconditional jump to LCL-5 (RIP)
 D=A // d=5
 @R13 // *R13 (old *LCL)
 A=M-D // *LCL-5 (*LCL)
@@ -517,7 +517,8 @@ A=M // d = [LCL-5] (*LCL)
 (Class1.get) // function Class1.get 0
 
 // (-59) push static 0
-@16 // push static 0 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
+@16 // push static 0 // function Class1.get 0
+ // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
 D=A
 @0
 A=D+A
@@ -527,7 +528,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 // (-61) push static 1
 @16 // push static 1 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class1.vm)
 D=A
@@ -577,19 +577,19 @@ M=M-1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
 M=D // [esp] = *ARG[0]+1
-@LCL // *LCL // function return: restore caller stack (THAT)
+@LCL // *LCL // return: restore caller stack (THAT)
 A=M-1 // *LCL-1 (**THAT)
 D=M // d = [LCL-1] (*THAT)
 @THAT
 M=D // [THAT] = [LCL-1] (*THAT)
-@2 // function return: restore caller stack (THIS)
+@2 // return: restore caller stack (THIS)
 D=A // d=2
 @LCL // *LCL 
 A=M-D // *LCL-2 (**THIS)
 D=M // d = [LCL-2] (*THIS)
 @THIS
 M=D // [THIS] = [LCL-2] (*THIS)
-@3 // function return: restore caller stack (ARG)
+@3 // return: restore caller stack (ARG)
 D=A // d=3
 @LCL // *LCL 
 A=M-D // *LCL-3 (**ARG)
@@ -600,14 +600,14 @@ M=D // [ARG] = [LCL-3] (*ARG)
 D=M // d = [LCL]
 @R13 // *R13
 M=D // [R13] = [LCL]
-@4 // function return: restore caller stack (LCL)
+@4 // return: restore caller stack (LCL)
 D=A // d=4
 @LCL // *LCL 
 A=M-D // *LCL-4 (**LCL)
 D=M // d = [LCL-4] (*LCL)
 @LCL
 M=D // [LCL] = [LCL-4] (*LCL)
-@5 // unconditional jump to LCL-5 (RIP)
+@5 // return: unconditional jump to LCL-5 (RIP)
 D=A // d=5
 @R13 // *R13 (old *LCL)
 A=M-D // *LCL-5 (*LCL)
@@ -618,7 +618,8 @@ A=M // d = [LCL-5] (*LCL)
 (Class2.set) // function Class2.set 0
 
 // (-72) push argument 0
-@ARG // push argument 0
+@ARG // push argument 0 // function Class2.set 0
+
 D=M
 @0
 A=D+A
@@ -628,7 +629,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 // (-74) pop static 0
 @18 // pop static 0 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
 D=A
@@ -715,19 +715,19 @@ M=M-1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
 M=D // [esp] = *ARG[0]+1
-@LCL // *LCL // function return: restore caller stack (THAT)
+@LCL // *LCL // return: restore caller stack (THAT)
 A=M-1 // *LCL-1 (**THAT)
 D=M // d = [LCL-1] (*THAT)
 @THAT
 M=D // [THAT] = [LCL-1] (*THAT)
-@2 // function return: restore caller stack (THIS)
+@2 // return: restore caller stack (THIS)
 D=A // d=2
 @LCL // *LCL 
 A=M-D // *LCL-2 (**THIS)
 D=M // d = [LCL-2] (*THIS)
 @THIS
 M=D // [THIS] = [LCL-2] (*THIS)
-@3 // function return: restore caller stack (ARG)
+@3 // return: restore caller stack (ARG)
 D=A // d=3
 @LCL // *LCL 
 A=M-D // *LCL-3 (**ARG)
@@ -738,14 +738,14 @@ M=D // [ARG] = [LCL-3] (*ARG)
 D=M // d = [LCL]
 @R13 // *R13
 M=D // [R13] = [LCL]
-@4 // function return: restore caller stack (LCL)
+@4 // return: restore caller stack (LCL)
 D=A // d=4
 @LCL // *LCL 
 A=M-D // *LCL-4 (**LCL)
 D=M // d = [LCL-4] (*LCL)
 @LCL
 M=D // [LCL] = [LCL-4] (*LCL)
-@5 // unconditional jump to LCL-5 (RIP)
+@5 // return: unconditional jump to LCL-5 (RIP)
 D=A // d=5
 @R13 // *R13 (old *LCL)
 A=M-D // *LCL-5 (*LCL)
@@ -756,7 +756,8 @@ A=M // d = [LCL-5] (*LCL)
 (Class2.get) // function Class2.get 0
 
 // (-89) push static 0
-@18 // push static 0 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
+@18 // push static 0 // function Class2.get 0
+ // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
 D=A
 @0
 A=D+A
@@ -766,7 +767,6 @@ A=M
 M=D
 @SP
 M=M+1
-
 // (-91) push static 1
 @18 // push static 1 // static + src segment offset (..\08\FunctionCalls\StaticsTest\Class2.vm)
 D=A
@@ -816,19 +816,19 @@ M=M-1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
 M=D // [esp] = *ARG[0]+1
-@LCL // *LCL // function return: restore caller stack (THAT)
+@LCL // *LCL // return: restore caller stack (THAT)
 A=M-1 // *LCL-1 (**THAT)
 D=M // d = [LCL-1] (*THAT)
 @THAT
 M=D // [THAT] = [LCL-1] (*THAT)
-@2 // function return: restore caller stack (THIS)
+@2 // return: restore caller stack (THIS)
 D=A // d=2
 @LCL // *LCL 
 A=M-D // *LCL-2 (**THIS)
 D=M // d = [LCL-2] (*THIS)
 @THIS
 M=D // [THIS] = [LCL-2] (*THIS)
-@3 // function return: restore caller stack (ARG)
+@3 // return: restore caller stack (ARG)
 D=A // d=3
 @LCL // *LCL 
 A=M-D // *LCL-3 (**ARG)
@@ -839,14 +839,14 @@ M=D // [ARG] = [LCL-3] (*ARG)
 D=M // d = [LCL]
 @R13 // *R13
 M=D // [R13] = [LCL]
-@4 // function return: restore caller stack (LCL)
+@4 // return: restore caller stack (LCL)
 D=A // d=4
 @LCL // *LCL 
 A=M-D // *LCL-4 (**LCL)
 D=M // d = [LCL-4] (*LCL)
 @LCL
 M=D // [LCL] = [LCL-4] (*LCL)
-@5 // unconditional jump to LCL-5 (RIP)
+@5 // return: unconditional jump to LCL-5 (RIP)
 D=A // d=5
 @R13 // *R13 (old *LCL)
 A=M-D // *LCL-5 (*LCL)

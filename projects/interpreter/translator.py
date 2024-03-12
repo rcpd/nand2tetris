@@ -471,13 +471,16 @@ def call(asm, cmd, src, guids, local_dict, static_dict, offset_list, vm_filepath
     # stack frame after call = <args>...<RIP><LCL><ARG><THIS><THAT><locals>...<SP>
 
     if num_args == 0:
-        asm, comment_count = push(asm, "push constant 9999 // call: if no args, create a space on the stack for the "
-                                       "return", "constant", "constant", 9999, static_dict, offset_list, vm_filepath,
-                                       comment_count, debug=debug)
+        asm, comment_count = push(asm, "push constant 9999 // call %s // if no args, create a space on the stack for "
+                                       "the return" % func_label, "constant", "constant", 9999, static_dict,
+                                       offset_list, vm_filepath, comment_count, debug=debug)
         prologue_size += 7  # 7 instructions added by conditional push for return placeholder
         num_args = 1
+        # adjust comment for cleaner debug output
+        asm += "@%s // push RIP\n" % label_str  # *rip
+    else:
+        asm += "@%s // call %s // push RIP\n" % (label_str, func_label)  # *rip
 
-    asm += "@%s // create the RIP pointer and push it to the stack\n" % label_str  # *rip
     asm += "D=A\n"  # d = [rip]
     asm += "@SP\n"  # *esp
     asm += "A=M\n"  # [esp]
@@ -596,13 +599,13 @@ def _return(asm, cmd, static_dict, offset_list, vm_filepath, comment_count, debu
     asm += "@SP // *esp // as the intent is to discard everything after result at this point\n"
     asm += "M=D // [esp] = *ARG[0]+1\n"
 
-    asm += "@LCL // *LCL // function return: restore caller stack (THAT)\n"
+    asm += "@LCL // *LCL // return: restore caller stack (THAT)\n"
     asm += "A=M-1 // *LCL-1 (**THAT)\n"
     asm += "D=M // d = [LCL-1] (*THAT)\n"
     asm += "@THAT\n"
     asm += "M=D // [THAT] = [LCL-1] (*THAT)\n"
 
-    asm += "@2 // function return: restore caller stack (THIS)\n"
+    asm += "@2 // return: restore caller stack (THIS)\n"
     asm += "D=A // d=2\n"
     asm += "@LCL // *LCL \n"
     asm += "A=M-D // *LCL-2 (**THIS)\n"
@@ -610,7 +613,7 @@ def _return(asm, cmd, static_dict, offset_list, vm_filepath, comment_count, debu
     asm += "@THIS\n"
     asm += "M=D // [THIS] = [LCL-2] (*THIS)\n"
 
-    asm += "@3 // function return: restore caller stack (ARG)\n"
+    asm += "@3 // return: restore caller stack (ARG)\n"
     asm += "D=A // d=3\n"
     asm += "@LCL // *LCL \n"
     asm += "A=M-D // *LCL-3 (**ARG)\n"
@@ -623,7 +626,7 @@ def _return(asm, cmd, static_dict, offset_list, vm_filepath, comment_count, debu
     asm += "@R13 // *R13\n"
     asm += "M=D // [R13] = [LCL]\n"
 
-    asm += "@4 // function return: restore caller stack (LCL)\n"
+    asm += "@4 // return: restore caller stack (LCL)\n"
     asm += "D=A // d=4\n"
     asm += "@LCL // *LCL \n"
     asm += "A=M-D // *LCL-4 (**LCL)\n"
@@ -631,7 +634,7 @@ def _return(asm, cmd, static_dict, offset_list, vm_filepath, comment_count, debu
     asm += "@LCL\n"
     asm += "M=D // [LCL] = [LCL-4] (*LCL)\n"
 
-    asm += "@5 // unconditional jump to LCL-5 (RIP)\n"
+    asm += "@5 // return: unconditional jump to LCL-5 (RIP)\n"
     asm += "D=A // d=5\n"
     asm += "@R13 // *R13 (old *LCL)\n"
     asm += "A=M-D // *LCL-5 (*LCL)\n"
@@ -650,6 +653,7 @@ def parse_asm(vm_filepath, asm, guids, local_dict, static_dict, offset_list, com
     with open(vm_filepath) as vm_file:
         vm_contents = vm_file.readlines()
 
+    stored_comment = ""
     for cmd in vm_contents:
         # cleanup test file
         cmd = cmd.strip()
@@ -687,7 +691,7 @@ def parse_asm(vm_filepath, asm, guids, local_dict, static_dict, offset_list, com
             raise Exception("last command was bad")
 
         if debug:
-            print(cmd)
+            print(cmd, stored_comment)
 
         # parse commands
         if cmd.startswith("push"):
@@ -721,6 +725,7 @@ def parse_asm(vm_filepath, asm, guids, local_dict, static_dict, offset_list, com
         elif cmd.startswith("if-goto"):
             asm, comment_count = if_goto(asm, cmd, src, comment_count, debug=debug)
         elif cmd.startswith("function"):
+            stored_comment = " // %s\n" % cmd  # function only creates a label which gets parsed out
             asm, guids, comment_count = function(asm, cmd, src, guids, comment_count, debug=debug)
         elif cmd.startswith("return"):
             asm, comment_count = _return(asm, cmd, static_dict, offset_list, vm_filepath, comment_count, debug=debug)
@@ -729,6 +734,18 @@ def parse_asm(vm_filepath, asm, guids, local_dict, static_dict, offset_list, com
                                              comment_count, debug=debug)
         else:
             raise RuntimeError("Translator: Unexpected command %s")
+
+        if stored_comment:
+            # append stored_comment to the next command
+            # but not the one that set it or labels as they get parsed out as well
+            if not any(cmd.startswith(x) for x in ["function", "label"]):
+                if asm[-1] == "\n":
+                    asm = asm[:-1]  # trim the carriage return
+                    insert_pos = asm.rfind(cmd) + len(cmd)  # seek pos where VM command ends
+                    asm = asm[:insert_pos] + stored_comment + asm[insert_pos:]  # insert comment
+                    stored_comment = ""
+                else:
+                    raise RuntimeError(r"Translator: Could not append stored_comment, ASM did not end with \n")
 
     return asm, guids, comment_count
 
