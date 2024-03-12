@@ -35,15 +35,3 @@ pop local 1 // position
 push local 0 // mask
 call Main.nextMask 1
 pop local 0 // mask
-
-// if <expression>
-push local 1 // position
-push constant 16
-gt
-not
-push local 1 // position
-push constant 16
-gt
-if-goto IF_TRUE_convert
-goto IF_FALSE_convert
-label IF_TRUE_convert
