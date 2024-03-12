@@ -116,7 +116,7 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
 
 
 def compile_statement(pcode, statement, class_dict, class_name, func_name, call_class, call_func,
-                      var_type, var_name, num_args):
+                      var_type, var_name, num_args, exp_buffer):
     """
     TODO: docstring
     """
@@ -125,7 +125,7 @@ def compile_statement(pcode, statement, class_dict, class_name, func_name, call_
         num_args = 0
 
     elif statement == "let":
-        raise NotImplementedError
+        exp_buffer.append(compile_lhs_statement(class_dict, class_name, func_name, var_name))
 
     elif statement == "return":
         # looks up func type (affects return behaviour)
@@ -144,7 +144,13 @@ def compile_statement(pcode, statement, class_dict, class_name, func_name, call_
     else:
         raise RuntimeError("Unexpected statement type: %s" % statement)
 
-    return pcode, class_dict, num_args
+    return pcode, class_dict, num_args, exp_buffer
+
+
+def compile_lhs_statement(class_dict, class_name, func_name, var_name):
+    lhs_kind = class_dict[class_name][func_name]['args'][var_name]['kind']
+    lhs_index = class_dict[class_name][func_name]['args'][var_name]['index']
+    return "pop %s %s // %s" % (lhs_kind, lhs_index, var_name)
 
 
 def compile_vardec(pcode, class_dict, class_name, func_name, var_type, var_name):
@@ -214,8 +220,8 @@ def main(filepath, debug=False):
     exp_buffer = []
     class_dict = {}
     num_args = 0
-    class_name = func_kind = call_class = call_func = statement = func_name = ''
-    keyword = _type = identifier = func_type = symbol = ''
+    class_name = func_kind = call_class = call_func = statement = func_name = keyword = _type = identifier = ''
+    func_type = symbol = lhs_var_name = rhs_parent = rhs_child = ''
 
     # dump tree
     for elem in tree.iter():
@@ -233,7 +239,7 @@ def main(filepath, debug=False):
         if elem:  # has children
             parent = elem.tag
             # reset tag context on depth change (possibly this can be controlled by function scoping?)
-            # exlcusion: class_name, func_kind, call_class, call_func, statement, func_name
+            # exlcusion: class_name, func_kind, call_class, call_func, statement, func_name, lhs_var_name
             keyword = _type = identifier = func_type = symbol = ''
 
         if elem.tag == 'keyword':
@@ -259,8 +265,9 @@ def main(filepath, debug=False):
                     pcode, class_dict = compile_function(pcode, func_name, _type, func_kind, class_dict, class_name)
 
                 elif keyword == 'var':
-                    pcode, class_dict, num_args = compile_statement(pcode, statement, class_dict, class_name, func_name,
-                                                                    None, None, _type, identifier, num_args)
+                    pcode, class_dict, num_args, exp_buffer = \
+                        compile_statement(pcode, statement, class_dict, class_name, func_name,
+                                          None, None, _type, identifier, num_args, exp_buffer)
 
                 elif keyword == 'do':
                     # "do" compilation is deferred until ";"
@@ -270,8 +277,17 @@ def main(filepath, debug=False):
                         call_func = identifier  # preserved for later
 
                 elif keyword == 'let':
-                    pcode, class_dict, num_args = compile_statement(pcode, statement, class_dict, class_name, func_name,
-                                                                    call_class, call_func, _type, identifier, num_args)
+                    if not lhs_var_name:
+                        lhs_var_name = identifier
+                    elif not rhs_parent:
+                        rhs_parent = identifier  # preserved for later
+                    else:
+                        rhs_child = identifier  # preserved for later
+
+                    if lhs_var_name:
+                        pcode, class_dict, num_args, exp_buffer = \
+                            compile_statement(pcode, statement, class_dict, class_name, func_name,
+                                              call_class, call_func, _type, identifier, num_args, exp_buffer)
 
                 else:
                     raise RuntimeError("unexpected keyword %s for identifier %s" % (keyword, elem.text))
@@ -298,12 +314,14 @@ def main(filepath, debug=False):
                 pass
             elif symbol == ';':
                 if statement == 'do':
-                    pcode, class_dict, num_args = compile_statement(pcode, statement, class_dict, None, None,
-                                                                    call_class, call_func, None, None, num_args)
+                    pcode, class_dict, num_args, exp_buffer = \
+                        compile_statement(pcode, statement, class_dict, None, None,
+                                          call_class, call_func, None, None, num_args, exp_buffer)
                     call_class = call_func = ''
                 elif statement == 'return':
-                    pcode, class_dict, num_args = compile_statement(pcode, statement, class_dict, class_name, func_name,
-                                                                    None, None, None, None, num_args)
+                    pcode, class_dict, num_args, exp_buffer = \
+                        compile_statement(pcode, statement, class_dict, class_name, func_name,
+                                          None, None, None, None, num_args, exp_buffer)
             else:
                 raise RuntimeError("unexpected symbol %s" % elem.text)
 
@@ -341,3 +359,5 @@ if __name__ == '__main__':
 
     for _filepath in jack_filepaths:
         main(_filepath, debug=False)
+
+    # TODO: implement rhs expression handler (queue the call in 'let value = Memory.peek(8000);')
