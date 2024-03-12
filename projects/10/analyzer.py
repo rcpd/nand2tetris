@@ -19,8 +19,6 @@ def main(debug=False):
         r"Square\SquareGame.jack"
     ]
 
-    output = []
-
     for filepath in jack_filepaths:
         input_tree = ET.parse(filepath.replace(".jack", "T_out.xml"))
         input_root = input_tree.getroot()
@@ -39,6 +37,13 @@ def main(debug=False):
         for i, input_tuple in enumerate(input_list):
             j = i+1  # next token
 
+            # TODO: debug
+            try:
+                if input_list[i][1] == "Keyboard":
+                    print("bp")
+            except IndexError:
+                pass
+
             if debug:
                 print("// line:", input_tuple[0], input_tuple[1])
 
@@ -54,9 +59,8 @@ def main(debug=False):
                         print("// insert:", "subroutineDec")
                     parent = ET.SubElement(parent, "subroutineDec")
 
-                # close varDec/letStatement
-                elif parent.tag in ("varDec", "letStatement") \
-                    and input_list[i][0] == "symbol" and input_list[i][1] == ";":
+                # close varDec
+                elif parent.tag == "varDec" and input_list[i][0] == "symbol" and input_list[i][1] == ";":
                     # insert current token and revert parent
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
@@ -73,13 +77,48 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                # open expression
-                elif input_list[i][0] == "symbol" and input_list[i][1] == "=":
+                # close () expression/expressionList
+                elif parent.tag in ("expression", "expressionList") \
+                    and input_list[i][0] == "symbol" and input_list[i][1] == ")":
+                    # revert parent until all desired tags closed
+                    for k in range(0, 2):
+                        if parent.tag in ("expression", "expressionList"):
+                            parent = find_parent(output_root, parent)
+
                     # insert current token
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    # inject expression & update parent(s)
+                # close ; term/expression/letStatement
+                elif parent.tag in ("term", "expression") and input_list[i][0] == "symbol" and input_list[i][1] == ";":
+                    # revert parent until all desired tags closed
+                    for k in range(0, 2):
+                        if parent.tag in ("term", "expression"):
+                            parent = find_parent(output_root, parent)
+
+                    # insert current token
+                    child = ET.SubElement(parent, input_tuple[0])
+                    child.text = " %s " % input_tuple[1]
+
+                    # if required close letStatement after ;
+                    if parent.tag == "letStatement":  #
+                        parent = find_parent(output_root, parent)
+
+                # close ; letStatement
+                elif parent.tag == "letStatement" and input_list[i][0] == "symbol" and input_list[i][1] == ";":
+                    # insert current token and revert parent
+                    child = ET.SubElement(parent, input_tuple[0])
+                    child.text = " %s " % input_tuple[1]
+                    parent = find_parent(output_root, parent)
+
+                # open expression
+                elif (input_list[i][0] == "symbol" and input_list[i][1] == "=") \
+                    or (parent.tag == "whileStatement" and input_list[i][0] == "symbol" and input_list[i][1] == "("):
+                    # insert current token
+                    child = ET.SubElement(parent, input_tuple[0])
+                    child.text = " %s " % input_tuple[1]
+
+                    # inject expression & update parent
                     parent = ET.SubElement(parent, "expression")
 
                 # open expressionList
@@ -106,7 +145,7 @@ def main(debug=False):
                     if input_list[j][0] != "symbol" or (input_list[j][0] == "symbol" and input_list[j][1] == ")"):
                         parent = find_parent(output_root, parent)
 
-                # open letStatement/doStatement/whileStatement  # TODO: how to close do/while statement?
+                # open letStatement/doStatement/whileStatement
                 elif input_list[i][0] == "keyword" and input_list[i][1] in ("let", "do", "while"):
                     # if required inject statements & update parent
                     if parent.tag != "statements":
