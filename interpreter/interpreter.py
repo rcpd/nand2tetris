@@ -811,7 +811,7 @@ if __name__ == '__main__':
     # project
     # TODO: Project 12: Implement the OS libraries in Jack, compile/test (test programs included)
     # TODO: add integration for Project 12 translate/execute/assemble ASM > HACK (integration test)
-    # TODO: VMEmulator equivalent for Jack debugging + tests
+    # TODO: VMEmulator equivalent for Jack debugging + tests (no instruction limit)
     # TODO: separate interpreter from test harness
 
     # test harness
@@ -820,10 +820,16 @@ if __name__ == '__main__':
 
     # compiler
     # TODO: int cannot exceed 32767
-    # TODO: non-void without return value
+    # TODO: non-void without return value / void with return value
     # TODO: statement without keyword/statement type
     # TODO: non-terminated statement
     # TODO: // in string strips the string
+    # TODO: prevent using reserved keywords as identifiers
+    # TODO: prevent duplicate variable/subroutine declaration
+    # TODO: check num args match called function
+    # TODO: check subroutine returns
+    # TODO: check constructor return type is class type
+    # TODO: check constructor returns this
 
     # interpreter
     # TODO: translator finish stack mapping: other stack manip(stacksize), functions(stackframes)
@@ -832,3 +838,27 @@ if __name__ == '__main__':
     # TODO: experiment with ebp (stackframe pointer) implementation
     # TODO: move remaining python comments to asm: associate all asm with function, check linebreaks
     # TODO: doc strings
+
+    # TODO: Jack OS Error Codes
+    '''
+    Code Method/Function       Description
+    ---- ---------------       -----------------------------------------------
+     1   Sys.wait              Duration must be positive
+     2   Array.new             Array size must be positive
+     3   Math.divide           Division by zero
+     4   Math.sqrt             Cannot compute square root of a negative number
+     5   Memory.alloc          Allocated memory size must be positive
+     6   Memory.alloc          Heap overflow
+     7   Screen.drawPixel      Illegal pixel coordinates
+     8   Screen.drawLine       Illegal line coordinates
+     9   Screen.drawRectangle  Illegal rectangle coordinates
+    12   Screen.drawCircle     Illegal center coordinates
+    13   Screen.drawCircle     Illegal radius
+    14   String.new            Maximum length must be non-negative
+    15   String.charAt         String index out of bounds
+    16   String.setCharAt      String index out of bounds
+    17   String.appendChar     String is full
+    18   String.eraseLastChar  String is empty
+    19   String.setInt         Insufficient string capacity
+    20   Output.moveCursor     Illegal cursor location
+    '''
