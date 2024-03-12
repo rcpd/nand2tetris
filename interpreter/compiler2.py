@@ -109,6 +109,22 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
     return pcode, class_dict
 
 
+def compile_vardec(pcode, class_dict, class_name, func_name, var_type, var_name):
+    """
+    add var to the class dict, print a comment in pcode
+    """
+    if "local" not in class_dict[class_name][func_name]['index_dict']:
+        index = 0
+    else:
+        index = class_dict[class_name][func_name]['index_dict']['local'] + 1
+
+    class_dict[class_name][func_name]['args'][var_name] = {'kind': 'local', 'type': var_type, 'index': index}
+    class_dict[class_name][func_name]['index_dict']['local'] = index
+    store_pcode(pcode, "// var %s %s (local %s)" % (var_type, var_name, index))
+
+    return pcode, class_dict
+
+
 def compile_constant(pcode, constant):
     store_pcode(pcode, "\npush %s" % constant)
     return pcode
@@ -190,6 +206,11 @@ def main(filepath, debug=False):
                         raise RuntimeError("undefined function kind for %s.%s" % (class_name, func_name))
                     pcode, class_dict = compile_function(pcode, func_name, func_type, func_kind, class_dict, class_name)
 
+                elif keyword == 'var':
+                    var_type = _type
+                    var_name = identifier
+                    pcode, class_dict = compile_vardec(pcode, class_dict, class_name, func_name, var_type, var_name)
+
                 elif keyword == 'do':
                     if not call_class:
                         call_class = identifier
@@ -211,6 +232,7 @@ def main(filepath, debug=False):
                 if exp_buffer:
                     pcode = compile_literal(pcode, exp_buffer.pop())
             elif symbol in op_map:
+                # FIXME: "neg" not "sub" in terms
                 exp_buffer.append(op_map[symbol])
             elif symbol == ',':
                 pass
@@ -240,7 +262,8 @@ def main(filepath, debug=False):
                     if c_elem.tag == 'expression':
                         num_args += 1
 
-        elif elem.tag in ('subroutineDec', 'subroutineBody', 'parameterList', 'statements', 'expression', 'term', ):
+        elif elem.tag in ('subroutineDec', 'subroutineBody', 'parameterList', 'statements', 'expression', 'term',
+                          'varDec'):
             pass
 
         else:
@@ -249,7 +272,8 @@ def main(filepath, debug=False):
 
 if __name__ == '__main__':
     jack_filepaths = [
-        r"..\11\Seven\Main.jack",  # matched to course compiler
+        # r"..\11\Seven\Main.jack",  # matched to course compiler
+        r"..\11\ConvertToBin\Main.jack",
     ]
 
     for _filepath in jack_filepaths:
