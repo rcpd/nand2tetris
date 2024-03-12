@@ -5,6 +5,9 @@ import assembler
 import tester
 import translator
 import subprocess
+import tokenizer
+import analyzer
+
 
 def dump_call_tree(call_tree, debug_msg):
     if len(call_tree) == 0:
@@ -384,6 +387,36 @@ if __name__ == '__main__':
         r"D:\dev\nand2tetris\projects\11\Square",
     ]
 
+    jack_filepaths = [
+        r"..\projects\09\Average\Main.jack",
+        r"..\projects\09\Fraction\Main.jack",
+        r"..\projects\09\Fraction\Fraction.jack",
+        r"..\projects\09\HelloWorld\Main.jack",
+        r"..\projects\09\List\Main.jack",
+        r"..\projects\09\List\List.jack",
+        r"..\projects\09\Square\Main.jack",
+        r"..\projects\09\Square\Square.jack",
+        r"..\projects\09\Square\SquareGame.jack",
+        r"..\projects\10\ArrayTest\Main.jack",
+        r"..\projects\10\ExpressionLessSquare\Main.jack",
+        r"..\projects\10\ExpressionLessSquare\Square.jack",
+        r"..\projects\10\ExpressionLessSquare\SquareGame.jack",
+        r"..\projects\10\Square\Main.jack",
+        r"..\projects\10\Square\Square.jack",
+        r"..\projects\10\Square\SquareGame.jack",
+        r"..\projects\11\Average\Main.jack",
+        r"..\projects\11\ComplexArrays\Main.jack",
+        r"..\projects\11\ConvertToBin\Main.jack",
+        r"..\projects\11\Pong\Ball.jack",
+        r"..\projects\11\Pong\Bat.jack",
+        r"..\projects\11\Pong\Main.jack",
+        r"..\projects\11\Pong\PongGame.jack",
+        r"..\projects\11\Seven\Main.jack",
+        r"..\projects\11\Square\Main.jack",
+        r"..\projects\11\Square\Square.jack",
+        r"..\projects\11\Square\SquareGame.jack",
+    ]
+
     # regular VM programs
     # TODO: standardise paths
     _vm_dirpaths = [
@@ -453,6 +486,11 @@ if __name__ == '__main__':
 
     vm_static_dicts = {}
     for _debug in debug_runs:
+        # tokenize / analyze Jack (not required with course compiler)
+        for _filepath in jack_filepaths:
+            tokenizer.main(_filepath, debug=False)
+            analyzer.main(_filepath, debug=False)
+
         # compile Jack to VM
         for jack_dir in jack_dirpaths:
             subprocess.run([r"D:\dev\nand2tetris\tools\JackCompiler.bat", jack_dir])
