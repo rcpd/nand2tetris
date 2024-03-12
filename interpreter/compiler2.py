@@ -206,6 +206,7 @@ def compile_function(pcode, func_name, func_type, func_kind, class_dict, class_n
     return pcode, class_dict
 
 
+# TODO: mandatory kwargs are not clearly identifiable
 def compile_statement(pcode=None, statement=None, class_dict=None, class_name=None, func_name=None, call_class=None,
                       call_func=None, var_type=None, var_name=None, num_args=0, exp_buffer=[], var_scope=None,
                       if_count=0, while_count=0, lhs_array=False, var_kind=None, prescan=False):
@@ -218,7 +219,7 @@ def compile_statement(pcode=None, statement=None, class_dict=None, class_name=No
 
     if statement == "do":
         pcode = compile_call(pcode=pcode, call_class=call_class, call_func=call_func, num_args=num_args,
-                             statement=statement, class_dict=class_dict)
+                             statement=statement, class_name=class_name, class_dict=class_dict)
         num_args = 0
 
     elif statement == "let":
@@ -378,7 +379,7 @@ def compile_constant(pcode, constant, exp_buffer=None):
 
 
 # TODO: remove num_params, num_args
-def compile_call(pcode, call_class, call_func, num_args, statement, exp_buffer=None, class_dict=None):
+def compile_call(pcode, call_class, call_func, num_args, statement, class_name, exp_buffer=None, class_dict=None):
     """
     emit pcode when call encountered, discard return on do call
     """
@@ -404,9 +405,30 @@ def compile_call(pcode, call_class, call_func, num_args, statement, exp_buffer=N
         if statement == 'do':
             exp_buffer.append("pop temp 0 // discard return on do call")
         exp_buffer.append("call %s.%s %s" % (call_class, call_func, num_args))
+
+        # implicit this param on class method call
+        if class_name == call_class:
+            if call_class in sys_func:
+                if sys_func[call_class][call_func]['kind'] == 'method':
+                    exp_buffer.append("push pointer 0 // this")
+            elif call_class in class_dict:
+                if class_dict[call_class][call_func]['kind'] == 'method':
+                    exp_buffer.append("push pointer 0 // this")
+            else:
+                raise RuntimeError("class not found: '%s'" % call_class)
+
         return exp_buffer
 
     else:
+        # implicit this param on class method call
+        if class_name == call_class:
+            if call_class in sys_func:
+                if sys_func[call_class][call_func]['kind'] == 'method':
+                    pcode = store_pcode(pcode, "push pointer 0 // this")
+            elif call_class in class_dict:
+                if class_dict[call_class][call_func]['kind'] == 'method':
+                    pcode = store_pcode(pcode, "push pointer 0 // this")
+
         pcode = store_pcode(pcode, "\ncall %s.%s %s" % (call_class, call_func, num_args))
         if statement == 'do':
             pcode = store_pcode(pcode, "\npop temp 0 // discard return on do call")
@@ -415,7 +437,7 @@ def compile_call(pcode, call_class, call_func, num_args, statement, exp_buffer=N
 
 def compile_return(pcode, class_dict, class_name, func_name):
     """
-    emit pcode when return encountered, push null for void functions
+    emit pcode when return encountered
     """
 
     if class_dict[class_name][func_name]["type"] == "void":
@@ -536,7 +558,7 @@ def compile_char(pcode, char):
 
 
 def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier=None, class_name=None, func_name=None,
-                       parent_obj=None, child_func=None, symbol=None):
+                       parent_obj=None, child_func=None, symbol=None, keyword=None):
     """
     expressions call the buffered version of compile functions so they are parsed first in, last out
     expressions are found in let (rhs), array indexes, if/while conditions and optionally as return values
@@ -583,14 +605,14 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
 
         # if parent/child pair found assume call & compile
         if parent_obj and child_func:
-            exp_buffer = compile_call(pcode, parent_obj, child_func, num_params, statement, exp_buffer=exp_buffer,
-                                      class_dict=class_dict)
+            exp_buffer = compile_call(pcode, parent_obj, child_func, num_params, statement, class_name=class_name,
+                                      exp_buffer=exp_buffer, class_dict=class_dict)
             parent_obj = child_func = ''
 
         # compile unqualified function call
         elif identifier in class_dict[class_name]:
-            exp_buffer = compile_call(pcode, class_name, identifier, num_params, statement, exp_buffer=exp_buffer,
-                                      class_dict=class_dict)
+            exp_buffer = compile_call(pcode, class_name, identifier, num_params, statement, class_name=class_name,
+                                      exp_buffer=exp_buffer, class_dict=class_dict)
             parent_obj = child_func = ''
 
         # compile as regular var (local)
@@ -616,6 +638,9 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
         else:
             if identifier != parent_obj:  # ignore first instance of parent_obj (first pass)
                 raise RuntimeError("unexpected identifier: %s" % identifier)
+
+    elif keyword == 'this':
+        pcode = store_pcode(pcode, "push pointer 0 // this")
 
     return pcode, exp_buffer, parent_obj, child_func
 
@@ -773,6 +798,10 @@ def main(filepath, file_list):
         if elem.tag == 'keyword':
             if elem.text in ('true', 'false'):
                 exp_buffer = compile_boolean(pcode, elem.text, exp_buffer)
+            elif elem.text == 'this':
+                pcode, exp_buffer, parent_obj, child_func = \
+                    expression_handler(pcode, statement, exp_buffer, parent_obj=parent_obj, child_func=child_func,
+                                       keyword=elem.text)
             elif not keyword:
                 keyword = elem.text  # preserved for later
             elif not var_type:
@@ -1041,7 +1070,8 @@ def main(filepath, file_list):
             statement = 'while'
             pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
                 compile_statement(pcode=pcode, statement=statement, class_dict=class_dict, num_args=num_args,
-                                  while_count=while_count, if_count=if_count, exp_buffer=exp_buffer)
+                                  while_count=while_count, if_count=if_count, exp_buffer=exp_buffer,
+                                  class_name=class_name)
         elif elem.tag == 'varDec':
             statement = 'var'
         elif elem.tag == 'classVarDec':
@@ -1155,6 +1185,5 @@ if __name__ == '__main__':
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
 
     # FIXME: num_args should not increase for members
-    # FIXME: push this (pointer 0) for methods
     # FIXME: all functions treated as constructors (see above)
     # FIXME: if without else (see above)

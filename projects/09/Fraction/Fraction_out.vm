@@ -6,8 +6,10 @@ push argument 0
 pop this 0
 push argument 1
 pop this 1
+push pointer 0
 call Fraction.reduce 1
 pop temp 0
+push pointer 0
 return
 function Fraction.reduce 2
 push constant 2
@@ -52,17 +54,20 @@ call Memory.alloc 1
 pop pointer 0
 push this 0
 push argument 1
+push pointer 0
 call Fraction.getDenominator 1
 call Math.multiply 2
 push argument 1
 push this 1
 call Math.multiply 2
+push pointer 0
 call Fraction.getNumerator 1
 add
 pop local 0
 push local 0
 push this 1
 push argument 1
+push pointer 0
 call Fraction.getDenominator 1
 call Math.multiply 2
 call Fraction.new 2
@@ -71,6 +76,7 @@ function Fraction.dispose 2
 push constant 2
 call Memory.alloc 1
 pop pointer 0
+push pointer 0
 call Memory.deAlloc 1
 pop temp 0
 push constant 0
