@@ -590,7 +590,7 @@ def _return(asm, cmd, static_dict, offset_list, vm_filepath, comment_count, debu
     # jump to RIP
 
     asm += '\n// (%s) %s\n' % (comment_count, cmd)
-    asm, comment_count = pop(asm, "pop argument 0 // return: move result to ARG[0] (soon to be last stack "
+    asm, comment_count = pop(asm, "pop argument 0 // return // move result to ARG[0] (soon to be last stack "
                              "item)", "argument", "ARG", 0, static_dict, offset_list, vm_filepath, comment_count,
                              debug=debug)
 

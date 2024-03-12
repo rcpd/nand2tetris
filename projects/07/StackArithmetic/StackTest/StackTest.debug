@@ -1,0 +1,1325 @@
+0 @17 
+  // push constant 17 
+  EVAL: A=17 
+  A=17 D=0 M=0
+1 D=A 
+  EVAL: D=17 (17) 
+  A=17 D=17 M=0
+2 @SP 
+  EVAL: A=0 
+  A=0 D=17 M=256
+3 A=M 
+  EVAL: A=256 (256) 
+  A=256 D=17 M=0
+4 M=D 
+  EVAL: M=17 (17) 
+  A=256 D=17 M=17
+5 @SP 
+  EVAL: A=0 
+  A=0 D=17 M=256
+6 M=M+1 
+  EVAL: M=257 (256+1) 
+  A=0 D=17 M=257
+7 @17 
+  // push constant 17 
+  EVAL: A=17 
+  A=17 D=17 M=0
+8 D=A 
+  EVAL: D=17 (17) 
+  A=17 D=17 M=0
+9 @SP 
+  EVAL: A=0 
+  A=0 D=17 M=257
+10 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=17 M=0
+11 M=D 
+  EVAL: M=17 (17) 
+  A=257 D=17 M=17
+12 @SP 
+  EVAL: A=0 
+  A=0 D=17 M=257
+13 M=M+1 
+  EVAL: M=258 (257+1) 
+  A=0 D=17 M=258
+14 @SP 
+  // eq 
+  // *esp 
+  EVAL: A=0 
+  A=0 D=17 M=258
+15 M=M-1 
+  // *esp-- (*val2) 
+  EVAL: M=257 (258-1) 
+  A=0 D=17 M=257
+16 A=M 
+  // [val2] 
+  EVAL: A=257 (257) 
+  A=257 D=17 M=17
+17 D=M 
+  // d = [val2] 
+  EVAL: D=17 (17) 
+  A=257 D=17 M=17
+18 @SP 
+  // *esp (*val2) 
+  EVAL: A=0 
+  A=0 D=17 M=257
+19 M=M-1 
+  // *esp-- (*val1) 
+  EVAL: M=256 (257-1) 
+  A=0 D=17 M=256
+20 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=256 (256) 
+  A=256 D=17 M=17
+21 D=M-D 
+  // d = [val1] - [val2] 
+  EVAL: D=0 (17-17) 
+  A=256 D=0 M=17
+22 @EQ_TRUE_1 
+  EVAL: A=28 
+  A=28 D=0 M=0
+27 D;JEQ 
+  EVAL: A=28 
+  A=28 D=0 M=0
+28 @0 
+  // (EQ_TRUE_1) 
+  EVAL: A=0 
+  A=0 D=0 M=256
+29 D=A 
+  EVAL: D=0 (0) 
+  A=0 D=0 M=256
+30 D=D-1 
+  // d = -1 (true) 
+  EVAL: D=-1 (0-1) 
+  A=0 D=-1 M=256
+31 @SP 
+  // *esp (*val1) 
+  // (EQ_END_1) 
+  EVAL: A=0 
+  A=0 D=-1 M=256
+32 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=256 (256) 
+  A=256 D=-1 M=17
+33 M=D 
+  // [esp] = eq result 
+  EVAL: M=-1 (-1) 
+  A=256 D=-1 M=-1
+34 @SP 
+  // *esp 
+  EVAL: A=0 
+  A=0 D=-1 M=256
+35 M=M+1 
+  // *esp++ 
+  EVAL: M=257 (256+1) 
+  A=0 D=-1 M=257
+36 @17 
+  // push constant 17 
+  EVAL: A=17 
+  A=17 D=-1 M=0
+37 D=A 
+  EVAL: D=17 (17) 
+  A=17 D=17 M=0
+38 @SP 
+  EVAL: A=0 
+  A=0 D=17 M=257
+39 A=M 
+  EVAL: A=257 (257) 
+  A=257 D=17 M=17
+40 M=D 
+  EVAL: M=17 (17) 
+  A=257 D=17 M=17
+41 @SP 
+  EVAL: A=0 
+  A=0 D=17 M=257
+42 M=M+1 
+  EVAL: M=258 (257+1) 
+  A=0 D=17 M=258
+43 @16 
+  // push constant 16 
+  EVAL: A=16 
+  A=16 D=17 M=0
+44 D=A 
+  EVAL: D=16 (16) 
+  A=16 D=16 M=0
+45 @SP 
+  EVAL: A=0 
+  A=0 D=16 M=258
+46 A=M 
+  EVAL: A=258 (258) 
+  A=258 D=16 M=0
+47 M=D 
+  EVAL: M=16 (16) 
+  A=258 D=16 M=16
+48 @SP 
+  EVAL: A=0 
+  A=0 D=16 M=258
+49 M=M+1 
+  EVAL: M=259 (258+1) 
+  A=0 D=16 M=259
+50 @SP 
+  // eq 
+  // *esp 
+  EVAL: A=0 
+  A=0 D=16 M=259
+51 M=M-1 
+  // *esp-- (*val2) 
+  EVAL: M=258 (259-1) 
+  A=0 D=16 M=258
+52 A=M 
+  // [val2] 
+  EVAL: A=258 (258) 
+  A=258 D=16 M=16
+53 D=M 
+  // d = [val2] 
+  EVAL: D=16 (16) 
+  A=258 D=16 M=16
+54 @SP 
+  // *esp (*val2) 
+  EVAL: A=0 
+  A=0 D=16 M=258
+55 M=M-1 
+  // *esp-- (*val1) 
+  EVAL: M=257 (258-1) 
+  A=0 D=16 M=257
+56 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=257 (257) 
+  A=257 D=16 M=17
+57 D=M-D 
+  // d = [val1] - [val2] 
+  EVAL: D=1 (17-16) 
+  A=257 D=1 M=17
+58 @EQ_TRUE_2 
+  EVAL: A=64 
+  A=64 D=1 M=0
+59 D;JEQ 
+  EVAL: A=64 
+  A=64 D=1 M=0
+60 @0 
+  // (EQ_FALSE_2) 
+  EVAL: A=0 
+  A=0 D=1 M=257
+61 D=A 
+  // d = false 
+  EVAL: D=0 (0) 
+  A=0 D=0 M=257
+62 @EQ_END_2 
+  EVAL: A=67 
+  A=67 D=0 M=0
+66 0;JMP 
+  EVAL: A=67 
+  A=67 D=0 M=0
+67 @SP 
+  // *esp (*val1) 
+  // (EQ_END_2) 
+  EVAL: A=0 
+  A=0 D=0 M=257
+68 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=257 (257) 
+  A=257 D=0 M=17
+69 M=D 
+  // [esp] = eq result 
+  EVAL: M=0 (0) 
+  A=257 D=0 M=0
+70 @SP 
+  // *esp 
+  EVAL: A=0 
+  A=0 D=0 M=257
+71 M=M+1 
+  // *esp++ 
+  EVAL: M=258 (257+1) 
+  A=0 D=0 M=258
+72 @16 
+  // push constant 16 
+  EVAL: A=16 
+  A=16 D=0 M=0
+73 D=A 
+  EVAL: D=16 (16) 
+  A=16 D=16 M=0
+74 @SP 
+  EVAL: A=0 
+  A=0 D=16 M=258
+75 A=M 
+  EVAL: A=258 (258) 
+  A=258 D=16 M=16
+76 M=D 
+  EVAL: M=16 (16) 
+  A=258 D=16 M=16
+77 @SP 
+  EVAL: A=0 
+  A=0 D=16 M=258
+78 M=M+1 
+  EVAL: M=259 (258+1) 
+  A=0 D=16 M=259
+79 @17 
+  // push constant 17 
+  EVAL: A=17 
+  A=17 D=16 M=0
+80 D=A 
+  EVAL: D=17 (17) 
+  A=17 D=17 M=0
+81 @SP 
+  EVAL: A=0 
+  A=0 D=17 M=259
+82 A=M 
+  EVAL: A=259 (259) 
+  A=259 D=17 M=0
+83 M=D 
+  EVAL: M=17 (17) 
+  A=259 D=17 M=17
+84 @SP 
+  EVAL: A=0 
+  A=0 D=17 M=259
+85 M=M+1 
+  EVAL: M=260 (259+1) 
+  A=0 D=17 M=260
+86 @SP 
+  // eq 
+  // *esp 
+  EVAL: A=0 
+  A=0 D=17 M=260
+87 M=M-1 
+  // *esp-- (*val2) 
+  EVAL: M=259 (260-1) 
+  A=0 D=17 M=259
+88 A=M 
+  // [val2] 
+  EVAL: A=259 (259) 
+  A=259 D=17 M=17
+89 D=M 
+  // d = [val2] 
+  EVAL: D=17 (17) 
+  A=259 D=17 M=17
+90 @SP 
+  // *esp (*val2) 
+  EVAL: A=0 
+  A=0 D=17 M=259
+91 M=M-1 
+  // *esp-- (*val1) 
+  EVAL: M=258 (259-1) 
+  A=0 D=17 M=258
+92 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=258 (258) 
+  A=258 D=17 M=16
+93 D=M-D 
+  // d = [val1] - [val2] 
+  EVAL: D=-1 (16-17) 
+  A=258 D=-1 M=16
+94 @EQ_TRUE_3 
+  EVAL: A=100 
+  A=100 D=-1 M=0
+95 D;JEQ 
+  EVAL: A=100 
+  A=100 D=-1 M=0
+96 @0 
+  // (EQ_FALSE_3) 
+  EVAL: A=0 
+  A=0 D=-1 M=258
+97 D=A 
+  // d = false 
+  EVAL: D=0 (0) 
+  A=0 D=0 M=258
+98 @EQ_END_3 
+  EVAL: A=103 
+  A=103 D=0 M=0
+102 0;JMP 
+  EVAL: A=103 
+  A=103 D=0 M=0
+103 @SP 
+  // *esp (*val1) 
+  // (EQ_END_3) 
+  EVAL: A=0 
+  A=0 D=0 M=258
+104 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=258 (258) 
+  A=258 D=0 M=16
+105 M=D 
+  // [esp] = eq result 
+  EVAL: M=0 (0) 
+  A=258 D=0 M=0
+106 @SP 
+  // *esp 
+  EVAL: A=0 
+  A=0 D=0 M=258
+107 M=M+1 
+  // *esp++ 
+  EVAL: M=259 (258+1) 
+  A=0 D=0 M=259
+108 @892 
+  // push constant 892 
+  EVAL: A=892 
+  A=892 D=0 M=0
+109 D=A 
+  EVAL: D=892 (892) 
+  A=892 D=892 M=0
+110 @SP 
+  EVAL: A=0 
+  A=0 D=892 M=259
+111 A=M 
+  EVAL: A=259 (259) 
+  A=259 D=892 M=17
+112 M=D 
+  EVAL: M=892 (892) 
+  A=259 D=892 M=892
+113 @SP 
+  EVAL: A=0 
+  A=0 D=892 M=259
+114 M=M+1 
+  EVAL: M=260 (259+1) 
+  A=0 D=892 M=260
+115 @891 
+  // push constant 891 
+  EVAL: A=891 
+  A=891 D=892 M=0
+116 D=A 
+  EVAL: D=891 (891) 
+  A=891 D=891 M=0
+117 @SP 
+  EVAL: A=0 
+  A=0 D=891 M=260
+118 A=M 
+  EVAL: A=260 (260) 
+  A=260 D=891 M=0
+119 M=D 
+  EVAL: M=891 (891) 
+  A=260 D=891 M=891
+120 @SP 
+  EVAL: A=0 
+  A=0 D=891 M=260
+121 M=M+1 
+  EVAL: M=261 (260+1) 
+  A=0 D=891 M=261
+122 @SP 
+  // *esp 
+  // lt 
+  EVAL: A=0 
+  A=0 D=891 M=261
+123 M=M-1 
+  // *esp-- (*val2) 
+  EVAL: M=260 (261-1) 
+  A=0 D=891 M=260
+124 A=M 
+  // [val2] 
+  EVAL: A=260 (260) 
+  A=260 D=891 M=891
+125 D=M 
+  // d = [val2] 
+  EVAL: D=891 (891) 
+  A=260 D=891 M=891
+126 @SP 
+  // *esp (*val2) 
+  EVAL: A=0 
+  A=0 D=891 M=260
+127 M=M-1 
+  // *esp-- (*val1) 
+  EVAL: M=259 (260-1) 
+  A=0 D=891 M=259
+128 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=259 (259) 
+  A=259 D=891 M=892
+129 D=M-D 
+  // d = [val1] - [val2] 
+  EVAL: D=1 (892-891) 
+  A=259 D=1 M=892
+130 @JLT_TRUE_4 
+  EVAL: A=136 
+  A=136 D=1 M=0
+131 D;JLT 
+  EVAL: A=136 
+  A=136 D=1 M=0
+132 @0 
+  // (JLT_FALSE_4) 
+  EVAL: A=0 
+  A=0 D=1 M=259
+133 D=A 
+  // d = false 
+  EVAL: D=0 (0) 
+  A=0 D=0 M=259
+134 @JLT_END_4 
+  EVAL: A=139 
+  A=139 D=0 M=0
+138 0;JMP 
+  EVAL: A=139 
+  A=139 D=0 M=0
+139 @SP 
+  // *esp (*val1) 
+  // (JLT_END_4) 
+  EVAL: A=0 
+  A=0 D=0 M=259
+140 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=259 (259) 
+  A=259 D=0 M=892
+141 M=D 
+  // [esp] = eq result 
+  EVAL: M=0 (0) 
+  A=259 D=0 M=0
+142 @SP 
+  // *esp 
+  EVAL: A=0 
+  A=0 D=0 M=259
+143 M=M+1 
+  // *esp++ 
+  EVAL: M=260 (259+1) 
+  A=0 D=0 M=260
+144 @891 
+  // push constant 891 
+  EVAL: A=891 
+  A=891 D=0 M=0
+145 D=A 
+  EVAL: D=891 (891) 
+  A=891 D=891 M=0
+146 @SP 
+  EVAL: A=0 
+  A=0 D=891 M=260
+147 A=M 
+  EVAL: A=260 (260) 
+  A=260 D=891 M=891
+148 M=D 
+  EVAL: M=891 (891) 
+  A=260 D=891 M=891
+149 @SP 
+  EVAL: A=0 
+  A=0 D=891 M=260
+150 M=M+1 
+  EVAL: M=261 (260+1) 
+  A=0 D=891 M=261
+151 @892 
+  // push constant 892 
+  EVAL: A=892 
+  A=892 D=891 M=0
+152 D=A 
+  EVAL: D=892 (892) 
+  A=892 D=892 M=0
+153 @SP 
+  EVAL: A=0 
+  A=0 D=892 M=261
+154 A=M 
+  EVAL: A=261 (261) 
+  A=261 D=892 M=0
+155 M=D 
+  EVAL: M=892 (892) 
+  A=261 D=892 M=892
+156 @SP 
+  EVAL: A=0 
+  A=0 D=892 M=261
+157 M=M+1 
+  EVAL: M=262 (261+1) 
+  A=0 D=892 M=262
+158 @SP 
+  // *esp 
+  // lt 
+  EVAL: A=0 
+  A=0 D=892 M=262
+159 M=M-1 
+  // *esp-- (*val2) 
+  EVAL: M=261 (262-1) 
+  A=0 D=892 M=261
+160 A=M 
+  // [val2] 
+  EVAL: A=261 (261) 
+  A=261 D=892 M=892
+161 D=M 
+  // d = [val2] 
+  EVAL: D=892 (892) 
+  A=261 D=892 M=892
+162 @SP 
+  // *esp (*val2) 
+  EVAL: A=0 
+  A=0 D=892 M=261
+163 M=M-1 
+  // *esp-- (*val1) 
+  EVAL: M=260 (261-1) 
+  A=0 D=892 M=260
+164 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=260 (260) 
+  A=260 D=892 M=891
+165 D=M-D 
+  // d = [val1] - [val2] 
+  EVAL: D=-1 (891-892) 
+  A=260 D=-1 M=891
+166 @JLT_TRUE_5 
+  EVAL: A=172 
+  A=172 D=-1 M=0
+171 D;JLT 
+  EVAL: A=172 
+  A=172 D=-1 M=0
+172 @0 
+  // (JLT_TRUE_5) 
+  EVAL: A=0 
+  A=0 D=-1 M=260
+173 D=A 
+  EVAL: D=0 (0) 
+  A=0 D=0 M=260
+174 D=D-1 
+  // d = -1 (true) 
+  EVAL: D=-1 (0-1) 
+  A=0 D=-1 M=260
+175 @SP 
+  // *esp (*val1) 
+  // (JLT_END_5) 
+  EVAL: A=0 
+  A=0 D=-1 M=260
+176 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=260 (260) 
+  A=260 D=-1 M=891
+177 M=D 
+  // [esp] = eq result 
+  EVAL: M=-1 (-1) 
+  A=260 D=-1 M=-1
+178 @SP 
+  // *esp 
+  EVAL: A=0 
+  A=0 D=-1 M=260
+179 M=M+1 
+  // *esp++ 
+  EVAL: M=261 (260+1) 
+  A=0 D=-1 M=261
+180 @891 
+  // push constant 891 
+  EVAL: A=891 
+  A=891 D=-1 M=0
+181 D=A 
+  EVAL: D=891 (891) 
+  A=891 D=891 M=0
+182 @SP 
+  EVAL: A=0 
+  A=0 D=891 M=261
+183 A=M 
+  EVAL: A=261 (261) 
+  A=261 D=891 M=892
+184 M=D 
+  EVAL: M=891 (891) 
+  A=261 D=891 M=891
+185 @SP 
+  EVAL: A=0 
+  A=0 D=891 M=261
+186 M=M+1 
+  EVAL: M=262 (261+1) 
+  A=0 D=891 M=262
+187 @891 
+  // push constant 891 
+  EVAL: A=891 
+  A=891 D=891 M=0
+188 D=A 
+  EVAL: D=891 (891) 
+  A=891 D=891 M=0
+189 @SP 
+  EVAL: A=0 
+  A=0 D=891 M=262
+190 A=M 
+  EVAL: A=262 (262) 
+  A=262 D=891 M=0
+191 M=D 
+  EVAL: M=891 (891) 
+  A=262 D=891 M=891
+192 @SP 
+  EVAL: A=0 
+  A=0 D=891 M=262
+193 M=M+1 
+  EVAL: M=263 (262+1) 
+  A=0 D=891 M=263
+194 @SP 
+  // *esp 
+  // lt 
+  EVAL: A=0 
+  A=0 D=891 M=263
+195 M=M-1 
+  // *esp-- (*val2) 
+  EVAL: M=262 (263-1) 
+  A=0 D=891 M=262
+196 A=M 
+  // [val2] 
+  EVAL: A=262 (262) 
+  A=262 D=891 M=891
+197 D=M 
+  // d = [val2] 
+  EVAL: D=891 (891) 
+  A=262 D=891 M=891
+198 @SP 
+  // *esp (*val2) 
+  EVAL: A=0 
+  A=0 D=891 M=262
+199 M=M-1 
+  // *esp-- (*val1) 
+  EVAL: M=261 (262-1) 
+  A=0 D=891 M=261
+200 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=261 (261) 
+  A=261 D=891 M=891
+201 D=M-D 
+  // d = [val1] - [val2] 
+  EVAL: D=0 (891-891) 
+  A=261 D=0 M=891
+202 @JLT_TRUE_6 
+  EVAL: A=208 
+  A=208 D=0 M=0
+203 D;JLT 
+  EVAL: A=208 
+  A=208 D=0 M=0
+204 @0 
+  // (JLT_FALSE_6) 
+  EVAL: A=0 
+  A=0 D=0 M=261
+205 D=A 
+  // d = false 
+  EVAL: D=0 (0) 
+  A=0 D=0 M=261
+206 @JLT_END_6 
+  EVAL: A=211 
+  A=211 D=0 M=0
+210 0;JMP 
+  EVAL: A=211 
+  A=211 D=0 M=0
+211 @SP 
+  // *esp (*val1) 
+  // (JLT_END_6) 
+  EVAL: A=0 
+  A=0 D=0 M=261
+212 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=261 (261) 
+  A=261 D=0 M=891
+213 M=D 
+  // [esp] = eq result 
+  EVAL: M=0 (0) 
+  A=261 D=0 M=0
+214 @SP 
+  // *esp 
+  EVAL: A=0 
+  A=0 D=0 M=261
+215 M=M+1 
+  // *esp++ 
+  EVAL: M=262 (261+1) 
+  A=0 D=0 M=262
+216 @32767 
+  // push constant 32767 
+  EVAL: A=32767 
+  A=32767 D=0 M=0
+217 D=A 
+  EVAL: D=32767 (32767) 
+  A=32767 D=32767 M=0
+218 @SP 
+  EVAL: A=0 
+  A=0 D=32767 M=262
+219 A=M 
+  EVAL: A=262 (262) 
+  A=262 D=32767 M=891
+220 M=D 
+  EVAL: M=32767 (32767) 
+  A=262 D=32767 M=32767
+221 @SP 
+  EVAL: A=0 
+  A=0 D=32767 M=262
+222 M=M+1 
+  EVAL: M=263 (262+1) 
+  A=0 D=32767 M=263
+223 @32766 
+  // push constant 32766 
+  EVAL: A=32766 
+  A=32766 D=32767 M=0
+224 D=A 
+  EVAL: D=32766 (32766) 
+  A=32766 D=32766 M=0
+225 @SP 
+  EVAL: A=0 
+  A=0 D=32766 M=263
+226 A=M 
+  EVAL: A=263 (263) 
+  A=263 D=32766 M=0
+227 M=D 
+  EVAL: M=32766 (32766) 
+  A=263 D=32766 M=32766
+228 @SP 
+  EVAL: A=0 
+  A=0 D=32766 M=263
+229 M=M+1 
+  EVAL: M=264 (263+1) 
+  A=0 D=32766 M=264
+230 @SP 
+  // *esp 
+  // gt 
+  EVAL: A=0 
+  A=0 D=32766 M=264
+231 M=M-1 
+  // *esp-- (*val2) 
+  EVAL: M=263 (264-1) 
+  A=0 D=32766 M=263
+232 A=M 
+  // [val2] 
+  EVAL: A=263 (263) 
+  A=263 D=32766 M=32766
+233 D=M 
+  // d = [val2] 
+  EVAL: D=32766 (32766) 
+  A=263 D=32766 M=32766
+234 @SP 
+  // *esp (*val2) 
+  EVAL: A=0 
+  A=0 D=32766 M=263
+235 M=M-1 
+  // *esp-- (*val1) 
+  EVAL: M=262 (263-1) 
+  A=0 D=32766 M=262
+236 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=262 (262) 
+  A=262 D=32766 M=32767
+237 D=M-D 
+  // d = [val1] - [val2] 
+  EVAL: D=1 (32767-32766) 
+  A=262 D=1 M=32767
+238 @JGT_TRUE_7 
+  EVAL: A=244 
+  A=244 D=1 M=0
+243 D;JGT 
+  EVAL: A=244 
+  A=244 D=1 M=0
+244 @0 
+  // (JGT_TRUE_7) 
+  EVAL: A=0 
+  A=0 D=1 M=262
+245 D=A 
+  EVAL: D=0 (0) 
+  A=0 D=0 M=262
+246 D=D-1 
+  // d = -1 (true) 
+  EVAL: D=-1 (0-1) 
+  A=0 D=-1 M=262
+247 @SP 
+  // *esp (*val1) 
+  // (JGT_END_7) 
+  EVAL: A=0 
+  A=0 D=-1 M=262
+248 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=262 (262) 
+  A=262 D=-1 M=32767
+249 M=D 
+  // [esp] = eq result 
+  EVAL: M=-1 (-1) 
+  A=262 D=-1 M=-1
+250 @SP 
+  // *esp 
+  EVAL: A=0 
+  A=0 D=-1 M=262
+251 M=M+1 
+  // *esp++ 
+  EVAL: M=263 (262+1) 
+  A=0 D=-1 M=263
+252 @32766 
+  // push constant 32766 
+  EVAL: A=32766 
+  A=32766 D=-1 M=0
+253 D=A 
+  EVAL: D=32766 (32766) 
+  A=32766 D=32766 M=0
+254 @SP 
+  EVAL: A=0 
+  A=0 D=32766 M=263
+255 A=M 
+  EVAL: A=263 (263) 
+  A=263 D=32766 M=32766
+256 M=D 
+  EVAL: M=32766 (32766) 
+  A=263 D=32766 M=32766
+257 @SP 
+  EVAL: A=0 
+  A=0 D=32766 M=263
+258 M=M+1 
+  EVAL: M=264 (263+1) 
+  A=0 D=32766 M=264
+259 @32767 
+  // push constant 32767 
+  EVAL: A=32767 
+  A=32767 D=32766 M=0
+260 D=A 
+  EVAL: D=32767 (32767) 
+  A=32767 D=32767 M=0
+261 @SP 
+  EVAL: A=0 
+  A=0 D=32767 M=264
+262 A=M 
+  EVAL: A=264 (264) 
+  A=264 D=32767 M=0
+263 M=D 
+  EVAL: M=32767 (32767) 
+  A=264 D=32767 M=32767
+264 @SP 
+  EVAL: A=0 
+  A=0 D=32767 M=264
+265 M=M+1 
+  EVAL: M=265 (264+1) 
+  A=0 D=32767 M=265
+266 @SP 
+  // *esp 
+  // gt 
+  EVAL: A=0 
+  A=0 D=32767 M=265
+267 M=M-1 
+  // *esp-- (*val2) 
+  EVAL: M=264 (265-1) 
+  A=0 D=32767 M=264
+268 A=M 
+  // [val2] 
+  EVAL: A=264 (264) 
+  A=264 D=32767 M=32767
+269 D=M 
+  // d = [val2] 
+  EVAL: D=32767 (32767) 
+  A=264 D=32767 M=32767
+270 @SP 
+  // *esp (*val2) 
+  EVAL: A=0 
+  A=0 D=32767 M=264
+271 M=M-1 
+  // *esp-- (*val1) 
+  EVAL: M=263 (264-1) 
+  A=0 D=32767 M=263
+272 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=263 (263) 
+  A=263 D=32767 M=32766
+273 D=M-D 
+  // d = [val1] - [val2] 
+  EVAL: D=-1 (32766-32767) 
+  A=263 D=-1 M=32766
+274 @JGT_TRUE_8 
+  EVAL: A=280 
+  A=280 D=-1 M=0
+275 D;JGT 
+  EVAL: A=280 
+  A=280 D=-1 M=0
+276 @0 
+  // (JGT_FALSE_8) 
+  EVAL: A=0 
+  A=0 D=-1 M=263
+277 D=A 
+  // d = false 
+  EVAL: D=0 (0) 
+  A=0 D=0 M=263
+278 @JGT_END_8 
+  EVAL: A=283 
+  A=283 D=0 M=0
+282 0;JMP 
+  EVAL: A=283 
+  A=283 D=0 M=0
+283 @SP 
+  // *esp (*val1) 
+  // (JGT_END_8) 
+  EVAL: A=0 
+  A=0 D=0 M=263
+284 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=263 (263) 
+  A=263 D=0 M=32766
+285 M=D 
+  // [esp] = eq result 
+  EVAL: M=0 (0) 
+  A=263 D=0 M=0
+286 @SP 
+  // *esp 
+  EVAL: A=0 
+  A=0 D=0 M=263
+287 M=M+1 
+  // *esp++ 
+  EVAL: M=264 (263+1) 
+  A=0 D=0 M=264
+288 @32766 
+  // push constant 32766 
+  EVAL: A=32766 
+  A=32766 D=0 M=0
+289 D=A 
+  EVAL: D=32766 (32766) 
+  A=32766 D=32766 M=0
+290 @SP 
+  EVAL: A=0 
+  A=0 D=32766 M=264
+291 A=M 
+  EVAL: A=264 (264) 
+  A=264 D=32766 M=32767
+292 M=D 
+  EVAL: M=32766 (32766) 
+  A=264 D=32766 M=32766
+293 @SP 
+  EVAL: A=0 
+  A=0 D=32766 M=264
+294 M=M+1 
+  EVAL: M=265 (264+1) 
+  A=0 D=32766 M=265
+295 @32766 
+  // push constant 32766 
+  EVAL: A=32766 
+  A=32766 D=32766 M=0
+296 D=A 
+  EVAL: D=32766 (32766) 
+  A=32766 D=32766 M=0
+297 @SP 
+  EVAL: A=0 
+  A=0 D=32766 M=265
+298 A=M 
+  EVAL: A=265 (265) 
+  A=265 D=32766 M=0
+299 M=D 
+  EVAL: M=32766 (32766) 
+  A=265 D=32766 M=32766
+300 @SP 
+  EVAL: A=0 
+  A=0 D=32766 M=265
+301 M=M+1 
+  EVAL: M=266 (265+1) 
+  A=0 D=32766 M=266
+302 @SP 
+  // *esp 
+  // gt 
+  EVAL: A=0 
+  A=0 D=32766 M=266
+303 M=M-1 
+  // *esp-- (*val2) 
+  EVAL: M=265 (266-1) 
+  A=0 D=32766 M=265
+304 A=M 
+  // [val2] 
+  EVAL: A=265 (265) 
+  A=265 D=32766 M=32766
+305 D=M 
+  // d = [val2] 
+  EVAL: D=32766 (32766) 
+  A=265 D=32766 M=32766
+306 @SP 
+  // *esp (*val2) 
+  EVAL: A=0 
+  A=0 D=32766 M=265
+307 M=M-1 
+  // *esp-- (*val1) 
+  EVAL: M=264 (265-1) 
+  A=0 D=32766 M=264
+308 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=264 (264) 
+  A=264 D=32766 M=32766
+309 D=M-D 
+  // d = [val1] - [val2] 
+  EVAL: D=0 (32766-32766) 
+  A=264 D=0 M=32766
+310 @JGT_TRUE_9 
+  EVAL: A=316 
+  A=316 D=0 M=0
+311 D;JGT 
+  EVAL: A=316 
+  A=316 D=0 M=0
+312 @0 
+  // (JGT_FALSE_9) 
+  EVAL: A=0 
+  A=0 D=0 M=264
+313 D=A 
+  // d = false 
+  EVAL: D=0 (0) 
+  A=0 D=0 M=264
+314 @JGT_END_9 
+  EVAL: A=319 
+  A=319 D=0 M=0
+318 0;JMP 
+  EVAL: A=319 
+  A=319 D=0 M=0
+319 @SP 
+  // *esp (*val1) 
+  // (JGT_END_9) 
+  EVAL: A=0 
+  A=0 D=0 M=264
+320 A=M 
+  // [esp] ([val1]) 
+  EVAL: A=264 (264) 
+  A=264 D=0 M=32766
+321 M=D 
+  // [esp] = eq result 
+  EVAL: M=0 (0) 
+  A=264 D=0 M=0
+322 @SP 
+  // *esp 
+  EVAL: A=0 
+  A=0 D=0 M=264
+323 M=M+1 
+  // *esp++ 
+  EVAL: M=265 (264+1) 
+  A=0 D=0 M=265
+324 @57 
+  // push constant 57 
+  EVAL: A=57 
+  A=57 D=0 M=0
+325 D=A 
+  EVAL: D=57 (57) 
+  A=57 D=57 M=0
+326 @SP 
+  EVAL: A=0 
+  A=0 D=57 M=265
+327 A=M 
+  EVAL: A=265 (265) 
+  A=265 D=57 M=32766
+328 M=D 
+  EVAL: M=57 (57) 
+  A=265 D=57 M=57
+329 @SP 
+  EVAL: A=0 
+  A=0 D=57 M=265
+330 M=M+1 
+  EVAL: M=266 (265+1) 
+  A=0 D=57 M=266
+331 @31 
+  // push constant 31 
+  EVAL: A=31 
+  A=31 D=57 M=0
+332 D=A 
+  EVAL: D=31 (31) 
+  A=31 D=31 M=0
+333 @SP 
+  EVAL: A=0 
+  A=0 D=31 M=266
+334 A=M 
+  EVAL: A=266 (266) 
+  A=266 D=31 M=0
+335 M=D 
+  EVAL: M=31 (31) 
+  A=266 D=31 M=31
+336 @SP 
+  EVAL: A=0 
+  A=0 D=31 M=266
+337 M=M+1 
+  EVAL: M=267 (266+1) 
+  A=0 D=31 M=267
+338 @53 
+  // push constant 53 
+  EVAL: A=53 
+  A=53 D=31 M=0
+339 D=A 
+  EVAL: D=53 (53) 
+  A=53 D=53 M=0
+340 @SP 
+  EVAL: A=0 
+  A=0 D=53 M=267
+341 A=M 
+  EVAL: A=267 (267) 
+  A=267 D=53 M=0
+342 M=D 
+  EVAL: M=53 (53) 
+  A=267 D=53 M=53
+343 @SP 
+  EVAL: A=0 
+  A=0 D=53 M=267
+344 M=M+1 
+  EVAL: M=268 (267+1) 
+  A=0 D=53 M=268
+345 @SP 
+  // add 
+  EVAL: A=0 
+  A=0 D=53 M=268
+346 M=M-1 
+  EVAL: M=267 (268-1) 
+  A=0 D=53 M=267
+347 A=M 
+  EVAL: A=267 (267) 
+  A=267 D=53 M=53
+348 D=M 
+  EVAL: D=53 (53) 
+  A=267 D=53 M=53
+349 @SP 
+  EVAL: A=0 
+  A=0 D=53 M=267
+350 M=M-1 
+  EVAL: M=266 (267-1) 
+  A=0 D=53 M=266
+351 A=M 
+  EVAL: A=266 (266) 
+  A=266 D=53 M=31
+352 M=D+M 
+  EVAL: M=84 (53+31) 
+  A=266 D=53 M=84
+353 @SP 
+  EVAL: A=0 
+  A=0 D=53 M=266
+354 M=M+1 
+  EVAL: M=267 (266+1) 
+  A=0 D=53 M=267
+355 @112 
+  // push constant 112 
+  EVAL: A=112 
+  A=112 D=53 M=0
+356 D=A 
+  EVAL: D=112 (112) 
+  A=112 D=112 M=0
+357 @SP 
+  EVAL: A=0 
+  A=0 D=112 M=267
+358 A=M 
+  EVAL: A=267 (267) 
+  A=267 D=112 M=53
+359 M=D 
+  EVAL: M=112 (112) 
+  A=267 D=112 M=112
+360 @SP 
+  EVAL: A=0 
+  A=0 D=112 M=267
+361 M=M+1 
+  EVAL: M=268 (267+1) 
+  A=0 D=112 M=268
+362 @SP 
+  // sub 
+  EVAL: A=0 
+  A=0 D=112 M=268
+363 M=M-1 
+  EVAL: M=267 (268-1) 
+  A=0 D=112 M=267
+364 A=M 
+  EVAL: A=267 (267) 
+  A=267 D=112 M=112
+365 D=M 
+  EVAL: D=112 (112) 
+  A=267 D=112 M=112
+366 @SP 
+  EVAL: A=0 
+  A=0 D=112 M=267
+367 M=M-1 
+  EVAL: M=266 (267-1) 
+  A=0 D=112 M=266
+368 A=M 
+  EVAL: A=266 (266) 
+  A=266 D=112 M=84
+369 M=M-D 
+  EVAL: M=-28 (84-112) 
+  A=266 D=112 M=-28
+370 @SP 
+  EVAL: A=0 
+  A=0 D=112 M=266
+371 M=M+1 
+  EVAL: M=267 (266+1) 
+  A=0 D=112 M=267
+372 @SP 
+  // neg 
+  EVAL: A=0 
+  A=0 D=112 M=267
+373 M=M-1 
+  EVAL: M=266 (267-1) 
+  A=0 D=112 M=266
+374 A=M 
+  EVAL: A=266 (266) 
+  A=266 D=112 M=-28
+375 M=-M 
+  EVAL: M=28 (--28) 
+  A=266 D=112 M=28
+376 @SP 
+  EVAL: A=0 
+  A=0 D=112 M=266
+377 M=M+1 
+  EVAL: M=267 (266+1) 
+  A=0 D=112 M=267
+378 @SP 
+  // and 
+  EVAL: A=0 
+  A=0 D=112 M=267
+379 M=M-1 
+  EVAL: M=266 (267-1) 
+  A=0 D=112 M=266
+380 A=M 
+  EVAL: A=266 (266) 
+  A=266 D=112 M=28
+381 D=M 
+  EVAL: D=28 (28) 
+  A=266 D=28 M=28
+382 @SP 
+  EVAL: A=0 
+  A=0 D=28 M=266
+383 M=M-1 
+  EVAL: M=265 (266-1) 
+  A=0 D=28 M=265
+384 A=M 
+  EVAL: A=265 (265) 
+  A=265 D=28 M=57
+385 M=D&M 
+  EVAL: M=24 (28&57) 
+  A=265 D=28 M=24
+386 @SP 
+  EVAL: A=0 
+  A=0 D=28 M=265
+387 M=M+1 
+  EVAL: M=266 (265+1) 
+  A=0 D=28 M=266
+388 @82 
+  // push constant 82 
+  EVAL: A=82 
+  A=82 D=28 M=0
+389 D=A 
+  EVAL: D=82 (82) 
+  A=82 D=82 M=0
+390 @SP 
+  EVAL: A=0 
+  A=0 D=82 M=266
+391 A=M 
+  EVAL: A=266 (266) 
+  A=266 D=82 M=28
+392 M=D 
+  EVAL: M=82 (82) 
+  A=266 D=82 M=82
+393 @SP 
+  EVAL: A=0 
+  A=0 D=82 M=266
+394 M=M+1 
+  EVAL: M=267 (266+1) 
+  A=0 D=82 M=267
+395 @SP 
+  // or 
+  EVAL: A=0 
+  A=0 D=82 M=267
+396 M=M-1 
+  EVAL: M=266 (267-1) 
+  A=0 D=82 M=266
+397 A=M 
+  EVAL: A=266 (266) 
+  A=266 D=82 M=82
+398 D=M 
+  EVAL: D=82 (82) 
+  A=266 D=82 M=82
+399 @SP 
+  EVAL: A=0 
+  A=0 D=82 M=266
+400 M=M-1 
+  EVAL: M=265 (266-1) 
+  A=0 D=82 M=265
+401 A=M 
+  EVAL: A=265 (265) 
+  A=265 D=82 M=24
+402 M=M|D 
+  EVAL: M=90 (24|82) 
+  A=265 D=82 M=90
+403 @SP 
+  EVAL: A=0 
+  A=0 D=82 M=265
+404 M=M+1 
+  EVAL: M=266 (265+1) 
+  A=0 D=82 M=266
+405 @SP 
+  // not 
+  EVAL: A=0 
+  A=0 D=82 M=266
+406 M=M-1 
+  EVAL: M=265 (266-1) 
+  A=0 D=82 M=265
+407 A=M 
+  EVAL: A=265 (265) 
+  A=265 D=82 M=90
+408 M=!M 
+  EVAL: M=-91 (~90) 
+  A=265 D=82 M=-91
+409 @SP 
+  EVAL: A=0 
+  A=0 D=82 M=265
+410 M=M+1 
+  EVAL: M=266 (265+1) 
+  A=0 D=82 M=266

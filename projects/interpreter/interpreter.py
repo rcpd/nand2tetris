@@ -6,11 +6,18 @@ import tester
 import translator
 
 
+def dump_call_tree(call_tree, debug_msg):
+    for i, func in enumerate(call_tree, start=1):
+        debug_msg += "  " + ("-" * i) + func + "\n"
+    return debug_msg
+
+
 def run(asm_filepath, tst_params=None, debug=False):
     # TODO: (week 6-8) all asm/tst/cmp/out/vms parsed/compiled/executed/passed
     # TODO: translator segment/stack/call tree mapping
     # TODO: doc strings
     # TODO: (future) write a HDL module for interpreter?
+    debug_log = []
 
     # initialize hardware
     ram = [0] * 32768
@@ -108,6 +115,7 @@ def run(asm_filepath, tst_params=None, debug=False):
 
     # runtime parsing
     cycle = 0
+    call_tree = []
     while cycle < hw["MAX"] and hw["PC"] < len(hw["ROM"]["raw"]):
         assignment = False
         raw_cmd = hw["ROM"]["raw"][hw["PC"]]
@@ -238,14 +246,36 @@ def run(asm_filepath, tst_params=None, debug=False):
             # show the state of the registers post-execute
             debug_msg += " // A=%s D=%s M=%s" % (hw["A"], hw["D"], hw["M"])
 
-            if "// call" in debug_cmd:
-                # TODO: flesh out call stack implmentation
-                debug_msg += "// ENTERING CALL"
+            if "// call " in debug_cmd:
+                callee = debug_cmd.split("// call ")[1].split()[0]
+                # TODO: clean up call tree debug
+                debug_msg += "// CALL: ADD TO CALL TREE (PRE-CALL)\n"
+                debug_msg = dump_call_tree(call_tree, debug_msg)
 
-            print(debug_msg.replace("//", "\n ").replace("~~", "\n  //"))
+                debug_msg += "// CALL: ADD TO CALL TREE (POST-CALL)\n"
+                call_tree.append(callee)
+                debug_msg = dump_call_tree(call_tree, debug_msg)
+
+            if "// return //" in debug_cmd:
+                debug_msg += "// RETURN: REMOVE FROM CALL TREE (PRE-RETURN)\n"
+                debug_msg = dump_call_tree(call_tree, debug_msg)
+
+                debug_msg += "// RETURN: REMOVE FROM CALL TREE (POST-RETURN)\n"
+                try:
+                    call_tree.pop()
+                except IndexError:
+                    if asm_filepath != '../08/FunctionCalls/SimpleFunction/SimpleFunction.asm':
+                        raise
+
+                debug_msg = dump_call_tree(call_tree, debug_msg)
+
+            debug_msg = debug_msg.replace("//", "\n ").replace("~~", "\n  //")
+            print(debug_msg)
+            debug_log.append(debug_msg)
 
         cycle += 1  # always advance clock cycle
 
+    # program end
     if hw["PC"] == len(hw["ROM"]["raw"]):
         if debug:
             print("EOF reached: %s" % asm_filepath)
@@ -256,6 +286,8 @@ def run(asm_filepath, tst_params=None, debug=False):
         # PC will jump off into empty ROM at end of SimpleFunction test
         if "SimpleFunction" not in asm_filepath:
             raise RuntimeError("Interpreter: Unexpected exit")
+    if len(call_tree) >= 1:
+        raise RuntimeError("Interpreter: Elements still exist in call tree at program exit")
 
     # evaluate results
     result_dict = {}
@@ -272,6 +304,9 @@ def run(asm_filepath, tst_params=None, debug=False):
                 cmp_file_contents = cmp_file.read()
             with open(asm_filepath.replace(".asm", ".out"), "w") as out_file:
                 out_file.write(cmp_file_contents)
+            with open(asm_filepath.replace(".asm", ".debug"), "w") as debug_file:
+                for line in debug_log:
+                    debug_file.write(line+'\n')
         else:
             raise RuntimeError("Interpreter: Test results did not match for %s" % asm_filepath)
 
