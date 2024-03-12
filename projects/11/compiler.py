@@ -87,6 +87,12 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
             if input_list[j][1] not in class_dict[class_name]:
                 class_dict[class_name][input_list[j][1]] = {"kind": input_list[j-2][1], "type": input_list[j-1][1],
                                                             "args": {}, "index_dict": {}, "label_dict": {}}
+            if input_list[j-2][1] == "method":
+                # assign space for the implicit "this" argument for class methods
+                class_dict[class_name][func_name]["index_dict"]["argument"] = 0
+                class_dict[class_name][func_name]["args"]["this"] = \
+                    {"kind": "argument", "type": "this", "index": 0}
+
             # define function arguments
             if input_list[j+1][1] == "(":
                 while input_list[j+2][1] != ")":
@@ -109,12 +115,26 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
         else:
             raise RuntimeError
 
-    if not pre:
+    else:
         if "local" in class_dict[class_name][input_list[i][1]]["index_dict"]:
-            store_pcode(pcode, "\n%s %s.%s %s" % (input_list[i-2][1], class_name, input_list[i][1],
-                                                  class_dict[class_name][input_list[i][1]]["index_dict"]["local"]+1))
+            num_params = class_dict[class_name][input_list[i][1]]["index_dict"]["local"]+1
         else:
-            store_pcode(pcode, "\n%s %s.%s %s" % (input_list[i-2][1], class_name, input_list[i][1], 0))
+            num_params = 0
+
+        # declaration
+        store_pcode(pcode, "\n%s %s.%s %s" % (input_list[i-2][1], class_name, input_list[i][1], num_params))
+
+        if input_list[j-2][1] == "constructor":
+            # allocate space on heap
+            store_pcode(pcode, "push %s // allocate object + params on heap" % num_params)
+            store_pcode(pcode, "call Memory.alloc 1")
+            store_pcode(pcode, "pop pointer 0 // update 'this' to heap address")
+
+        elif input_list[j-2][1] == "method":
+            # move pointer to current object (implicit "this" argument)
+            store_pcode(pcode, "push argument 0")
+            store_pcode(pcode, "pop pointer 0 // update 'this' to object for method call")
+
     return pcode, class_dict, func_name
 
 
@@ -251,7 +271,7 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name, 
         elif input_list[i][1] == ",":
             k += 1
         elif input_list[i][0] == "keyword" and input_list[i][1] == "this":
-            store_pcode(pcode, "push pointer 0")
+            store_pcode(pcode, "push pointer 0 // this")
             k += 1
         else:
             raise RuntimeError(input_list[i])
@@ -279,7 +299,10 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
                     var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
                 except KeyError:
                     var = class_dict[class_name]["args"][input_list[i+1][1]]
-                store_pcode(pcode, "pop %s %s // %s" % (var["kind"], var["index"], input_list[i+1][1]))
+                if var["kind"] != "field":
+                    store_pcode(pcode, "pop %s %s // %s =" % (var["kind"], var["index"], input_list[i+1][1]))
+                else:
+                    store_pcode(pcode, "pop %s %s // %s =" % ("this", var["index"], input_list[i+1][1]))
             else:
                 raise RuntimeError(input_list[i+1])
         else:
@@ -321,6 +344,21 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
             if class_func or input_list[j+1][1] == "(":
                 # parse function params
                 if class_func:
+                    # push implicit "this" argument for class methods
+                    var = None
+                    if input_list[j][1] in class_dict[class_name][func_name]["args"]:  # local
+                        var = class_dict[class_name][func_name]["args"][input_list[j][1]]
+                    elif input_list[j][1] in class_dict[class_name]["args"]:  # class attr
+                        var = class_dict[class_name]["args"][input_list[j][1]]
+                    else:  # non-local call
+                        # TODO: does this still need a this push?
+                        call_type = input_list[j][1] + input_list[j+1][1] + input_list[j+2][1]
+                        store_pcode(pcode, "// static call %s " % call_type)
+
+                    if var is not None:
+                        store_pcode(pcode, "push %s %s // %s (implicit this push)" % (var["kind"], var["index"],
+                                                                                      input_list[i][1]))
+
                     if input_list[j+4][1] != ")":
                         pcode, proc = compile_expression(pcode, input_list, j+4, class_dict, class_name, func_name)
                 else:
@@ -342,8 +380,15 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
 
                 # compile call
                 if class_func:
-                    store_pcode(pcode, "call %s.%s %s" % (input_list[j][1], input_list[j+2][1], num_params))
+                    try:
+                        # lookup class for object
+                        obj_type = class_dict[class_name][func_name]["args"][input_list[j][1]]["type"]
+                        store_pcode(pcode, "call %s.%s %s" % (obj_type, input_list[j+2][1], num_params))
+                    except KeyError:
+                        # external module / not in scope
+                        store_pcode(pcode, "call %s.%s %s" % (input_list[j][1], input_list[j+2][1], num_params))
                 else:
+                    # TODO: lookup/convert this to be fully qualified
                     store_pcode(pcode, "call %s %s" % (input_list[j][1], num_params))
                 return pcode, class_dict
             else:

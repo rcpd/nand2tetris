@@ -1,6 +1,7 @@
 // class Main
 
 function Main.main 0
+// static call Output.printInt 
 push constant 2
 push constant 3
 call Math.multiply 2
