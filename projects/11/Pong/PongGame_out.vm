@@ -314,3 +314,5 @@ push local 0
 call Ball.bounce 2
 pop temp 0
 label IF_FALSE0
+push constant 0
+return
