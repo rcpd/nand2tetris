@@ -6,27 +6,27 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-5) pop pointer 0
 @3 // pop pointer 0
 D=A
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-7) push constant 3040
 @3040 // push constant 3040
@@ -35,27 +35,27 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-9) pop pointer 1
 @3 // pop pointer 1
 D=A
-@1
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-11) push constant 32
 @32 // push constant 32
@@ -64,27 +64,27 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-13) pop this 2
 @THIS // pop this 2
 D=M
-@2
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-15) push constant 46
 @46 // push constant 46
@@ -93,27 +93,27 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-17) pop that 6
 @THAT // pop that 6
 D=M
-@6
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@6 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-19) push pointer 0
 @3 // push pointer 0
@@ -125,7 +125,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-21) push pointer 1
 @3 // push pointer 1
@@ -137,7 +137,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-23) add
 @SP // add
@@ -161,7 +161,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-27) sub
 @SP // sub
@@ -185,7 +185,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-31) add
 @SP // add

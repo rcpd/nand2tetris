@@ -7,14 +7,18 @@ import translator
 
 
 def dump_call_tree(call_tree, debug_msg):
-    for i, func in enumerate(call_tree, start=1):
-        debug_msg += "  " + ("-" * i) + func + "\n"
+    if len(call_tree) == 0:
+        debug_msg += "  <nil>"
+    else:
+        for i, func in enumerate(call_tree, start=1):
+            debug_msg += "  " + ("-" * i) + func + "\n"
     return debug_msg
 
 
-def run(asm_filepath, tst_params=None, debug=False):
+def run(asm_filepath, static_dict=None, tst_params=None, debug=False):
     # TODO: (week 6-8) all asm/tst/cmp/out/vms parsed/compiled/executed/passed
-    # TODO: translator segment/stack/call tree mapping
+    # TODO: translator finish stack mapping: other stack manip(stacksize), functions(stackframes)
+    # TODO: move remaining python comments to asm: associate all asm with function, check linebreaks
     # TODO: doc strings
     # TODO: (future) write a HDL module for interpreter?
     debug_log = []
@@ -116,6 +120,7 @@ def run(asm_filepath, tst_params=None, debug=False):
     # runtime parsing
     cycle = 0
     call_tree = []
+    stacksize = 0
     while cycle < hw["MAX"] and hw["PC"] < len(hw["ROM"]["raw"]):
         assignment = False
         raw_cmd = hw["ROM"]["raw"][hw["PC"]]
@@ -246,28 +251,60 @@ def run(asm_filepath, tst_params=None, debug=False):
             # show the state of the registers post-execute
             debug_msg += " // A=%s D=%s M=%s" % (hw["A"], hw["D"], hw["M"])
 
-            if "// call " in debug_cmd:
-                callee = debug_cmd.split("// call ")[1].split()[0]
-                # TODO: clean up call tree debug
-                debug_msg += "// CALL: ADD TO CALL TREE (PRE-CALL)\n"
-                debug_msg = dump_call_tree(call_tree, debug_msg)
+            # show the state of RAM registers
+            # TODO: map this to address_labels{} not literals
+            debug_msg += " R13=%s" % hw["RAM"][13]
+            debug_msg += " R14=%s" % hw["RAM"][14]
+            debug_msg += " R15=%s" % hw["RAM"][15]
 
-                debug_msg += "// CALL: ADD TO CALL TREE (POST-CALL)\n"
+            debug_msg += " // SP: %s" % hw["RAM"][0]
+            debug_msg += " LCL=%s" % hw["RAM"][1]
+            debug_msg += " ARG=%s" % hw["RAM"][2]
+            debug_msg += " THIS=%s" % hw["RAM"][3]
+            debug_msg += " THAT=%s" % hw["RAM"][4]
+            debug_msg += " // TEMP0-7: "
+            for i in range(5, 13):
+                debug_msg += "%s " % hw["RAM"][i]
+
+            # update & dump the call graph on call/return
+            if "// call " in debug_cmd:
+                debug_msg += "// CALL: call graph updated\n"
+                callee = debug_cmd.split("// call ")[1].split()[0]
                 call_tree.append(callee)
                 debug_msg = dump_call_tree(call_tree, debug_msg)
 
-            if "// return //" in debug_cmd:
-                debug_msg += "// RETURN: REMOVE FROM CALL TREE (PRE-RETURN)\n"
-                debug_msg = dump_call_tree(call_tree, debug_msg)
-
-                debug_msg += "// RETURN: REMOVE FROM CALL TREE (POST-RETURN)\n"
+            elif "// return //" in debug_cmd:
+                debug_msg += "// RETURN: call graph updated\n"
                 try:
                     call_tree.pop()
                 except IndexError:
+                    # SimpleFunction does not contain a call so will always break the index on return
                     if asm_filepath != '../08/FunctionCalls/SimpleFunction/SimpleFunction.asm':
                         raise
 
                 debug_msg = dump_call_tree(call_tree, debug_msg)
+
+            # display the stack (if values to display)
+            if "// stacksize++" in debug_cmd:
+                stacksize += 1
+            elif "// stacksize--" in debug_cmd:
+                stacksize -= 1
+            if stacksize:
+                debug_msg += "// STACK: "
+                sp = hw["RAM"][address_labels["SP"]]
+                for i in range(sp, sp+stacksize):
+                    debug_msg += "%s " % hw["RAM"][i]
+
+            # display the static segment if used
+            static_count = 0
+            if static_dict is not None:
+                for vm_file in static_dict:
+                    static_count += static_dict[vm_file][1]
+            if static_count:
+                debug_msg += "// STATICS: "
+                sp = address_labels["STATIC"]
+                for i in range(sp, sp+static_count):
+                    debug_msg += "%s " % hw["RAM"][i]
 
             debug_msg = debug_msg.replace("//", "\n ").replace("~~", "\n  //")
             print(debug_msg)
@@ -313,6 +350,7 @@ def run(asm_filepath, tst_params=None, debug=False):
 
 if __name__ == '__main__':
     # regular VM programs
+    # TODO: standardise paths
     _vm_dirpaths = [
         r'..\07\MemoryAccess\BasicTest',
         r'..\07\MemoryAccess\PointerTest',
@@ -362,9 +400,11 @@ if __name__ == '__main__':
     # debug_runs = [True, False]
     debug_runs = [True]
     # debug_runs = [False]
+    vm_static_dicts = {}
     for _debug in debug_runs:
         # transpile VM to ASM
-        translator.translate(_vm_dirpaths, _vm_bootstrap_paths, debug=False)
+        for _vm_dir in _vm_dirpaths:
+            vm_static_dicts[_vm_dir] = translator.translate(_vm_dir, _vm_bootstrap_paths, debug=False)
 
         # compile all ASM to HACK and binary match if available
         _asm_filepaths = vm_asm_filepaths + binary_asm_filepaths
@@ -381,4 +421,15 @@ if __name__ == '__main__':
             _cmp_filepath = _asm_filepath.replace(".asm", ".cmp")
             _tst_params = tester.load_tst(_tst_filepath, debug=False)
             _tst_params["compare"] = tester.load_cmp(_cmp_filepath, debug=False)
-            run(_asm_filepath, tst_params=_tst_params, debug=_debug)
+
+            # retrieve static_dict from translator run
+            _static_dict = None
+            for _vm_dir in _vm_dirpaths:
+                # TODO: standardise paths
+                if _vm_dir.replace("\\", "/") in _asm_filepath:
+                    _static_dict = vm_static_dicts[_vm_dir]
+
+            # execute
+            run(_asm_filepath, static_dict=_static_dict, tst_params=_tst_params, debug=_debug)
+
+

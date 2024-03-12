@@ -13,26 +13,26 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 // (-8) pop pointer 0
 @3 // pop pointer 0
 D=A
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-10) push constant 5000
 @5000 // push constant 5000
@@ -41,27 +41,27 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-12) pop pointer 1
 @3 // pop pointer 1
 D=A
-@1
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-15) call Sys.main 0
 (sys.Sys.main.1) // call Sys.main 0
@@ -73,7 +73,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 @sys.Sys.main.1 // push RIP
 D=A
 @SP
@@ -117,7 +117,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-21) push constant 0 // local(1) init
 @0 // push constant 0 // local(1) init
@@ -126,7 +126,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-23) push constant 0 // local(2) init
 @0 // push constant 0 // local(2) init
@@ -135,7 +135,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-25) push constant 0 // local(3) init
 @0 // push constant 0 // local(3) init
@@ -144,7 +144,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-27) push constant 0 // local(4) init
 @0 // push constant 0 // local(4) init
@@ -153,7 +153,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 @10 // increment RIP (SP-5+num_locals) by prologue_size (all the instructions added by call)
 D=A // d = 5+num_locals
 @SP // **esp
@@ -187,22 +187,22 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 // (-29) pop temp 1
 @5 // pop temp 1
 D=A
-@1
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-31) label LOOP
 (sys.LOOP) // label LOOP
@@ -221,26 +221,26 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 // (-41) pop pointer 0
 @3 // pop pointer 0
 D=A
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-43) push constant 5001
 @5001 // push constant 5001
@@ -249,27 +249,27 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-45) pop pointer 1
 @3 // pop pointer 1
 D=A
-@1
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-47) push constant 200
 @200 // push constant 200
@@ -278,27 +278,27 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-49) pop local 1
 @LCL // pop local 1
 D=M
-@1
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-51) push constant 40
 @40 // push constant 40
@@ -307,27 +307,27 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-53) pop local 2
 @LCL // pop local 2
 D=M
-@2
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@2 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-55) push constant 6
 @6 // push constant 6
@@ -336,27 +336,27 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-57) pop local 3
 @LCL // pop local 3
 D=M
-@3
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@3 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-59) push constant 123
 @123 // push constant 123
@@ -365,7 +365,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-62) call Sys.add12 1
 (sys.Sys.add12.2) // call Sys.add12 1
@@ -437,22 +437,22 @@ M=D // [LCL] = *SP-num_locals ([LCL])
 // (-64) pop temp 0
 @5 // pop temp 0
 D=A
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-66) push local 0
 @LCL // push local 0
@@ -464,7 +464,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-68) push local 1
 @LCL // push local 1
@@ -476,7 +476,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-70) push local 2
 @LCL // push local 2
@@ -488,7 +488,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-72) push local 3
 @LCL // push local 3
@@ -500,7 +500,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-74) push local 4
 @LCL // push local 4
@@ -512,7 +512,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-76) add
 @SP // add
@@ -567,22 +567,22 @@ M=M+1
 // (-86) pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 @ARG // pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 D=M
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 @ARG // *ARG[0] // return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
@@ -634,26 +634,26 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 // (-93) pop pointer 0
 @3 // pop pointer 0
 D=A
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-95) push constant 5002
 @5002 // push constant 5002
@@ -662,27 +662,27 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-97) pop pointer 1
 @3 // pop pointer 1
 D=A
-@1
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@1 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 
 // (-99) push argument 0
 @ARG // push argument 0
@@ -694,7 +694,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-101) push constant 12
 @12 // push constant 12
@@ -703,7 +703,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-103) add
 @SP // add
@@ -722,22 +722,22 @@ M=M+1
 // (-107) pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 @ARG // pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 D=M
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 @ARG // *ARG[0] // return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point

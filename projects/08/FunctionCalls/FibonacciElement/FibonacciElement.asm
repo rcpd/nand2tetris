@@ -13,7 +13,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 // (-9) call Main.fibonacci 1 // computes the 4th fibonacci element
 (sys.Main.fibonacci.1) // call Main.fibonacci 1 // computes the 4th fibonacci element
 @sys.Main.fibonacci.1 // call Main.fibonacci // push RIP
@@ -101,7 +101,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 // (-21) push constant 2
 @2 // push constant 2
 D=A
@@ -109,7 +109,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-23) lt // checks if n<2
 @SP // *esp // lt // checks if n<2
@@ -174,29 +174,29 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-37) return
 
 // (-39) pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 @ARG // pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 D=M
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 @ARG // *ARG[0] // return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
@@ -251,7 +251,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-46) push constant 2
 @2 // push constant 2
@@ -260,7 +260,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-48) sub
 @SP // sub
@@ -351,7 +351,7 @@ D=M
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-55) push constant 1
 @1 // push constant 1
@@ -360,7 +360,7 @@ D=A
 A=M
 M=D
 @SP
-M=M+1
+M=M+1 // stacksize++
 
 // (-57) sub
 @SP // sub
@@ -458,22 +458,22 @@ M=M+1
 // (-66) pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 @ARG // pop argument 0 // return // move result to ARG[0] (soon to be last stack item)
 D=M
-@0
-D=D+A
-@SP
-A=M
-M=D
-@SP
-M=M-1
-A=M
-D=M
-@SP
-M=M+1
-A=M
-A=M
-M=D
-@SP
-M=M-1
+@0 // retrieve the *dst (segment+offset) and temporarily store it at *esp // offset
+D=D+A // d = [asm_segment+offset] (*dst)
+@SP // *esp
+A=M // [esp]
+M=D // [esp] = *dst
+@SP // retrieve the *src pointer from esp-1 // *esp
+M=M-1 // *esp-- (*src)
+A=M // [src]
+D=M // d = [src]
+@SP // restore esp (*esp)
+M=M+1 // *esp++ (**dst)
+A=M // copy [src] to [dst] // *dst
+A=M // [dst]
+M=D // [dst] = [src] (pop)
+@SP // *esp
+M=M-1 // *esp-- (*src) // stacksize--
 @ARG // *ARG[0] // return: discard the callee stack leaving result in ARG[0] and SP at ARG[0]+1
 D=M+1 // d = *ARG[0]+1 // whether this is ARG[1] (2+ args) or RIP doesn't matter
 @SP // *esp // as the intent is to discard everything after result at this point
