@@ -298,6 +298,8 @@ def compile_return(pcode, class_dict, class_name, func_name):
 
     if class_dict[class_name][func_name]["type"] == "void":
         store_pcode(pcode, "push constant 0 // void return")
+    elif class_dict[class_name][func_name]["type"] == "int":
+        pass
     else:
         raise NotImplementedError(class_dict[class_name][func_name]["type"])
     store_pcode(pcode, "\nreturn")
@@ -592,7 +594,7 @@ def main(filepath, debug=False):
                                                    parent_obj=parent_obj, child_func=child_func)
 
                     # buffer while/if expressions
-                    elif statement in ('while', 'if'):
+                    elif statement in ('while', 'if', 'return'):
                         pcode, exp_buffer, parent_obj, child_func = \
                             expression_handler(pcode, statement, exp_buffer, class_dict=class_dict,
                                                identifier=identifier, class_name=class_name, func_name=func_name)
@@ -689,7 +691,6 @@ def main(filepath, debug=False):
                     pcode = pop_buffer(pcode, exp_buffer)  # empty the buffer
 
                     if statement == 'return':
-                        # TODO: if returning a value it needs to be processed before this
                         pcode, class_dict, num_args, while_count, if_count, exp_buffer = \
                             compile_statement(pcode=pcode, class_dict=class_dict, class_name=class_name,
                                               func_name=func_name, statement=statement, while_count=while_count,
@@ -800,4 +801,4 @@ if __name__ == '__main__':
                     print("%s mismatch after line %s/%s" % (wip, index, strict_matches[match]))
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
-    # TODO: return value
+    # TODO: multiple params in function dec
