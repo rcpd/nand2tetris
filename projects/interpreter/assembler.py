@@ -111,7 +111,7 @@ def assemble(asm_filepath, debug=False):
                 binary_file.append(address)
                 line += 1
             else:
-                raise Exception("%s: Parsed %s bits worth of instructions (a command): %s >> %s"
+                raise Exception("Interpreter: %s: Parsed %s bits worth of instructions (a command): %s >> %s"
                                 % (asm_filepath, len(address), instruction, address))
 
         elif c_command:
@@ -219,7 +219,7 @@ def assemble(asm_filepath, debug=False):
                 binary_file.append(binary_line)
                 line += 1
             else:
-                raise Exception("%s: Parsed %s bits worth of instructions (c command): %s >> %s"
+                raise Exception("Interpreter: %s: Parsed %s bits worth of instructions (c command): %s >> %s"
                                 % (asm_filepath, len(binary_line), instruction, binary_line))
 
     output_filepath = asm_filepath.replace(".asm", ".hack")
@@ -244,7 +244,7 @@ def assemble(asm_filepath, debug=False):
                         if debug:
                             print('target : ' + sol_line[0:3]+" "+sol_line[3]+" "+sol_line[4:10] +
                                   " "+sol_line[10:13]+" "+sol_line[13:])
-                        raise Exception('%s: mismatch on line %s' % (asm_filepath, i))
+                        raise Exception('Interpreter: %s: mismatch on line %s' % (asm_filepath, i))
             print('Assembler: %s Complete (no errors / matches solution file)' % asm_filepath)
 
     else:
@@ -259,7 +259,7 @@ def assemble(asm_filepath, debug=False):
 
 
 if __name__ == '__main__':
-    file_list = [
+    _asm_filepaths = [
         "../06/add/add.asm",
         "../06/max/max.asm",
         "../06/max/maxL.asm",
@@ -284,5 +284,5 @@ if __name__ == '__main__':
 
     debug_runs = [True, False]
     for debug in debug_runs:
-        for _asm_filepath in file_list:
+        for _asm_filepath in _asm_filepaths:
             assemble(_asm_filepath, debug=debug)
