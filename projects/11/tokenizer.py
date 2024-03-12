@@ -76,14 +76,23 @@ def parse(word, keyword, strings, tokens, debug=False):
 
 def main(debug=False):
     jack_filepaths = [
-        r"Seven\Main.jack",
+        r"..\09\Average\Main.jack",
+        r"..\09\Fraction\Main.jack",
+        r"..\09\Fraction\Fraction.jack",
+        r"..\09\HelloWorld\Main.jack",
+        r"..\09\List\Main.jack",
+        r"..\09\List\List.jack",
+        r"..\09\Square\Main.jack",
+        r"..\09\Square\Square.jack",
+        r"..\09\Square\SquareGame.jack",
         r"..\10\ArrayTest\Main.jack",
         r"..\10\ExpressionLessSquare\Main.jack",
         r"..\10\ExpressionLessSquare\Square.jack",
         r"..\10\ExpressionLessSquare\SquareGame.jack",
         r"..\10\Square\Main.jack",
         r"..\10\Square\Square.jack",
-        r"..\10\Square\SquareGame.jack"
+        r"..\10\Square\SquareGame.jack",
+        r"..\11\Seven\Main.jack",
     ]
 
     for filepath in jack_filepaths:
