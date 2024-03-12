@@ -27,7 +27,7 @@ M=D
 M=M+1
 
 // (-9) pop static 8
-@16
+@16 // static + src segment offset (..\07\MemoryAccess\StaticTest\StaticTest.vm)
 D=A
 @8
 D=D+A
@@ -47,7 +47,7 @@ M=D
 M=M-1
 
 // (-11) pop static 3
-@16
+@16 // static + src segment offset (..\07\MemoryAccess\StaticTest\StaticTest.vm)
 D=A
 @3
 D=D+A
@@ -67,7 +67,7 @@ M=D
 M=M-1
 
 // (-13) pop static 1
-@16
+@16 // static + src segment offset (..\07\MemoryAccess\StaticTest\StaticTest.vm)
 D=A
 @1
 D=D+A
@@ -87,7 +87,7 @@ M=D
 M=M-1
 
 // (-15) push static 3
-@16
+@16 // static + src segment offset (..\07\MemoryAccess\StaticTest\StaticTest.vm)
 D=A
 @3
 A=D+A
@@ -99,7 +99,7 @@ M=D
 M=M+1
 
 // (-17) push static 1
-@16
+@16 // static + src segment offset (..\07\MemoryAccess\StaticTest\StaticTest.vm)
 D=A
 @1
 A=D+A
@@ -123,7 +123,7 @@ M=M-D
 M=M+1
 
 // (-21) push static 8
-@16
+@16 // static + src segment offset (..\07\MemoryAccess\StaticTest\StaticTest.vm)
 D=A
 @8
 A=D+A

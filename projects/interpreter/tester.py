@@ -149,8 +149,8 @@ if __name__ == '__main__':
     ]
 
     debug_runs = [True, False]
-    for debug in debug_runs:
+    for _debug in debug_runs:
         for _tst_filepath in tst_filepaths:
             _cmp_filepath = _tst_filepath.replace("VME", "").replace(".tst", ".cmp")
-            _tst_params = load_tst(_tst_filepath, debug=debug)
-            _tst_params["compare"] = load_cmp(_cmp_filepath, debug=debug)
+            _tst_params = load_tst(_tst_filepath, debug=_debug)
+            _tst_params["compare"] = load_cmp(_cmp_filepath, debug=_debug)
