@@ -7,6 +7,7 @@ import translator
 import subprocess
 import tokenizer
 import analyzer
+import compiler
 
 
 def dump_call_tree(call_tree, debug_msg):
@@ -387,9 +388,9 @@ if __name__ == '__main__':
         r"..\projects\09\Square\Square.jack",
         r"..\projects\09\Square\SquareGame.jack",
         r"..\projects\10\ArrayTest\Main.jack",
-        # r"..\10\ExpressionLessSquare\Main.jack",  # nonsense code that doesn't / shouldn't compile or run
-        # r"..\10\ExpressionLessSquare\Square.jack",  # nonsense code that doesn't / shouldn't compile or run
-        # r"..\10\ExpressionLessSquare\SquareGame.jack",  # nonsense code that doesn't / shouldn't compile or run
+        # r"..\projects\10\ExpressionLessSquare\Main.jack",  # nonsense code that shouldn't compile or run
+        # r"..\projects\10\ExpressionLessSquare\Square.jack",
+        # r"..\projects\10\ExpressionLessSquare\SquareGame.jack",
         r"..\projects\10\Square\Main.jack",
         r"..\projects\10\Square\Square.jack",
         r"..\projects\10\Square\SquareGame.jack",
@@ -405,6 +406,58 @@ if __name__ == '__main__':
         r"..\projects\11\Square\Square.jack",
         r"..\projects\11\Square\SquareGame.jack",
     ]
+
+    jack_filepath_lists = [  # TODO: projects 1-11 accounted for, included in interpreter/tokenizer/analyzer
+        [r"..\projects\09\Average\Main.jack"],
+        [r"..\projects\09\Fraction\Main.jack",
+         r"..\projects\09\Fraction\Fraction.jack"],
+        [r"..\projects\09\HelloWorld\Main.jack"],
+        [r"..\projects\09\List\Main.jack",
+         r"..\projects\09\List\List.jack"],
+        [r"..\projects\09\Square\Main.jack",
+         r"..\projects\09\Square\Square.jack",
+         r"..\projects\09\Square\SquareGame.jack"],
+        [r"..\projects\10\ArrayTest\Main.jack"],
+        # [r"..\projects\10\ExpressionLessSquare\Main.jack",  # nonsense code that shouldn't compile or run
+        #  r"..\projects\10\ExpressionLessSquare\Square.jack",
+        #  r"..\projects\10\ExpressionLessSquare\SquareGame.jack"],
+        [r"..\projects\10\Square\Main.jack",
+         r"..\projects\10\Square\Square.jack",
+         r"..\projects\10\Square\SquareGame.jack"],
+        [r"..\projects\11\Average\Main.jack"],
+        [r"..\projects\11\ComplexArrays\Main.jack"],
+        [r"..\projects\11\ConvertToBin\Main.jack"],
+        [r"..\projects\11\Pong\Ball.jack",
+         r"..\projects\11\Pong\Bat.jack",
+         r"..\projects\11\Pong\Main.jack",
+         r"..\projects\11\Pong\PongGame.jack"],
+        [r"..\projects\11\Seven\Main.jack"],
+        [r"..\projects\11\Square\Main.jack",
+         r"..\projects\11\Square\Square.jack",
+         r"..\projects\11\Square\SquareGame.jack"],
+    ]
+
+    # enforce matching of compiler against course compiler
+    jack_matches = {  # TODO: projects 1-11 accounted for
+        # all
+        r"..\projects\09\Average\Main.vm": 149,
+        r"..\projects\11\Seven\Main.vm": 10,
+        r"..\projects\11\ConvertToBin\Main.vm": 109,
+        r"..\projects\09\Fraction\Main.vm": 18,
+        r"..\projects\09\Fraction\Fraction.vm": 116,
+        r"..\projects\09\HelloWorld\Main.vm": 33,
+        r"..\projects\09\List\Main.vm": 19,
+        r"..\projects\09\List\List.vm": 65,
+        r"..\projects\09\Square\Main.vm": 11,
+        r"..\projects\09\Square\Square.vm": 304,
+        r"..\projects\09\Square\SquareGame.vm": 179,
+        r"..\projects\10\ArrayTest\Main.vm": 183,
+        r"..\projects\11\Pong\Bat.vm": 207,
+        r"..\projects\11\Pong\Ball.vm": 444,
+        r"..\projects\11\Pong\Main.vm": 13,
+        r"..\projects\11\Pong\PongGame.vm": 318,
+        r"..\projects\11\ComplexArrays\Main.vm": 702,
+    }
 
     # VM programs (translator only, interpreted below) # TODO: projects 1-11 accounted for, included in translator
     _vm_dirpaths = [
@@ -580,9 +633,12 @@ if __name__ == '__main__':
             tokenizer.main(_filepath, debug=False)
             analyzer.main(_filepath, debug=False)
 
-        # compile Jack to VM
+        # compile Jack to VM (course compiler)
         for jack_dir in jack_dirpaths:
             subprocess.run([r"..\tools\JackCompiler.bat", jack_dir])
+
+        # compile Jack to VM (match against course compiler)
+        compiler._compile(jack_filepath_lists, jack_matches)
 
         # translate VM to ASM
         for _vm_dir in _vm_dirpaths:
@@ -671,9 +727,9 @@ if __name__ == '__main__':
                             raise RuntimeError("%s mismatch after line %s" % (out_file, index))
                     line += 1
 
+    # TODO: collect/test/print output from course compiler run via interpreter
+    # TODO: cleanup output for compiler in interpreter run
     # TODO: map dependencies for OS libraries
-    # TODO: add integration for compiler (jack_filepaths list version)
-    # TODO: add integration for Project 9-11 compile + compare Jack VM/XML files
     # TODO: add integration for Project 9-11 translate/execute/assemble ASM > HACK (integration test)
     # TODO: Project 12: Implement the OS libraries in Jack, compile/test (test programs included)
 
