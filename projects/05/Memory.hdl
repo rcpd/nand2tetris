@@ -23,9 +23,29 @@
  */
 
 CHIP Memory {
-    IN in[16], load, address[15];
+    IN in[16], load, address[15]; //0=LSB,14=MSB
     OUT out[16];
-
+	// RAM(L)    = 00000 or 000 0000 0000 0000 
+	// RAM(H)    = 16383 or 011 1111 1111 1111 
+	// SCREEN(L) = 16384 or 100 0000 0000 0000
+	// SCREEN(H) = 24575 or 101 1111 1111 1111
+	// KEYB      = 24576 or 110 0000 0000 0000
+	
     PARTS:
-    // Put your code here:
+	// determine which chip is being addressed from 2xMSB in address
+	// A/B = RAM, C = SCREEN, D = KEYBOARD
+	DMux4Way(in=true,sel[0]=address[13],sel[1]=address[14],a=aOut,b=bOut,c=cOut);
+	Or(a=aOut,b=bOut,out=abOut);
+	
+	// determine what chip, if any, will load
+	And(a=abOut,b=load,out=ramLoad); 
+	And(a=cOut,b=load,out=screenLoad);
+	
+	// process memory maps: selective load, always read
+    RAM16K(in=in,load=ramLoad,address=address[0..13],out=ramOut);
+	Screen(in=in,load=screenLoad,address=address[0..12],out=screenOut); 
+	Keyboard(out=keyOut);
+	
+	// select which out gets expressed
+	Mux4Way16(a=ramOut,b=ramOut,c=screenOut,d=keyOut,sel[0]=address[13],sel[1]=address[14],out=out);
 }
