@@ -1149,7 +1149,7 @@ def main(filepath, debug=False):
 
 if __name__ == '__main__':
     jack_filepaths = [
-        # TODO: integration test
+        # TODO: integration test (untested?)
         # r"..\09\Average\Main.jack",
         # r"..\09\Fraction\Main.jack",
         # r"..\09\Fraction\Fraction.jack",
@@ -1167,19 +1167,22 @@ if __name__ == '__main__':
         # r"..\10\Square\Square.jack",
         # r"..\10\Square\SquareGame.jack",
 
-        r"..\11\Seven\Main.jack",  # compiled / tested
-        r"..\11\ConvertToBin\Main.jack",  # compiled / tested
-        r"..\11\Square\Main.jack",  # compiled / tested
-        r"..\11\Square\Square.jack",  # compiled / tested
-        r"..\11\Square\SquareGame.jack",  # compiled / tested
-        r"..\11\Average\Main.jack",  # compiled / tested
+        # compiled / tested
+        r"..\11\Seven\Main.jack",
+        r"..\11\ConvertToBin\Main.jack",
+        r"..\11\Average\Main.jack",
 
-        r"..\11\ComplexArrays\Main.jack",  # compiled
+        # TODO: compiled / tested but non-fatal Index Count Mismatch
+        # r"..\11\Square\Main.jack",
+        # r"..\11\Square\Square.jack",
+        # r"..\11\Square\SquareGame.jack",
 
-        r"..\11\Pong\Ball.jack",  # compiled
-        r"..\11\Pong\Bat.jack",  # compiled
-        r"..\11\Pong\Main.jack",  # compiled
-        r"..\11\Pong\PongGame.jack",  # compiled
+        # TODO: stable compilation but untested or incorrect result/behaviour
+        r"..\11\ComplexArrays\Main.jack",
+        r"..\11\Pong\Ball.jack",  # Index Count Mismatch
+        r"..\11\Pong\Bat.jack",  # Index Count Mismatch
+        r"..\11\Pong\Main.jack",
+        r"..\11\Pong\PongGame.jack",  # Index Count Mismatch
     ]
 
     for _filepath in jack_filepaths:

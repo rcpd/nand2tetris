@@ -170,14 +170,16 @@ if __name__ == '__main__':
         r"..\11\Average\Main.jack",
         r"..\11\ComplexArrays\Main.jack",
         r"..\11\ConvertToBin\Main.jack",
-        r"..\11\Pong\Ball.jack",
-        r"..\11\Pong\Bat.jack",
-        r"..\11\Pong\Main.jack",
-        r"..\11\Pong\PongGame.jack",
         r"..\11\Seven\Main.jack",
         r"..\11\Square\Main.jack",
         r"..\11\Square\Square.jack",
         r"..\11\Square\SquareGame.jack",
+
+        # TODO: injecting changes?
+        # r"..\11\Pong\Ball.jack",
+        # r"..\11\Pong\Bat.jack",
+        # r"..\11\Pong\Main.jack",
+        # r"..\11\Pong\PongGame.jack",
     ]
 
     for _filepath in jack_filepaths:
