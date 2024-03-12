@@ -391,6 +391,8 @@ if __name__ == '__main__':
     ]
 
     binary_asm_filepaths = [
+        "../04/fill/fill.asm",
+        "../04/mult/mult.asm",
         "../06/add/add.asm",
         "../06/max/max.asm",
         "../06/max/maxL.asm",
