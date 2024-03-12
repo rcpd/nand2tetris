@@ -35,10 +35,20 @@ def find_ancestor(tree, node, ancestors):
     return node
 
 
-def store_pcode(pcode, cmd, debug=True):
+def store_pcode(pcode, cmd, write=None, debug=True):
     if debug:
-        print(cmd)
-    pcode.append(cmd+"\n")
+        if cmd.strip() != "":
+            print(cmd)
+
+    if write:
+        # debug/wip write
+        with open(write.replace(".jack", ".vm"), "w") as pcode_file:
+            pcode_file.writelines(pcode)
+    else:
+        # overwrite at end if successful
+        # don't append empty debug "write" calls
+        pcode.append(cmd+"\n")
+
     return pcode
 
 
@@ -50,7 +60,7 @@ def compile_class(pcode, input_list, i, class_dict, pre=False):
     # define class_name and initialize symbol table
     class_name = input_list[i][1]
     if class_name not in class_dict:
-        class_dict[class_name] = {"args": {}}
+        class_dict[class_name] = {"args": {}, "index_dict": {}}
 
     if not pre:
         store_pcode(pcode, "// class %s" % class_name)
@@ -170,8 +180,8 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name):
                 store_pcode(pcode, "push constant %s" % input_list[i+1][1])
                 k += 1
             elif input_list[i+1][0] == "identifier":
-                var = class_dict[class_name][func_name]["args"][input_list[i][1]]
-                store_pcode(pcode, "push %s %s // %s" % (var["type"], var["index"], input_list[i][1]))
+                var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
+                store_pcode(pcode, "push %s %s // %s" % (var["type"], var["index"], input_list[i+1][1]))
                 k += 1
 
             if input_list[i][1] == "-":
@@ -284,7 +294,7 @@ def main(debug=False):
     ]
 
     for filepath in jack_filepaths:
-        print("\nParsing: %s" % filepath)
+        print("Parsing: %s" % filepath)
         input_tree = ET.parse(filepath.replace(".jack", "T_out.xml"))
         input_root = input_tree.getroot()
         output_root = ET.Element("class")
@@ -303,22 +313,31 @@ def main(debug=False):
 
         class_name = None
         func_name = None
+        # TODO: look these up programatically
         class_dict = {
-            # TODO: look these up programatically
-            "Output": {"args": {}, "printInt": {"type": "function", "kind": "void", "args": {"i": {"type": "int",
-                       "kind": "argument", "index": 0}}, "index_dict": {"argument": 0}}},
-            "Memory": {"args": {}, "peek": {"type": "function", "kind": "void", "args": {"i": {"type": "int",
-                       "kind": "argument", "index": 0}}, "index_dict": {"argument": 0}}},
-        }
+            "Output": {"args": {}, "index_dict": {},
+                       "printInt": {"type": "function", "kind": "void",
+                                    "args": {"i": {"type": "int", "kind": "argument", "index": 0}},
+                                    "index_dict": {"argument": 0}}},
+            "Memory": {"args": {}, "index_dict": {},
+                       "peek": {"type": "function", "kind": "void",
+                                "args": {"i": {"type": "int", "kind": "argument", "index": 0}},
+                                "index_dict": {"argument": 0}},
+                       "poke": {"type": "function", "kind": "void",
+                                "args": {"address": {"type": "int", "kind": "argument", "index": 0},
+                                         "value": {"type": "int", "kind": "argument", "index": 1}},
+                                "index_dict": {"argument": 1}}}}
 
         # pre-process stream for class/function definitions
         for i, token in enumerate(input_list):
             if token[0] == "keyword":
                 if token[1] == "class" and input_list[i+1][0] == "identifier":
                     pcode, class_dict, class_name = compile_class(pcode, input_list, i+1, class_dict, pre=True)
+                    store_pcode(pcode, "", write=filepath)
                 elif token[1] in ("function", "method") and input_list[i+2][0] == "identifier":
                     pcode, class_dict, func_name = \
                         compile_function(pcode, input_list, i+2, class_dict, class_name, pre=True)
+                    store_pcode(pcode, "", write=filepath)
 
         for i, input_tuple in enumerate(input_list):
             j = i+1  # next token
@@ -359,6 +378,7 @@ def main(debug=False):
 
                     if input_list[j][0] == "identifier":
                         pcode, class_dict, class_name = compile_class(pcode, input_list, j, class_dict)
+                        store_pcode(pcode, "", write=filepath)
                     else:
                         raise RuntimeError()
 
@@ -372,6 +392,7 @@ def main(debug=False):
 
                     if input_list[j][0] == "keyword" and input_list[j+1][0] == "identifier":
                         pcode, class_dict, func_name = compile_function(pcode, input_list, j+1, class_dict, class_name)
+                        store_pcode(pcode, "", write=filepath)
 
                 # open classVarDec
                 elif parent.tag == "class" and input_list[i][0] == "keyword" \
@@ -385,6 +406,7 @@ def main(debug=False):
                         child.text = " %s " % input_tuple[1]
 
                         # pcode, class_dict = compile_classvardec(pcode, input_list, i, class_dict)
+                        # store_pcode(pcode, "", write=filepath)
 
                 # open varDec
                 elif input_list[i][0] == "keyword" and input_list[i][1] == "var":
@@ -394,6 +416,7 @@ def main(debug=False):
                     child.text = " %s " % input_tuple[1]
 
                     pcode, class_dict = compile_vardec(pcode, input_list, i, class_dict, class_name, func_name)
+                    store_pcode(pcode, "", write=filepath)
 
                 # close statements/whileStatement/subroutineBody/subroutineDec }
                 elif parent.tag in ("statements", "whileStatement", "ifStatement", "subroutineBody") \
@@ -475,7 +498,8 @@ def main(debug=False):
                         child = ET.SubElement(parent, input_tuple[0])
                         child.text = " %s " % input_tuple[1]
 
-                        # pcode = compile_expression(pcode, input_list, i)
+                        # pcode = compile_expression(pcode, input_list, i, class_dict, class_name, func_name)
+                        # store_pcode(pcode, "", write=filepath)
 
                         if parent.tag not in ("letStatement", "whileStatement", "ifStatement") \
                                 and input_list[i][1] != "[":
@@ -511,7 +535,8 @@ def main(debug=False):
                     child = ET.SubElement(parent, input_tuple[0])
                     child.text = " %s " % input_tuple[1]
 
-                    # pcode = compile_expression(pcode, input_list, i)
+                    # pcode = compile_expression(pcode, input_list, i, class_dict, class_name, func_name)
+                    # store_pcode(pcode, "", write=filepath)
 
                 # open term / nested term
                 elif parent.tag == "expression":
@@ -539,6 +564,7 @@ def main(debug=False):
                     child.text = " %s " % input_tuple[1]
 
                     pcode, class_dict = compile_statement(pcode, input_list, i, class_dict, class_name, func_name)
+                    store_pcode(pcode, "", write=filepath)
 
                 # close parameterList
                 elif parent.tag == "parameterList" and input_list[i][0] == "symbol" and input_list[i][1] == ")":
