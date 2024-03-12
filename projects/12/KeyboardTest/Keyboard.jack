@@ -77,10 +77,10 @@ class Keyboard {
         var String inputString;
         var boolean endOfLine;
 
-        let inputString = String.new(80); // is length ever tested?
+        let inputString = String.new(80);
         do Output.printString(message);
-        let newline = String.newLine(); // could be inlined
-        let backspace = String.backSpace(); // could be inlined
+        let newline = String.newLine();
+        let backspace = String.backSpace();
 
         while(~endOfLine) {
             let inputChar = Keyboard.readChar();

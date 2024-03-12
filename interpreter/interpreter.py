@@ -763,56 +763,26 @@ if __name__ == '__main__':
                             raise RuntimeError("%s mismatch after line %s" % (out_file, index))
                     line += 1
 
-        # run hack tests (CPUEmulator) -- shares CMP and OUT files with VMEmulator
-        cmd = r'..\tools\CPUEmulator.bat'
-        for test in cpu_tst_files:
-            print(r"Running: %s %s" % (cmd, test))
-            result = subprocess.run([cmd, test], capture_output=True, text=True)
-            if 'End of script - Comparison ended successfully\n' != result.stdout and not result.stderr:
-                raise RuntimeError(r"Error when running %s: %s" % (cmd, result.stderr))
-
-            line = 0
-            out_file = test.replace(".tst", ".out")
-            cmp_file = test.replace(".tst", ".cmp")
-            with open(out_file) as out:
-                with open(cmp_file) as cmp:
-                    for index, (solution, current) in enumerate(zip(cmp, out)):
-                        if solution != current:
-                            raise RuntimeError("%s mismatch after line %s" % (out_file, index))
-                    line += 1
-
-        # run VM tests (VMEmulator) -- shares CMP and OUT files with CPUEmulator
-        cmd = r'..\tools\VMEmulator.bat'
-        for test in vm_tst_files:
-            print(r"Running: %s %s" % (cmd, test))
-            result = subprocess.run([cmd, test], capture_output=True, text=True)
-            if 'End of script - Comparison ended successfully\n' != result.stdout and not result.stderr:
-                raise RuntimeError(r"Error when running %s: %s" % (cmd, result.stderr))
-
-            line = 0
-            out_file = test.replace("VME.tst", ".out")
-            cmp_file = test.replace("VME.tst", ".cmp")
-            with open(out_file) as out:
-                with open(cmp_file) as cmp:
-                    for index, (solution, current) in enumerate(zip(cmp, out)):
-                        if solution != current:
-                            raise RuntimeError("%s mismatch after line %s" % (out_file, index))
-                    line += 1
-
+    # project
     # TODO: Project 12: Implement the OS libraries in Jack, compile/test (test programs included)
     # TODO: add integration for Project 12 translate/execute/assemble ASM > HACK (integration test)
+    # TODO: VMEmulator equivalent for Jack debugging + tests
+    # TODO: separate interpreter from test harness
 
-    # TODO: file lists should be imported from common file
-    # TODO: jack_matches / strict_matches should be max lines not const number
+    # test harness
+    # TODO: import file lists from common file
+    # TODO: dynamically count lines in jack/strict matches
 
+    # compiler
+    # TODO: int cannot exceed 32767
+    # TODO: non-void without return value
+    # TODO: statement without keyword/statement type
+    # TODO: non-terminated statement
+
+    # interpreter
     # TODO: translator finish stack mapping: other stack manip(stacksize), functions(stackframes)
     # TODO: maybe stacksize should be <start-sp>-esp function instead?
     # TODO: maybe stack metadata could use address labels dict?
     # TODO: experiment with ebp (stackframe pointer) implementation
     # TODO: move remaining python comments to asm: associate all asm with function, check linebreaks
     # TODO: doc strings
-
-    # TODO: int cannot exceed 32767
-    # TODO: non-void without return value
-    # TODO: statement without keyword/statement type
-    # TODO: non-terminated statement
