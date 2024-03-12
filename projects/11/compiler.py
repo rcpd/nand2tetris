@@ -308,11 +308,17 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
     j = i
     while input_list[j][1] != ";":
         if input_list[j][0] == "identifier":
-            # call
-            if input_list[j+1][1] == "." and input_list[j+2][0] == "identifier" and input_list[j+3][1] == "(":
-                if input_list[j+4][1] != ")":
-                    # parse function params
-                    pcode, proc = compile_expression(pcode, input_list, j+4, class_dict, class_name, func_name)
+            # call // identify "do class.func();" or "do func();"
+            class_func = (input_list[j+1][1] == "." and input_list[j+2][0] == "identifier" and
+                          input_list[j+3][1] == "(")
+            if class_func or input_list[j+1][1] == "(":
+                # parse function params
+                if class_func:
+                    if input_list[j+4][1] != ")":
+                        pcode, proc = compile_expression(pcode, input_list, j+4, class_dict, class_name, func_name)
+                else:
+                    if input_list[j+2][1] != ")":
+                        pcode, proc = compile_expression(pcode, input_list, j+4, class_dict, class_name, func_name)
 
                 # count params for call
                 k = j+4
@@ -325,7 +331,10 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                     k += 1
 
                 # compile call
-                store_pcode(pcode, "call %s.%s %s" % (input_list[j][1], input_list[j+2][1], num_params))
+                if class_func:
+                    store_pcode(pcode, "call %s.%s %s" % (input_list[j][1], input_list[j+2][1], num_params))
+                else:
+                    store_pcode(pcode, "call %s %s" % (input_list[j][1], num_params))
                 return pcode, class_dict
             else:
                 pcode, proc = compile_expression(pcode, input_list, j, class_dict, class_name, func_name)
