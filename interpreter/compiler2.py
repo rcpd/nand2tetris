@@ -91,7 +91,7 @@ sys_func = {
 # function: global to all instantiations of the class (a constructor is a function)
 
 types = ['int', 'boolean', 'char', 'void']
-# FIXME: Fraction is not a built-in, supplementary modules should be added at runtime
+# TODO: Fraction is not a built-in, supplementary modules should be added at runtime
 objects = ['Math', 'Memory', 'String', 'Array', 'Output', 'Screen', 'Keyboard', 'Sys', 'Fraction']
 kinds = ['class', 'constructor', 'method', 'function', 'static', 'field', 'var']
 
@@ -211,9 +211,7 @@ def compile_statement(pcode=None, statement=None, class_dict=None, class_name=No
     """
 
     if statement == "do":
-        pcode = compile_call(pcode=pcode, call_class=call_class, call_func=call_func, num_args=num_args,
-                             statement=statement, class_name=class_name, class_dict=class_dict)
-        num_args = 0
+        pass
 
     elif statement == "let":
         exp_buffer, class_dict = \
@@ -372,7 +370,8 @@ def compile_constant(pcode, constant, exp_buffer=None):
 
 
 # TODO: remove num_params, num_args
-def compile_call(pcode, call_class, call_func, num_args, statement, class_name, exp_buffer=None, class_dict=None):
+def compile_call(pcode, call_class, call_func, num_args, statement, class_name, exp_buffer=None, class_dict=None,
+                 qualified=False):
     """
     emit pcode when call encountered, discard return on do call
     """
@@ -399,8 +398,8 @@ def compile_call(pcode, call_class, call_func, num_args, statement, class_name, 
             exp_buffer.append("pop temp 0 // discard return on do call")
         exp_buffer.append("call %s.%s %s" % (call_class, call_func, num_args))
 
-        # implicit this param on class method call
-        if class_name == call_class:
+        # implicit this param on unqualified class method call
+        if not qualified and class_name == call_class:
             if call_class in sys_func:
                 if sys_func[call_class][call_func]['kind'] == 'method':
                     exp_buffer.append("push pointer 0 // this")
@@ -413,14 +412,16 @@ def compile_call(pcode, call_class, call_func, num_args, statement, class_name, 
         return exp_buffer
 
     else:
-        # implicit this param on class method call
-        if class_name == call_class:
+        # implicit this param on unqualified class method call
+        if not qualified and class_name == call_class:
             if call_class in sys_func:
                 if sys_func[call_class][call_func]['kind'] == 'method':
                     pcode = store_pcode(pcode, "push pointer 0 // this")
             elif call_class in class_dict:
                 if class_dict[call_class][call_func]['kind'] == 'method':
                     pcode = store_pcode(pcode, "push pointer 0 // this")
+            else:
+                raise RuntimeError("class not found: '%s'" % call_class)
 
         pcode = store_pcode(pcode, "\ncall %s.%s %s" % (call_class, call_func, num_args))
         if statement == 'do':
@@ -431,12 +432,11 @@ def compile_call(pcode, call_class, call_func, num_args, statement, class_name, 
 def compile_return(pcode, class_dict, class_name, func_name):
     """
     emit pcode when return encountered
+    return expression will compile without extra handling
     """
 
     if class_dict[class_name][func_name]["type"] == "void":
         pcode = store_pcode(pcode, "push constant 0 // void return")
-    else:
-        pass  # FIXME: push expression?
     pcode = store_pcode(pcode, "\nreturn")
     return pcode
 
@@ -599,13 +599,13 @@ def expression_handler(pcode, statement, exp_buffer, class_dict=None, identifier
         # if parent/child pair found assume call & compile
         if parent_obj and child_func:
             exp_buffer = compile_call(pcode, parent_obj, child_func, num_params, statement, class_name=class_name,
-                                      exp_buffer=exp_buffer, class_dict=class_dict)
+                                      exp_buffer=exp_buffer, class_dict=class_dict, qualified=True)
             parent_obj = child_func = ''
 
         # compile unqualified function call
         elif identifier in class_dict[class_name]:
             exp_buffer = compile_call(pcode, class_name, identifier, num_params, statement, class_name=class_name,
-                                      exp_buffer=exp_buffer, class_dict=class_dict)
+                                      exp_buffer=exp_buffer, class_dict=class_dict, qualified=False)
             parent_obj = child_func = ''
 
         # compile as regular var (local)
@@ -771,6 +771,7 @@ def main(filepath, file_list):
     # persist through loop scope
     exp_buffer = []
     block = []
+    end_block = False
     num_args = while_count = if_count = 0
     class_name = statement = func_name = func_type = keyword = var_type = var_kind = identifier = ''
     lhs_var_name = lhs_array = parent_obj = child_func = func_kind = ''
@@ -784,6 +785,36 @@ def main(filepath, file_list):
         # skip rootnode
         if elem.tag == 'class':
             continue
+
+        if end_block:
+            if block:
+                # TODO: compile_end_block
+                # if-without-else
+                if elem.tag != 'keyword' and elem.text != 'else' and block[-1] == 'if':
+                    pcode = store_pcode(pcode, "\nlabel IF_FALSE%s // end if_block" % (if_count - 1))
+                    block.pop()
+
+                # other statement blocks
+                elif block[-1] == 'else':
+                    pcode = store_pcode(pcode, "\nlabel IF_END%s // end if_block" % (if_count - 1))
+                    block.pop()
+                    if_count -= 1
+
+                elif block[-1] == 'if':
+                    pcode = store_pcode(pcode, "\ngoto IF_END%s // end if_true_block" % (if_count - 1))
+                    block.pop()
+
+                elif block[-1] == 'while':
+                    pcode = store_pcode(pcode, "\ngoto WHILE_EXP%s // loop to start of while_block" %
+                                        (while_count - 1))
+                    pcode = store_pcode(pcode, "\nlabel WHILE_END%s // end while_block" % (while_count - 1))
+                    block.pop()
+                    while_count -= 1
+
+                else:
+                    raise RuntimeError("unexpected block '%s'" % block[-1])
+
+            end_block = False
 
         # has children
         if elem:
@@ -935,14 +966,13 @@ def main(filepath, file_list):
                 if exp_buffer:
                     raise RuntimeError("unparsed expressions still in buffer: %s" % exp_buffer)
 
+                # TODO: compile_start_block
                 elif keyword == 'else':  # no explicit statement type for else
-                    # TODO: compile_else_start
                     block.append(keyword)
                     # close the latest if_true block (-1) but don't dec until IF_END
                     pcode = store_pcode(pcode, "\nlabel IF_FALSE%s // begin if_false_block" % (if_count-1))
 
                 elif statement == 'if':
-                    # TODO: compile_if_start
                     block.append(statement)
                     pcode = store_pcode(pcode, "\nif-goto IF_TRUE%s // end if expression / if_true_jump" % if_count)
                     pcode = store_pcode(pcode, "\ngoto IF_FALSE%s // if_false_jump" % if_count)
@@ -950,7 +980,6 @@ def main(filepath, file_list):
                     if_count += 1  # inc now so any nested if are correct
 
                 elif statement == 'while':
-                    # TODO: compile_while_goto
                     block.append(statement)
                     pcode = store_pcode(pcode, "\nnot // end while expression / while_jump (1/2)")
                     pcode = store_pcode(pcode, "\nif-goto WHILE_END%s // while_jump (2/2) [break loop if not]" %
@@ -963,27 +992,7 @@ def main(filepath, file_list):
                     raise RuntimeError("unexpected '{' (statement '%s', keyword '%s')" % (statement, keyword))
 
             elif symbol == "}":
-                if block:
-                    if block[-1] == 'else':
-                        # TODO: compile_else_end
-                        pcode = store_pcode(pcode, "\nlabel IF_END%s // end if_block" % (if_count-1))
-                        block.pop()
-                        # FIXME: how to handle if-without-else ?
-                        if_count -= 1
-
-                    elif block[-1] == 'if':
-                        pcode = store_pcode(pcode, "\ngoto IF_END%s // end if_true_block" % (if_count-1))
-                        block.pop()
-
-                    elif block[-1] == 'while':
-                        # TODO: compile_while_end
-                        pcode = store_pcode(pcode, "\ngoto WHILE_EXP%s // loop to start of while_block" %
-                                            (while_count-1))
-                        pcode = store_pcode(pcode, "\nlabel WHILE_END%s // end while_block" % (while_count-1))
-                        block.pop()
-                        while_count -= 1
-                    else:
-                        raise RuntimeError("unexpected block '%s'" % block[-1])
+                end_block = True  # compilation triggered on next token due to if-no-else case
 
             elif symbol == "[":
                 if lhs_var_name:  # collected during let statement
@@ -1183,4 +1192,8 @@ if __name__ == '__main__':
                 else:
                     print("%s matches for %s/%s lines captured" % (wip, index, strict_matches[match]))
 
-    # FIXME: if without else (see above)
+    # FIXME: 2nd call in expression out of order
+    #  let sum = (numerator * other.getDenominator()) + (other.getNumerator() * denominator);
+    # FIXME: call is incorrectly compiled as unqualified
+    #  return Fraction.new(sum, denominator * other.getDenominator());
+    # FIXME: remove string padding / fix analyzer stripping

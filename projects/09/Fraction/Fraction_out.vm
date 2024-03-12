@@ -32,7 +32,7 @@ push this 1
 push local 0
 call Math.divide 2
 pop this 1
-goto IF_END0
+label IF_FALSE0
 push constant 0
 return
 function Fraction.getNumerator 0
@@ -50,13 +50,11 @@ push argument 0
 pop pointer 0
 push this 0
 push argument 1
-push pointer 0
 call Fraction.getDenominator 1
 call Math.multiply 2
 push argument 1
 push this 1
 call Math.multiply 2
-push pointer 0
 call Fraction.getNumerator 1
 add
 pop local 0
