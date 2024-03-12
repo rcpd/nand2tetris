@@ -3,8 +3,6 @@ Compile a JACK program into a VM program (pcode) from the token stream initially
 by tokenizer/analyzer.
 """
 
-# FIXME: Square.draw() gets passed "0" for "this" which gets caught by emulator after return from Screen.setColor()
-
 import xml.etree.ElementTree as ET
 
 
@@ -84,9 +82,13 @@ def store_pcode(pcode, cmd, write=None, debug=True):
 def label_index(class_dict, class_name, func_name, label_type):
     labels = class_dict[class_name][func_name]["label_dict"]
     if label_type in labels:
-        labels[label_type] += 1
+        if "count" in labels[label_type]:
+            # update total
+            labels[label_type]["count"] += 1
+            # set instance to most recently opened
+            labels[label_type]["instance"] = labels[label_type]["count"]
     else:
-        labels[label_type] = 0
+        labels[label_type] = {"count": 0, "instance": 0}
     class_dict[class_name][func_name]["label_dict"] = labels
     return class_dict, labels[label_type]
 
@@ -409,19 +411,21 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
         store_pcode(pcode, "return")
 
     elif input_list[i][1] == "while":
+        # open while statement
         class_dict, while_index = label_index(class_dict, class_name, func_name, "while")
-        store_pcode(pcode, "\nlabel WHILE_TEST_%s_%s // while <expression>" % (func_name, while_index))
+        store_pcode(pcode, "\nlabel WHILE_TEST_%s_%s // test while <expression>" % (func_name, while_index["count"]))
         pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
-        store_pcode(pcode, "\nif-goto WHILE_TRUE_%s_%s // enter while" % (func_name, while_index))
-        store_pcode(pcode, "goto WHILE_FALSE_%s_%s // exit while" % (func_name, while_index))
-        store_pcode(pcode, "label WHILE_TRUE_%s_%s // start while" % (func_name, while_index))
+        store_pcode(pcode, "\nif-goto WHILE_TRUE_%s_%s // jump to start while (true)" % (func_name, while_index["count"]))
+        store_pcode(pcode, "goto WHILE_FALSE_%s_%s // jump to exit while (false)" % (func_name, while_index["count"]))
+        store_pcode(pcode, "\nlabel WHILE_TRUE_%s_%s // start while" % (func_name, while_index["count"]))
     elif input_list[i][1] == "if":
+        # open if statement
         class_dict, if_index = label_index(class_dict, class_name, func_name, "if")
         store_pcode(pcode, "\n// if <expression>")
         pcode, proc = compile_expression(pcode, input_list, i+1, class_dict, class_name, func_name)
-        store_pcode(pcode, "\nif-goto IF_%s_%s // enter if" % (func_name, if_index))
-        store_pcode(pcode, "goto ELSE_%s_%s // exit if or enter else" % (func_name, if_index))
-        store_pcode(pcode, "label IF_%s_%s // start if" % (func_name, if_index))
+        store_pcode(pcode, "\nif-goto IF_%s_%s // jump to start if (true)" % (func_name, if_index["count"]))
+        store_pcode(pcode, "goto ELSE_%s_%s // jump to else/end (false)" % (func_name, if_index["count"]))
+        store_pcode(pcode, "\nlabel IF_%s_%s // start if (true)" % (func_name, if_index["count"]))
     else:
         raise RuntimeError(input_list[i])
     return pcode, class_dict
@@ -443,6 +447,7 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
             if class_call or input_list[j+1][1] == "(":
                 # determine parent of callee function
                 var = None
+                call_obj = None
                 if local_call:
                     var = class_dict[class_name][input_list[j][1]]
                 if class_call:
@@ -662,31 +667,33 @@ def main(filepath, debug=False):
 
                 if parent.tag == "ifStatement":
                     # don't close ifStatement if } followed by else
-                    # FIXME: label ELSE_x_y is not incrementing and gets reused
+                    # FIXME: instance should be set to "last open" on close, not -1
+                    # FIXME: will affect while and if, currently seen w/ no while_false_run_0 on SquareGame.run
                     if_index = class_dict[class_name][func_name]["label_dict"]["if"]
                     if input_list[j][0] == "keyword" and input_list[j][1] == "else":
+                        # open else statement
                         class_dict[class_name][func_name]["label_dict"]["else"] = if_index
-                        store_pcode(pcode, "\ngoto IF_END_%s_%s // jump over else" % (func_name, if_index))
-                        store_pcode(pcode, "\nlabel ELSE_%s_%s // else" % (func_name, if_index))
-                        class_dict[class_name][func_name]["label_dict"]["else"] -= 1
+                        store_pcode(pcode, "goto IF_END_%s_%s // jump over else (true)" %
+                                    (func_name, if_index["instance"]))
+                        store_pcode(pcode, "\nlabel ELSE_%s_%s // start else (false)" %
+                                    (func_name, if_index["instance"]))
                     else:
+                        # close else statement (implied)
                         parent = find_parent(output_root, parent)
-                        if "else" in class_dict[class_name][func_name]["label_dict"]:
-                            if class_dict[class_name][func_name]["label_dict"]["else"] == if_index:
-                                store_pcode(pcode, "\nlabel ELSE_%s_%s // else" % (func_name, if_index))
-                                class_dict[class_name][func_name]["label_dict"]["else"] -= 1
-                        else:
-                            store_pcode(pcode, "\nlabel ELSE_%s_%s // else" % (func_name, if_index))
-                        store_pcode(pcode, "label IF_END_%s_%s // exit if" % (func_name, if_index))
-                        class_dict[class_name][func_name]["label_dict"]["if"] -= 1
+                        if "else" not in class_dict[class_name][func_name]["label_dict"]:
+                            store_pcode(pcode, "\nlabel ELSE_%s_%s // else" % (func_name, if_index["instance"]))
+
+                        # close if statement
+                        store_pcode(pcode, "label IF_END_%s_%s // exit if\n" % (func_name, if_index["instance"]))
+                        class_dict[class_name][func_name]["label_dict"]["if"]["instance"] -= 1
 
                 if parent.tag == "whileStatement":
                     # close parent
                     parent = find_parent(output_root, parent)
-                    while_index = class_dict[class_name][func_name]["label_dict"]["while"]
-                    store_pcode(pcode, "\ngoto WHILE_TEST_%s_%s // loop or exit" % (func_name, while_index))
+                    while_index = class_dict[class_name][func_name]["label_dict"]["while"]["instance"]
+                    store_pcode(pcode, "goto WHILE_TEST_%s_%s // loop or exit" % (func_name, while_index))
                     store_pcode(pcode, "label WHILE_FALSE_%s_%s // exit while\n" % (func_name, while_index))
-                    class_dict[class_name][func_name]["label_dict"]["while"] -= 1
+                    class_dict[class_name][func_name]["label_dict"]["while"]["instance"] -= 1
 
                 if parent.tag == "subroutineBody":
                     # close parent(s)
