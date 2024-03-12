@@ -14,8 +14,9 @@ class Memory {
     /** Initializes the class. */
     function void init() {
         let static0 = 0; // manually assign pointer value as zero
-        let static0[2048] = 14334; // 2048 = heap start, 16383=heap end (14334+2048+1 = 163823)
-        let static0[2049] = 2050; // 2050 = next free block?
+        // 2048 = first heap, 16383 = last heap
+        let static0[2048] = 14334; // blockSize (length of free block)
+        let static0[2049] = 2050; // nextPtr = blockData (start of free block)
         return;
     }
 
@@ -33,8 +34,8 @@ class Memory {
     /** Finds an available RAM block of the given size and returns
      *  a reference to its base address. */
     function int alloc(int size) {
-        var Array heapPtr; // heap size remaining?
-        var int freePtr;
+        var Array heapPtr;
+        var int nextBlock;
 
         if (size < 0) {
             do Sys.error(5); // Allocated memory size must be positive
@@ -44,65 +45,115 @@ class Memory {
             let size = 1; // min allocation is 1
         }
 
-        let heapPtr = 2048; // heapStart
-        // heapPtr[0]{2048} = blocksFree(14334)
-        // heapPtr[1]{2049} = freePtr(2050)
-        // heapPtr[2]{2050} = freeBlock
+        let heapPtr = 2048; // start of heap
+        // heapPtr[0]{2048} = blockSize(14334) // init
+        // heapPtr[1]{2049} = nextPtr(2050) // init
+        // heapPtr[2]{2050} = blockData (0) ... heapPtr[blockSize-1]{16381} (0)
 
-        // while heapPtr in bounds and blocksFree < size
-        // 1st alloc (non-max size): true
-        while ((heapPtr < 16383) & (heapPtr[0] < size) ) {
-            let freePtr = heapPtr[1]; // {2049} = 2050 (freeBlock)
+        // while heapPtr in bounds and blockSize < size
+        // 1st alloc: always false if valid (initial blockSize == maxSize)
+        // 2nd+ alloc: always true on first loop (initial blockSize == 0)
+        // 2nd+ alloc: break when out of bounds or blockSize > size required
+        while ((heapPtr < 16383) & (heapPtr[0] < size)) {
+            // 2nd alloc 1st loop:
+            // {2048} = 0 blockSize (heapPtr)
+            // {2049} = 2051 nextPtr
+            // {2050} = <blockData>
+            // {2051} = 14331 blockSize (nextBlock)
+            // {2052} = 2053 nextBlockPtr (null)
+            // {2053} = 0 newBlockData
 
-            // if no blocksFree or freePtr at end of heap or freePtr referencing at empty block
-            // 1st alloc (non-max size): true
-            if ((heapPtr[0] = 0) | (freePtr > 16382) | (freePtr[0] = 0)) {
-                let heapPtr = freePtr; // {2048} = 2050 (freeBlock)
+            // 2nd alloc 1st loop: nextBlock = 2051
+            let nextBlock = heapPtr[1];
+
+            // search from start of heap until suitable free block or heap exhausted
+            // if currentBlock/nextBlock size is zero or nextBlock would exceed heap boundary
+            // 2nd alloc 1st loop: true (currentBlockSize == 0)
+            if ((heapPtr[0] = 0) | (nextBlock > 16382) | (nextBlock[0] = 0)) {
+                // 2nd alloc 1st loop: heapPtr = 2051
+                let heapPtr = nextBlock; // advance to next block & continue
             }
-
-            // TODO
+            
+            // TODO: not yet reached
             else {
-                let heapPtr[0] = (heapPtr[1] - heapPtr) + freePtr[0];
+                // currentBlockSize = (&blockData - &currentBlock) + nextBlockSize
+                let heapPtr[0] = (heapPtr[1] - heapPtr) + nextBlock[0];
 
-                if (freePtr[1] = (freePtr + 2)) {
+                // if nextPtr == blockData
+                if (nextBlock[1] = (nextBlock + 2)) {
                     let heapPtr[1] = heapPtr + 2;
                 }
                 else {
-                    let heapPtr[1] = freePtr[1];
+                    let heapPtr[1] = nextBlock[1];
                 }
             }
         }
 
-        // TODO: why 4 words?
+        // error if loop was broken by exhausting heap / going out of bounds
+        // (3 + size) words required (blockSize, nextPtr, newBlockSize)
         if ((heapPtr + size) > 16379) {
             do Sys.error(6); // Heap overflow
         }
-
-        // 1st alloc (non-max size): {2050} > size+2 (false)
-        // TODO
-        if (heapPtr[0] > (size + 2)) {
+        
+        // if currentBlock has required space (blockSize > size+2)
+        // split it into the required space (allocBlock) and the remainder (newBlock)
+        if (heapPtr[0] > (size + 2)) {           
+            // newBlockSize = currentBlockSize - allocBlockSize
+            // {2054} (2051+2+1) = 14328 (14331-2-1)
             let heapPtr[size + 2] = heapPtr[0] - size - 2;
+            
+            // 1st alloc (1): {2051} = 14331
 
+            // 2nd alloc (1):
+            // {2051} = 14331 blockSize (nextBlock)
+            // {2052} = 2053 nextBlockPtr
+            // {2053} = 0 blockData
+            // {2054} = 14328 newBlockSize
+            // {2055} = 0 newBlockPtr
+            // {2056} = 0 newBlockData
+            
+            // if nextPtr has not been updated // TODO: when alloc is new and not recycled?
             if (heapPtr[1] = (heapPtr + 2)) {
+                // newBlockPtr = &newBlockData (null)
                 let heapPtr[size + 3] = heapPtr + size + 4;
+                
+                // 1st alloc (1):
+                // {2048} = 14334 blockSize
+                // {2049} = 2050 nextPtr
+                // {2050} = 0 blockData
+                // {2051} = 14331 blockSize
+                // {2052} = 2053
+                
+                // 2nd alloc (1):
+                // {2051} = 14331 blockSize (nextBlock)
+                // {2052} = 2053 nextBlockPtr
+                // {2053} = 0 newBlockData
+                // {2054} = 14328 newBlockSize
+                // {2055} = 2056 newBlockPtr
+                // {2056} = 0 newBlockData
+                
             }
-            else {
+            else { // TODO: only reachable during prior unreached else
+                // newBlockNextPtr = nextPtr (updated previously)
                 let heapPtr[size + 3] = heapPtr[1];
             }
 
+            // link allocBlock to newBlock
+            // nextPtr = &newBlock
+            // 1st alloc (1): {2049} = 2051
+            // 2nd alloc (1): {2052} = 2054
             let heapPtr[1] = heapPtr + size + 2;
         }
 
-        // return first word after linked list?
-        // 1st alloc (non-max size): {2050} = 0 (no effect), {2051} also 0
-        // 1st alloc (non-max size): return 2052
-        let heapPtr[0] = 0;
-        return heapPtr + 2;
+        let heapPtr[0] = 0; // set allocBlockSize to zero, flagging it as allocated
+        return heapPtr + 2; // return &allocBlockData
     }
 
     /** De-allocates the given object (cast as an array) by making
      *  it available for future allocations. */
     function void deAlloc(Array o) {
+        // append alloc block to end of existing list
+        // freeList[-1][0] = head of block
         return; // placeholder
     }
 }
