@@ -1,14 +1,20 @@
-function Fraction.new 0
+function Fraction.new 2
+push constant 2
+call Memory.alloc 1
+pop pointer 0
 push argument 0
-pop field 0
+pop this 0
 push argument 1
-pop field 1
+pop this 1
 call Fraction.reduce 1
 pop temp 0
 return
-function Fraction.reduce 1
-push field 0
-push field 1
+function Fraction.reduce 2
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push this 0
+push this 1
 call Fraction.gcd 2
 pop local 0
 push local 0
@@ -17,48 +23,63 @@ gt
 if-goto IF_TRUE0
 goto IF_FALSE0
 label IF_TRUE0
-push field 0
+push this 0
 push local 0
 call Math.divide 2
-pop field 0
-push field 1
+pop this 0
+push this 1
 push local 0
 call Math.divide 2
-pop field 1
+pop this 1
 goto IF_END0
 push constant 0
 return
-function Fraction.getNumerator 0
-push field 0
+function Fraction.getNumerator 2
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push this 0
 return
-function Fraction.getDenominator 0
-push field 1
+function Fraction.getDenominator 2
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push this 1
 return
-function Fraction.plus 1
-push field 0
+function Fraction.plus 2
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push this 0
 push argument 1
 call Fraction.getDenominator 1
 call Math.multiply 2
 push argument 1
-push field 1
+push this 1
 call Math.multiply 2
 call Fraction.getNumerator 1
 add
 pop local 0
 push local 0
-push field 1
+push this 1
 push argument 1
 call Fraction.getDenominator 1
 call Math.multiply 2
 call Fraction.new 2
 return
-function Fraction.dispose 0
+function Fraction.dispose 2
+push constant 2
+call Memory.alloc 1
+pop pointer 0
 call Memory.deAlloc 1
 pop temp 0
 push constant 0
 return
-function Fraction.print 0
-push field 0
+function Fraction.print 2
+push constant 2
+call Memory.alloc 1
+pop pointer 0
+push this 0
 call Output.printInt 1
 pop temp 0
 push constant 2
@@ -69,12 +90,15 @@ push constant 32
 call String.appendChar 2
 call Output.printString 1
 pop temp 0
-push field 1
+push this 1
 call Output.printInt 1
 pop temp 0
 push constant 0
 return
-function Fraction.gcd 1
+function Fraction.gcd 2
+push constant 2
+call Memory.alloc 1
+pop pointer 0
 label WHILE_EXP0
 push argument 1
 push constant 0
