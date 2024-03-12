@@ -9,7 +9,7 @@ call SquareGame.dispose 1
 pop temp 0
 push constant 0
 return
-function Main.test 4
+function Main.more 4
 push constant 0
 if-goto IF_TRUE0
 goto IF_FALSE0

@@ -1,9 +1,4 @@
 function Main.main 1
-push constant 8000
-push constant 1
-push constant 500
-call Main.fillMemory 3
-pop temp 0
 push constant 8001
 push constant 16
 push constant 1

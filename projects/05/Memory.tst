@@ -10,6 +10,19 @@ output-list in%D1.6.1 load%B2.1.2 address%B1.15.1 out%D1.6.1;
 
 echo "Before you run this script, select the 'Screen' option from the 'View' menu";
 
+
+// There is an interesting design error that has shown up in several students'
+// Memory.hdl files that causes zeros to be written in the corresponding offset
+// in the inactive memory segments to the actual write.  To detect this, the
+// test must not only look for writes into the wrong segment, but changes.
+// The following initialization writes a signal number into the memory where
+// the bad writes may occur.
+
+//// Set RAM[2000], RAM[4000] = 12345 (for following overwrite test)
+set in 12345, set load 1, set address %X2000, tick, output; tock, output;
+set address %X4000, tick, output; tock, output;
+
+
 set in -1,				// Set RAM[0] = -1
 set load 1,
 set address 0,
@@ -31,6 +44,12 @@ output;
 set address %X4000,
 eval,
 output;
+
+
+//// Set RAM[0], RAM[4000] = 12345 (for following overwrite test)
+set in 12345, set load 1, set address %X0000, tick, output; tock, output;
+set address %X4000, tick, output; tock, output;
+
 
 set in 2222,			// Set RAM[2000] = 2222
 set load 1,
@@ -98,6 +117,11 @@ eval, output;
 set address %X4345,
 eval, output;
 
+
+//// Clear the overwrite detection value from the screen
+set in 0, set load 1, set address %X4000, tick, output; tock, output;
+
+
 // Keyboard test
 
 set address 24576,
@@ -106,13 +130,17 @@ echo "Click the Keyboard icon and hold down the 'K' key (uppercase) until you se
 // the memory will zero itself before being outputted.
 
 while out <> 75 {
-    eval,
+    tick, tock,     // tick, tock prevents hang if sync. parts used in KB path.
 }
 
 clear-echo,
 output;
 
 // Screen test
+
+//// Set RAM[0FCF], RAM[2FCF] = 12345 (for following overwrite test)
+set in 12345, set load 1, set address %X0FCF, tick, output; tock, output;
+set address %X2FCF, tick, output; tock, output;
 
 set load 1,
 set in -1,
@@ -156,7 +184,7 @@ echo "Make sure you see ONLY two horizontal lines in the middle of the screen. H
 // the memory will zero itself before being outputted.
 
 while out <> 89 {
-    eval,
+    tick, tock,     // tick, tock prevents hang if sync. parts used in KB path.
 }
 
 clear-echo,
