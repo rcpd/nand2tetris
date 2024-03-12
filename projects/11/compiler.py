@@ -121,8 +121,8 @@ def compile_function(pcode, input_list, i, class_dict, class_name, pre=False):
     return pcode, class_dict, func_name
 
 
-def compile_classvardec(pcode, input_list, i, class_dict):
-    return pcode, class_dict
+# def compile_classvardec(pcode, input_list, i, class_dict):
+#     return pcode, class_dict
 
 
 def compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=False):
@@ -292,9 +292,19 @@ def compile_sub_statement(pcode, input_list, i, class_dict, class_name, func_nam
                 if input_list[j+4][1] != ")":
                     # parse function params
                     pcode, proc = compile_expression(pcode, input_list, j+4, class_dict, class_name, func_name)
-                # parse call
-                num_args = class_dict[input_list[j][1]][input_list[j+2][1]]["index_dict"]["argument"]
-                store_pcode(pcode, "call %s.%s %s" % (input_list[j][1], input_list[j+2][1], num_args + 1))
+
+                # count params for call
+                k = j+4
+                num_params = 0
+                if input_list[k][1] != ")":
+                    num_params = 1
+                while input_list[k][1] != ";":
+                    if input_list[k][1] == ",":
+                        num_params += 1
+                    k += 1
+
+                # compile call
+                store_pcode(pcode, "call %s.%s %s" % (input_list[j][1], input_list[j+2][1], num_params))
                 return pcode, class_dict
             else:
                 pcode, proc = compile_expression(pcode, input_list, j, class_dict, class_name, func_name)
@@ -355,25 +365,7 @@ def main(debug=False):
 
         class_name = None
         func_name = None
-        # TODO: look these up programatically
-        class_dict = {
-            "Output": {"args": {}, "index_dict": {},
-                       "printInt": {"kind": "function", "type": "void",
-                                    "args": {"i": {"type": "int", "kind": "argument", "index": 0}},
-                                    "index_dict": {"argument": 0},
-                                    }
-                       },
-            "Memory": {"args": {}, "index_dict": {},
-                       "peek": {"kind": "function", "type": "void",
-                                "args": {"i": {"type": "int", "kind": "argument", "index": 0}},
-                                "index_dict": {"argument": 0}},
-                       "poke": {"kind": "function", "type": "void",
-                                "args": {"address": {"type": "int", "kind": "argument", "index": 0},
-                                         "value": {"type": "int", "kind": "argument", "index": 1}},
-                                "index_dict": {"argument": 1},
-                                }
-                       }
-        }
+        class_dict = {}
 
         # pre-process stream for class/function definitions
         for i, token in enumerate(input_list):
@@ -386,7 +378,8 @@ def main(debug=False):
                         compile_function(pcode, input_list, i+2, class_dict, class_name, pre=True)
                     store_pcode(pcode, "", write=filepath)
                 elif token[1] == "var" and input_list[i+1][0] == "keyword":
-                    pcode, class_dict = compile_vardec(pcode, input_list, i, class_dict, class_name, func_name, pre=True)
+                    pcode, class_dict = compile_vardec(pcode, input_list, i, class_dict, class_name, func_name,
+                                                       pre=True)
                     store_pcode(pcode, "", write=filepath)
 
         for i, input_tuple in enumerate(input_list):
