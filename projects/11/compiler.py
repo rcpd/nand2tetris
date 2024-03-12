@@ -156,40 +156,39 @@ def compile_expression(pcode, input_list, i, class_dict, class_name, func_name):
     # process expression
     # TODO: remove duplication of single vs multi term parse
     while input_list[i][1] not in ("(", ")", ";"):
-        inc = 0
+        j = 0
         # parse x <op> y expressions
         if input_list[i][0] == "integerConstant":
-            # parse x
             store_pcode(pcode, "push constant %s" % input_list[i][1])
-            inc += 1
-            if input_list[i+1][1] in operators:
-                # parse y
-                if input_list[i+2][0] == "integerConstant":
-                    store_pcode(pcode, "push constant %s" % input_list[i+2][1])
-                    inc += 1
-                elif input_list[i+2][0] == "identifier":
-                    var = class_dict[class_name][func_name]["args"][input_list[i][1]]
-                    store_pcode(pcode, "push %s %s" % (var["type"], var["index"]))
-                    inc += 1
-                elif input_list[i+2][1] == "(":
-                    pass
-                else:
-                    raise RuntimeError(input_list[i])
-                store_pcode(pcode, "%s" % op_map[input_list[i+1][1]])  # parse op
-                inc += 1
+            j += 1
         elif input_list[i][0] == "identifier":
             var = class_dict[class_name][func_name]["args"][input_list[i][1]]
-            store_pcode(pcode, "push %s %s" % (var["type"], var["index"]))
-            inc += 1
+            store_pcode(pcode, "push %s %s // %s" % (var["type"], var["index"], input_list[i][1]))
+            j += 1
+        elif input_list[i][1] in operators:
+            if input_list[i+1][0] == "integerConstant":
+                store_pcode(pcode, "push constant %s" % input_list[i+1][1])
+                j += 1
+            elif input_list[i+1][0] == "identifier":
+                var = class_dict[class_name][func_name]["args"][input_list[i][1]]
+                store_pcode(pcode, "push %s %s // %s" % (var["type"], var["index"], input_list[i][1]))
+                j += 1
+            elif input_list[i+1][1] == "(":
+                pass
+            else:
+                raise RuntimeError(input_list[i+1])
+
+            if input_list[i][1] == "-":
+                store_pcode(pcode, "neg")
+                j += 1
+
+            store_pcode(pcode, "%s" % op_map[input_list[i][1]])  # parse op
+            j += 1
         elif input_list[i][1] == ",":  # TODO: check push order
-            inc += 1
-        elif input_list[i][1] == "-" and input_list[i+1][0] == "integerConstant":
-            store_pcode(pcode, "push constant %s" % input_list[i+1][1])
-            store_pcode(pcode, "neg")
-            inc += 2
+            j += 1
         else:
             raise RuntimeError(input_list[i])
-        i += inc
+        i += j
     return pcode
 
 
@@ -208,7 +207,7 @@ def compile_statement(pcode, input_list, i, class_dict, class_name, func_name):
             if input_list[i+1][0] == "identifier":
                 # pop result into destination segment
                 var = class_dict[class_name][func_name]["args"][input_list[i+1][1]]
-                store_pcode(pcode, "pop %s %s" % (var["type"], var["index"]))
+                store_pcode(pcode, "pop %s %s // %s" % (var["type"], var["index"], input_list[i+1][1]))
             else:
                 raise RuntimeError(input_list[i+1])
         else:
