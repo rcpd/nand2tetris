@@ -3,6 +3,10 @@
 def main():
     global hw
 
+    # TODO: parse all the asm files to check for parsing errors
+    # TODO: parse the tst scripts
+    # TODO: generate out files & match to the cmp files
+
     file_list = [r"..\06\add\Add.asm", r"..\06\add\Add.asm"]
 
     for input_file in file_list:
@@ -143,6 +147,7 @@ def main():
                 else:
                     raise RuntimeError("Unexpected command: %s %s %s %s" % (hw["PC"], raw_cmd, "---", debug_cmd))
 
+            # jumps
             elif raw_cmd[1] == ";":
                 jump = False
                 if raw_cmd == "0;JMP":
